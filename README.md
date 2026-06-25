@@ -4,7 +4,7 @@ Patronus is a collection of scripts conjured for interferometric data reduction 
 
 Going through the following references is highly recommended before using this software: 
 * [https://www.bloomsbury.com/uk/discover/harry-potter/fun-facts/harry-potter-glossary/](url)
-* [https://harrypotter.fandom.com/wiki/List_of_spells#C](url).
+* [https://harrypotter.fandom.com/wiki/List_of_spells](url).
 
 Patronus is neither automated nor an end-to-end pipeline. It is _NOT_ designed for general interferometric data analysis. If you are not sure if it is suitable for your purpose, it is probably _NOT_ so.
 
