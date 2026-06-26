@@ -345,7 +345,7 @@ if (argus.snapshot or argus.petrificus):
     
 
 #   Show patronus
-if (argus.expecto_patronum or argus.lumos or argus.revelio or argus.accio or argus.scourgify or argus.crucio or argus.defidio or \
+if (argus.expecto_patronum or argus.lumos or argus.revelio or argus.accio or argus.scourgify or argus.crucio or argus.defodio or \
     argus.confringo or argus.reducto or argus.imperio or argus.incendio or argus.rictusempra or argus.petrificus):
 
     patronus_charm (argus)
