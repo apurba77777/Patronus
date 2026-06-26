@@ -53,20 +53,20 @@ from cascripts.utils import *
 #                                       lumos       //  List Usable Modes On Screen
 #                                       revelio     //  Reveal configuration parameters
 #
-#   Advanced spells and charms (Do not attempt before passing O W L)
+#   Advanced spells and charms (Should NOT be attempted before passing O. W. L.s)
 #                        
 #                                       accio       //  Accumulate Continuum Components in Image Output
 #                                       scourgify   //  Scrutinize Calibration Outputs and Ultimate Robustness of Gains with Image Files Yielded
 #                                       incendio    //  Image Normal Continuum Emission using Nice Data from Interferometric Observations
 #  
-#   Dangeroous spells and curses ( Extreme caution recommended !!)
+#   Dangerous spells and curses ( Extreme caution recommended !! Should NOT be attempted before passing N.E.W.T.s)
 #
 #                                       crucio      //  Calibrate Response for an Uncorrupted Channel Isolated from Observation 
 #                                       defodio     //  Determine Effects of Frequency Ousting Detected Interference in Observation
 #                                       confringo   //  Calibrate Observation for Normal and Frequency Response of the Instrument with Natural Good Objects
 #                                       imperio     //  Iterative Mapping of Persistent Emission in Radio using Interferometric Observations
 #                                       reducto     //  Reduce entire dataset to usable calibrated target outputs
-#                                       rictusempra //  Remove Image Components Through Uv Subtraction and Endeavour Mitigation of Persistent Radio Altercations
+#                                       rictusempra //  Remove Image Components Through Uv Subtraction and Endeavour Mitigation of Persistent Radio Aberrations 
 #                                       petrificus  //  Produce and Encapsulate Time Resolved Images into a Fits Image by Combining Unique Snapshots
 #
 #	--------------------------------------------------------------------------------------------------------
