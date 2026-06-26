@@ -2,8 +2,6 @@ astropy==7.1.0
 astropy-iers-data==0.2025.9.1.0.42.11
 asttokens==3.0.1
 backports.shutil-get-terminal-size==1.0.0
-basemap==2.0.0
-basemap_data==2.0.0
 bdsf==1.13.0.post2
 casaconfig==1.5.0
 casafeather==0.0.28
