@@ -12,4 +12,4 @@ Patronus uses CASA ([https://casa.nrao.edu/](url)) for calibration and imaging o
 
 Additionally, Patronus uses a number of Python packages listed in `templates/basilisk.txt`. 
 
-Basic instructions for using Patronus are given in github Wiki. 
+Basic instructions for using Patronus are given in the github Wiki. 
