@@ -106,12 +106,12 @@ if (argus.lumos):
 #   --------------------------- Execute spells, charms and curses(!)   --------------------------------------------------
 
 #   Convert fits to MS
-if (argus.fitstoms or argus.crucio or argus.confringo or argus.reducto):  
+if (argus.fitstoms):  
     importrawuvfile(pars['RawUvFile'], pars['RawFlagFiles'], pars, ovrt=argus.obliviate)
 
 
 #   Initialize raw MS file
-if (argus.initrawms or argus.crucio or argus.confringo or argus.reducto):   
+if (argus.initrawms):   
     initrawuvfile(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars, rfifreq=argus.rfifile, ovrt=argus.obliviate)
 
 
@@ -263,6 +263,12 @@ if (argus.imperio or argus.reducto):
         #   Make image for this iteration
         listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg.ms" for vis in vislist ]
         oldmask     = pars['WorkDir']+pars['ImgDir']+'/'+pars['TargetName']+"_fscal_"+str(atmpt-1)+"_src_mask.mask"
+        
+        if ( (pars['MaskFile'] != None) and (pars['MaskFile'] != "") ):
+            if ( os.path.exists(pars['MaskFile'])):
+                oldmask     = pars['MaskFile']
+                print("Using given Mask file for cleaning...")
+
         imgtarget(listofvis, "fscal_"+str(atmpt), dosavemodel=True, dointeractive=argus.intmask, pars=pars, clnmask=oldmask)
 
         #   Find sources and make a clean mask

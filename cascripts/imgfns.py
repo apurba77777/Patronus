@@ -319,6 +319,20 @@ def finalimg (targetvislist, dosavemodel=True, pars=None):
         pbmask=0.2, \
         savemodel=savemod        
     )
+
+    print("Exporting final image to Output Directory...")
+
+    ct.exportfits(
+        imagename=imgpre+".image.tt0", \
+        fitsimage=pars['OutDir']+'/'+pars['FinImage']+"_continuum.fits", \
+        overwrite=True
+    )
+
+    ct.exportfits(
+        imagename=imgpre+".alpha", \
+        fitsimage=pars['OutDir']+'/'+pars['FinImage']+"_alpha.fits", \
+        overwrite=True
+    )
     
     print(" Done!\n")
 
