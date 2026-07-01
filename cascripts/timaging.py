@@ -40,29 +40,29 @@ def makehdr (fitshdr, imdhr, tmjds):
     fitshdr['TIMESYS']  = imdhr['TIMESYS']
     fitshdr['RADESYS']  = imdhr['RADESYS']
 
-    fitshdr['CTYPE1']   = imdhr['CTYPE'][0]
-    fitshdr['CTYPE2']   = imdhr['CTYPE'][1]
-    fitshdr['CTYPE3']   = imdhr['CTYPE'][3]
+    fitshdr['CTYPE1']   = imdhr['CTYPE1']
+    fitshdr['CTYPE2']   = imdhr['CTYPE2']
+    fitshdr['CTYPE3']   = imdhr['CTYPE3']
     fitshdr['CTYPE4']   = ('TIME', 'The time values are in an extension table')
 
     fitshdr['CUNIT1']   = imdhr['CUNIT1']
     fitshdr['CUNIT2']   = imdhr['CUNIT2']
-    fitshdr['CUNIT3']   = imdhr['CUNIT4']
+    fitshdr['CUNIT3']   = imdhr['CUNIT3']
     fitshdr['CUNIT4']   = 'MJDSEC'
 
-    fitshdr['CRPIX1']   = imdhr['CRPIX'][0]
-    fitshdr['CRPIX2']   = imdhr['CRPIX'][1]
-    fitshdr['CRPIX3']   = imdhr['CRPIX'][3]
+    fitshdr['CRPIX1']   = imdhr['CRPIX1']
+    fitshdr['CRPIX2']   = imdhr['CRPIX2']
+    fitshdr['CRPIX3']   = imdhr['CRPIX3']
     fitshdr['CRPIX4']   = 1.0
 
-    fitshdr['CRVAL1']   = imdhr['CRVAL'][0]
-    fitshdr['CRVAL2']   = imdhr['CRVAL'][1]
-    fitshdr['CRVAL3']   = imdhr['CRVAL'][3]
+    fitshdr['CRVAL1']   = imdhr['CRVAL1']
+    fitshdr['CRVAL2']   = imdhr['CRVAL2']
+    fitshdr['CRVAL3']   = imdhr['CRVAL3']
     fitshdr['CRVAL4']   = 0.0
 
-    fitshdr['CDELT1']   = imdhr['CDELT'][0]
-    fitshdr['CDELT2']   = imdhr['CDELT'][1]
-    fitshdr['CDELT3']   = imdhr['CDELT'][3]
+    fitshdr['CDELT1']   = imdhr['CDELT1']
+    fitshdr['CDELT2']   = imdhr['CDELT2']
+    fitshdr['CDELT3']   = imdhr['CDELT3']
     fitshdr['CDELT4']   = dtsec
 
     return(0)
@@ -141,8 +141,14 @@ def makefits (tmjds, cubename, ntime=-1):
     else:
         mjdarr  = tmjds
 
-    tfcube  = []
-    beamtf  = []
+    ct.exportfits(imagename="tcube_0.image", fitsimage="tcube_0.fits", dropstokes=True, overwrite=True)
+
+    refcube = fits.open("tcube_0.fits")
+    imhdr   = refcube[0].header
+    refcube.close() 
+
+    tfcube  = np.zeros((len(mjdarr), imhdr['NAXIS3'], imhdr['NAXIS2'], imhdr['NAXIS1']), dtype='float32')
+    beamtf  = np.zeros((len(mjdarr), imhdr['NAXIS3'], 3), dtype='float32')
 
     for ki in range(0,len(mjdarr)):
         
@@ -152,7 +158,7 @@ def makefits (tmjds, cubename, ntime=-1):
         timecube    = iman.getchunk(dropdeg=True)
         imgchan     = timecube.shape[2]
         #print(timecube.shape)
-        tfcube.append(np.transpose(timecube, (2,0,1)))
+        tfcube[ki] = np.transpose(timecube, (2,0,1))
             
         chbeam  = iman.restoringbeam()
         beamarr = []
@@ -162,18 +168,12 @@ def makefits (tmjds, cubename, ntime=-1):
             cbeam   = chbeam['beams']['*'+str(c)]['*0']
             beamarr.append([cbeam['major']['value'], cbeam['minor']['value'], cbeam['positionangle']['value']])
 
-        beamtf.append(beamarr)
+        beamtf[ki] = np.array(beamarr)
 
         iman.done()
 
-
-    iman.open("tcube_0.image")
-    imhdr   = iman.fitsheader()
-    iman.done()
-    
     iman.close()
     
-    tfcube  = np.array(tfcube).astype('float32')
     print(f"\n  Cube dimensions = {tfcube.shape} \n")
 
     #   Image 4d cube
@@ -183,17 +183,15 @@ def makefits (tmjds, cubename, ntime=-1):
 
     hdulist     = fits.HDUList([tfhdu])
 
-    beamtf      = np.array(beamtf).astype('float32')
-
     #   Beam image in time-frequency
     beamhdu     = fits.ImageHDU(data=np.transpose(beamtf, (2,1,0)))
     beamhdu.header['EXTNAME']   = "BEAMS"
     beamhdu.header['CTYPE1']    = ('TIME', 'The time values are in an extension table')
-    beamhdu.header['CTYPE2']    = imhdr['CTYPE'][3]
-    beamhdu.header['CUNIT2']    = imhdr['CUNIT4']
-    beamhdu.header['CRPIX2']    = imhdr['CRPIX'][3]
-    beamhdu.header['CRVAL2']    = imhdr['CRVAL'][3]
-    beamhdu.header['CDELT2']    = imhdr['CDELT'][3]
+    beamhdu.header['CTYPE2']    = imhdr['CTYPE3']
+    beamhdu.header['CUNIT2']    = imhdr['CUNIT3']
+    beamhdu.header['CRPIX2']    = imhdr['CRPIX3']
+    beamhdu.header['CRVAL2']    = imhdr['CRVAL3']
+    beamhdu.header['CDELT2']    = imhdr['CDELT3']
     beamhdu.header['CTYPE3']    = ('BEAM', 'arcsec, arcsec, deg')
 
     hdulist.append(beamhdu)
