@@ -5,9 +5,12 @@ from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.coordinates import SkyCoord
 
-
-
-
+#   --------------------------------------------------------------------------------------------------------------------------
+#   Function for transient search 
+#
+#                                              AB  [last updated: 1 July 2026] 
+#
+#   --------------------------------------------------------------------------------------------------------------------------
 
 def getdynspec (fitsfile, pars=None):
 
@@ -28,7 +31,7 @@ def getdynspec (fitsfile, pars=None):
     print(f"\n    Source at {px},{py} pixel \n")
 
     tfdata      = hdulist[0].data[:,:,px,py]
-    mjdtime     = hdulist[2].data['MJDSEC'] / 3600
+    mjdtime     = hdulist[1].data['MJDSEC'] / 3600
 
 
     fig     = plt.figure(figsize=(8,4)) 
@@ -42,15 +45,15 @@ def getdynspec (fitsfile, pars=None):
 
     fig     = plt.figure(figsize=(9,3)) 
     ax3     = fig.add_subplot(1,3,1) 
-    plt.imshow(np.nanmean(hdulist[0].data[400:420], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
+    plt.imshow(np.nanmean(hdulist[0].data[1000:1020], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
     #plt.show(block=False)
 
     ax4     = fig.add_subplot(1,3,2) 
-    plt.imshow(np.nanmean(hdulist[0].data[471:490], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
+    plt.imshow(np.nanmean(hdulist[0].data[1070:1090], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
     #plt.show(block=False)
 
     ax5     = fig.add_subplot(1,3,3)
-    plt.imshow(np.nanmean(hdulist[0].data[590:610], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
+    plt.imshow(np.nanmean(hdulist[0].data[1190:1210], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
     plt.show()
     
 

@@ -171,6 +171,18 @@ def conjure_boxes(pars):
     else:
         print("Creating ",pars['WorkDir']+pars['ImgDir'])
         os.system("mkdir "+pars['WorkDir']+pars['ImgDir'])
+    
+    if (os.path.exists(pars['OutDir'])):
+        print("Found ",pars['OutDir'])
+    else:
+        print("Creating ",pars['OutDir'])
+        os.system("mkdir "+pars['OutDir'])
+    
+    if (os.path.exists(pars['OutDir']+pars['CubeDir'])):
+        print("Found ",pars['OutDir']+pars['CubeDir'])
+    else:
+        print("Creating ",pars['OutDir']+pars['CubeDir'])
+        os.system("mkdir "+pars['OutDir']+pars['CubeDir'])
 
     return (0)
 #   --------------------------------------------------------------------------------------------------------------------------
@@ -213,6 +225,90 @@ def patronus_charm (args):
         os.system(f"cat {patid}")
     else:
         print("\n\n                Wand broken. Couldn't conjure PATRONUS.\n\n")
+
+    return (0)
+#   --------------------------------------------------------------------------------------------------------------------------
+
+
+def incan_args():
+    
+    #   Read command-line arguments for incantations
+
+    parser = ap.ArgumentParser(
+        description = "Incantations for casting spells and charms"
+    )
+
+    #   Input files, identifiers & parameters
+    parser.add_argument("--infile", help = "YAML file with input params", type = str, default = None)
+    parser.add_argument("--pipedir", help = "Directory to the pipeline", type = str, default = None)
+
+    #   Options/utilities
+    parser.add_argument("--obliviate", help = "Clear existing files ?", action='store_true')
+    parser.add_argument("--lumos", help = "List usable modes on screen", action='store_true')
+    parser.add_argument("--revelio", help = "Reveal configuration parameters", action='store_true')
+
+    #   Search at a specific sky position
+    parser.add_argument("--getdspec", help = "Generate dynamic spectrum at a specific sky position", action='store_true')
+    
+    parser.add_argument("--expecto_patronum", help = "What it says...", action='store_true')
+    
+    args = parser.parse_args()
+
+    return args
+#   --------------------------------------------------------------------------------------------------------------------------
+
+
+def incan_spells():
+
+    #   Print charms and spells for incantations
+
+    print("\n*** List of spells ***\n")
+
+    print(" Muggle-friendly spells \n")
+
+    print("      --getdspec    - Generate dynamic spectrum at a specific sky position")
+
+    print("\n Simple & convenient charms \n")
+
+    print("      --obliviate   - Clear existing files")  
+    print("      --lumos       - List Usable Modes On Screen")
+    print("      --revelio     - Reveal configuration parameters\n")
+
+    print("\n Advanced spells and charms (Do not attempt before passing O W L) \n")
+
+    print("      --accio       - Accumulate Continuum Components in Image Output")
+    
+    return (0)
+#   --------------------------------------------------------------------------------------------------------------------------
+
+
+def niffler (pars):
+
+    #   Create directories for Nifflers to store their treasures
+
+    if (os.path.exists(pars['OutDir'])):
+        print("Found ",pars['OutDir'])
+    else:
+        print("Creating ",pars['OutDir'])
+        os.system("mkdir "+pars['OutDir'])
+
+    if (os.path.exists(pars['OutDir']+pars['CubeDir'])):
+        print("Found ",pars['OutDir']+pars['CubeDir'])
+    else:
+        print("Creating ",pars['OutDir']+pars['CubeDir'])
+        os.system("mkdir "+pars['OutDir']+pars['CubeDir'])
+
+    if (os.path.exists(pars['OutDir']+pars['PlotDir'])):
+        print("Found ",pars['OutDir']+pars['PlotDir'])
+    else:
+        print("Creating ",pars['OutDir']+pars['PlotDir'])
+        os.system("mkdir "+pars['OutDir']+pars['PlotDir'])
+
+    if (os.path.exists(pars['OutDir']+pars['CanDir'])):
+        print("Found ",pars['OutDir']+pars['CanDir'])
+    else:
+        print("Creating ",pars['OutDir']+pars['CanDir'])
+        os.system("mkdir "+pars['OutDir']+pars['CanDir'])    
 
     return (0)
 #   --------------------------------------------------------------------------------------------------------------------------

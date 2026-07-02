@@ -105,6 +105,65 @@ def timager (visfile, tmjds, pars=None, ntime=-1):
             imsize=pars['TimgSize'], \
             cell=pars['TcellSize'], \
             phasecenter=pars['TphaseCen'], \
+            restoration=False, \
+            selectdata=True, \
+            field=pars['TargetName'],\
+            uvrange=pars['FinUvLim'], \
+            timerange=tstring, \
+            specmode='mfs', \
+            gridder='widefield', \
+            wprojplanes=pars['TwprojPln'], \
+            pblimit=0.2, \
+            deconvolver='hogbom', \
+            weighting='briggs',\
+            robust=pars['TwtRobust'], \
+            niter=0
+        )
+        
+
+    casq.done()
+
+    return(0)
+#   -----------------------------------------------------------------------------------------------------
+
+
+
+def tfimager (visfile, tmjds, pars=None, ntime=-1):
+
+    #   Make a time series of image cubes 
+
+    casq    = casatools.quanta()
+
+    dtsec   = np.nanmedian(tmjds[1:,0] - tmjds[:-1,0])
+    print(f"\n Time resolution = {dtsec} seconds\n")
+
+    mjdlims = np.array([ (tmjds[:,0] - (dtsec/2.0)) / 86400 , (tmjds[:,0] + (dtsec/2.0)) / 86400 ]).T
+
+    if (ntime >= 3):
+        mjdlims = mjdlims[:ntime]
+
+    print(f"\n Imaging {mjdlims.shape[0]} time intervals...\n")
+
+    for ki in range(0,len(mjdlims)):
+
+        os.system("rm -rf tfcube_"+str(ki)+"*")
+
+        mjdlim  = mjdlims[ki]
+        
+        startm  = casq.time(casq.quantity(mjdlim[0], 'd'),form=["ymd"]) 
+        stoptm  = casq.time(casq.quantity(mjdlim[1], 'd'),form=["ymd"]) 
+
+        tstring = startm[0]+"~"+stoptm[0]
+        print(f"\n\n  Imaging time range {ki} / {len(mjdlims)}: {tstring}\n")
+
+        ct.tclean(
+            vis=visfile+".ms", \
+            imagename="tfcube_"+str(ki), \
+            datacolumn="corrected", \
+            imsize=pars['TimgSize'], \
+            cell=pars['TcellSize'], \
+            phasecenter=pars['TphaseCen'], \
+            restoration=False, \
             selectdata=True, \
             field=pars['TargetName'],\
             uvrange=pars['FinUvLim'], \
@@ -113,7 +172,7 @@ def timager (visfile, tmjds, pars=None, ntime=-1):
             width=pars['TavgChan'], \
             gridder='widefield', \
             wprojplanes=pars['TwprojPln'], \
-            pblimit=-0.1, \
+            pblimit=0.2, \
             deconvolver='hogbom', \
             weighting='briggs',\
             robust=pars['TwtRobust'], \
@@ -141,34 +200,23 @@ def makefits (tmjds, cubename, ntime=-1):
     else:
         mjdarr  = tmjds
 
-    ct.exportfits(imagename="tcube_0.image", fitsimage="tcube_0.fits", dropstokes=True, overwrite=True)
+    ct.exportfits(imagename="tcube_0.residual", fitsimage="tcube_0.fits", dropstokes=True, overwrite=True)
 
     refcube = fits.open("tcube_0.fits")
     imhdr   = refcube[0].header
     refcube.close() 
 
     tfcube  = np.zeros((len(mjdarr), imhdr['NAXIS3'], imhdr['NAXIS2'], imhdr['NAXIS1']), dtype='float32')
-    beamtf  = np.zeros((len(mjdarr), imhdr['NAXIS3'], 3), dtype='float32')
 
     for ki in range(0,len(mjdarr)):
         
         print(f"Reading image {ki}")
-        iman.open("tcube_"+str(ki)+".image")
+        iman.open("tcube_"+str(ki)+".residual")
 
         timecube    = iman.getchunk(dropdeg=True)
         imgchan     = timecube.shape[2]
         #print(timecube.shape)
         tfcube[ki] = np.transpose(timecube, (2,0,1))
-            
-        chbeam  = iman.restoringbeam()
-        beamarr = []
-
-        for c in range(0, imgchan):
-
-            cbeam   = chbeam['beams']['*'+str(c)]['*0']
-            beamarr.append([cbeam['major']['value'], cbeam['minor']['value'], cbeam['positionangle']['value']])
-
-        beamtf[ki] = np.array(beamarr)
 
         iman.done()
 
@@ -182,19 +230,6 @@ def makefits (tmjds, cubename, ntime=-1):
     makehdr(tfhdu.header, imhdr, tmjds)
 
     hdulist     = fits.HDUList([tfhdu])
-
-    #   Beam image in time-frequency
-    beamhdu     = fits.ImageHDU(data=np.transpose(beamtf, (2,1,0)))
-    beamhdu.header['EXTNAME']   = "BEAMS"
-    beamhdu.header['CTYPE1']    = ('TIME', 'The time values are in an extension table')
-    beamhdu.header['CTYPE2']    = imhdr['CTYPE3']
-    beamhdu.header['CUNIT2']    = imhdr['CUNIT3']
-    beamhdu.header['CRPIX2']    = imhdr['CRPIX3']
-    beamhdu.header['CRVAL2']    = imhdr['CRVAL3']
-    beamhdu.header['CDELT2']    = imhdr['CDELT3']
-    beamhdu.header['CTYPE3']    = ('BEAM', 'arcsec, arcsec, deg')
-
-    hdulist.append(beamhdu)
 
     #   Time table
     tcol    = fits.Column(name='MJDSEC', format='D', unit='MJDSEC', array=mjdarr[:,0])

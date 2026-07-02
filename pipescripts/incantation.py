@@ -1,82 +1,73 @@
 import os,sys
 import argparse as ap
 import yaml as ym
+from cascripts.utils import *
 from dynspecripts.transearch import *
 
 #	---------------------------------------------------------------------------------------------------------
 #
-#	-------
+#	Incatations for spells and charms  
+#                                                   AB  [last updated: 1 July 2026]
+#
+#   This programme can be used to identify transient events in a time-resolved image cube
+#
+#   To run this programme, use the following command with a python executor
+#
+#   incantation.py      --[spell(s)]                //  processing step(s) -- see description below
+#                       --infile [param_YAML]       //  YAML file containing input parameters
+#                       --pipedir [pipe_direcory]   //  Path to the pipeline itself
+#
+#   Muggle-friendly spells              getdspec    //  Generate dynamic spectrum at a specific sky position
+#                                       initrawms   //  Initialize raw MS
+#
+#   Simple & convenient charms          obliviate   //  Clear existing files 
+#                                       lumos       //  List Usable Modes On Screen
+#                                       revelio     //  Reveal configuration parameters
+#
+#   Advanced spells and charms (Should NOT be attempted before passing O. W. L.s)
+#                        
+#                                       accio       //  Accumulate Continuum Components in Image Output
+#                                       scourgify   //  Scrutinize Calibration Outputs and Ultimate Robustness of Gains with Image Files Yielded
+#                                       incendio    //  Image Normal Continuum Emission using Nice Data from Interferometric Observations
+#  
+#   Dangerous spells and curses ( Extreme caution recommended !! Should NOT be attempted before passing N.E.W.T.s)
+#
+#                                       crucio      //  Calibrate Response for an Uncorrupted Channel Isolated from Observation 
 #
 #	--------------------------------------------------------------------------------------------------------
 
 
+#   Get command line arguments
+argus   = incan_args()
 
-#   --------------------------------------------------------------------------------------------------------
-def get_args():
-    
-    #   Read command-line arguments
+print("\n-------------------------------------------------------\n")
+print("        Concentrate And Search Transients (CAST) ")
+print("\n-------------------------------------------------------\n")
 
-    parser = ap.ArgumentParser(
-        description = "Run the *unnamed* pipeline"
-    )
-
-    parser.add_argument("--mode", help = "What to do", type = str, default = None)
-    parser.add_argument("--infile", help = "YAML file with input params", type = str, default = None)    
-    parser.add_argument("--overwrite", help = "Clear existing files?", action='store_true')
-
-    args = parser.parse_args()
-
-    return args
-
-
-def print_modes():
-    print("\n You need to specify a mode with --mode !!!!!\n")
-    print(" Supported modes are      searchpos   - Search at a specific sky position")
-    print("                          qqqqqqqq    - ")
-    
-    print("\n Let's try again...\n")
-    return (0)
-
-#   ---------------------------------------------------------------------------------------------------------
-
-#   ------------------------------------    Main script starts here ----------------------
-
-argus   = get_args()
-
-print("\n\n ******** This is *unnamed* pipeline ******** \n\n")
-
-#   Read input parameters
+#   Read and complain about input parameters
 if (argus.infile == None):
     print(" Missing input YAML file! Please provide one...")
     sys.exit()
 else:
     with open(argus.infile+'.yml', 'r') as infl:
         pars = ym.load(infl, Loader=ym.SafeLoader)
-        print(" Inputs provided -- \n")
-        print(ym.dump(pars, sort_keys=False))
+        if (argus.revelio):
+            print(" Inputs provided -- \n")
+            print(ym.dump(pars, sort_keys=False))
 
+#   Make data directories
+niffler(pars)
 
-#   ------------------  Make data directories   ---------------
-
-
-if (os.path.exists(pars['OutDir']+pars['PlotDir'])):
-    print("Found ",pars['OutDir']+pars['PlotDir'])
-else:
-    print("Creating ",pars['OutDir']+pars['PlotDir'])
-    os.system("mkdir "+pars['OutDir']+pars['PlotDir'])
-
-
-#   -------------------------   Missing mode    ---------
-if (argus.mode == None):
-    print_modes()
-    sys.exit()
+#   List supported modes
+if (argus.lumos):  
+    incan_spells()
 
 #   --------------------------- Tasks   ------------
 
 
 #   Search at a specific sky position
 
-if (argus.mode == "searchpos"):  
+if (argus.getdspec):  
     
     fitslist   = [ pars['OutDir']+pars['CubeDir']+fname for fname in pars['FitsNames'] ]
 
@@ -87,8 +78,11 @@ if (argus.mode == "searchpos"):
 
 
 
+#   Show patronus
+if (argus.expecto_patronum or argus.lumos or argus.revelio):
+    patronus_charm (argus)
 
 
-else:
-    print_modes()
+print("\n----------------------------------------------------------------------------")
+print("----------------------------------------------------------------------------")
 

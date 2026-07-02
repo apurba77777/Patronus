@@ -9,7 +9,7 @@ from cascripts.utils import *
 #	---------------------------------------------------------------------------------------------------------
 #
 #	The wand used to cast spells 
-#                                                   AB  [last updated: 23 June 2026]
+#                                                   AB  [last updated: 1 July 2026]
 #
 #   This programme can be used to calibrate and image (GMRT) visibility data
 #
