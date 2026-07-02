@@ -333,6 +333,12 @@ def finalimg (targetvislist, dosavemodel=True, pars=None):
         fitsimage=pars['OutDir']+'/'+pars['FinImage']+"_alpha.fits", \
         overwrite=True
     )
+
+    ct.exportfits(
+        imagename=imgpre+".alpha.error", \
+        fitsimage=pars['OutDir']+'/'+pars['FinImage']+"_alpha_error.fits", \
+        overwrite=True
+    )
     
     print(" Done!\n")
 
@@ -621,8 +627,14 @@ def checkselfcal (imgold, imgnew, pars=None):
     oldcat  = oldcat[np.argsort(oldcat['Peak_flux'])]
     newcat  = newcat[np.argsort(newcat['Peak_flux'])]
 
-    oldcat  = oldcat[:pars['MaxSrcs']]
-    newcat  = newcat[:pars['MaxSrcs']]
+    nsrcmin  = min(len(oldcat), len(newcat))
+
+    if (nsrcmin > pars['MaxSrcs']):   
+        oldcat  = oldcat[:pars['MaxSrcs']]
+        newcat  = newcat[:pars['MaxSrcs']]
+    else:
+        oldcat  = oldcat[:nsrcmin]
+        newcat  = newcat[:nsrcmin]
 
     #print(oldcat['Peak_flux'])
     #print(oldcat['Xposn'])

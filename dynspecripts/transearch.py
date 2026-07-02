@@ -45,15 +45,15 @@ def getdynspec (fitsfile, pars=None):
 
     fig     = plt.figure(figsize=(9,3)) 
     ax3     = fig.add_subplot(1,3,1) 
-    plt.imshow(np.nanmean(hdulist[0].data[1000:1020], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
+    plt.imshow(np.nanmean(hdulist[0].data[525:527], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
     #plt.show(block=False)
 
     ax4     = fig.add_subplot(1,3,2) 
-    plt.imshow(np.nanmean(hdulist[0].data[1070:1090], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
+    plt.imshow(np.nanmean(hdulist[0].data[545:547], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
     #plt.show(block=False)
 
     ax5     = fig.add_subplot(1,3,3)
-    plt.imshow(np.nanmean(hdulist[0].data[1190:1210], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
+    plt.imshow(np.nanmean(hdulist[0].data[575:577], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
     plt.show()
     
 

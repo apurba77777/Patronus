@@ -334,7 +334,7 @@ if (argus.metronome or argus.petrificus):
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_uvsub_f_avg" for vis in visuvsublist ]
 
     for ivis in listofvis:
-        maketime (ivis)
+        maketime (ivis, pars=pars)
 
 
 #   Make snapshot images

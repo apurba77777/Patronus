@@ -7,7 +7,7 @@ from astropy.io import fits
 
 
 
-def maketime (visfile):
+def maketime (visfile, pars=None):
 
     #   Make a list of time stamps in the given visibility dataset
 
@@ -19,6 +19,11 @@ def maketime (visfile):
     msmd.done()    
 
     mjds    = times/86400
+
+    mjds    = mjds[: : pars['TimeBins']]
+    times   = times[: : pars['TimeBins']]
+
+    print(f"\n Binning {pars['TimeBins']} timestamps...\n")
 
     print(f"Writing to {mjdfile}\n")    
     np.savetxt(mjdfile, np.array([times,mjds]).T, fmt="%.2f   %.6f")
@@ -105,7 +110,7 @@ def timager (visfile, tmjds, pars=None, ntime=-1):
             imsize=pars['TimgSize'], \
             cell=pars['TcellSize'], \
             phasecenter=pars['TphaseCen'], \
-            restoration=False, \
+            restoration=True, \
             selectdata=True, \
             field=pars['TargetName'],\
             uvrange=pars['FinUvLim'], \
@@ -117,7 +122,8 @@ def timager (visfile, tmjds, pars=None, ntime=-1):
             deconvolver='hogbom', \
             weighting='briggs',\
             robust=pars['TwtRobust'], \
-            niter=0
+            nsigma=pars['TinSigma'], \
+            niter=pars['TimNiter']
         )
         
 
@@ -163,7 +169,7 @@ def tfimager (visfile, tmjds, pars=None, ntime=-1):
             imsize=pars['TimgSize'], \
             cell=pars['TcellSize'], \
             phasecenter=pars['TphaseCen'], \
-            restoration=False, \
+            restoration=True, \
             selectdata=True, \
             field=pars['TargetName'],\
             uvrange=pars['FinUvLim'], \
@@ -176,7 +182,8 @@ def tfimager (visfile, tmjds, pars=None, ntime=-1):
             deconvolver='hogbom', \
             weighting='briggs',\
             robust=pars['TwtRobust'], \
-            niter=0
+            nsigma=pars['TinSigma'], \
+            niter=pars['TimNiter']
         )
         
 
@@ -201,10 +208,10 @@ def makefits (tmjds, cubename, ntime=-1, nchan=-1):
         mjdarr  = tmjds
 
     if (nchan < 1):
-        ct.exportfits(imagename="tcube_0.residual", fitsimage="tcube_0.fits", dropstokes=True, overwrite=True)
+        ct.exportfits(imagename="tcube_0.image", fitsimage="tcube_0.fits", dropstokes=True, overwrite=True)
         refcube = fits.open("tcube_0.fits")
     else:
-        ct.exportfits(imagename="tfcube_0.residual", fitsimage="tfcube_0.fits", dropstokes=True, overwrite=True)
+        ct.exportfits(imagename="tfcube_0.image", fitsimage="tfcube_0.fits", dropstokes=True, overwrite=True)
         refcube = fits.open("tfcube_0.fits")
         
     imhdr   = refcube[0].header
@@ -217,12 +224,12 @@ def makefits (tmjds, cubename, ntime=-1, nchan=-1):
     for ki in range(0,len(mjdarr)):
         
         if (nchan < 1):
-            iman.open("tcube_"+str(ki)+".residual")
+            iman.open("tcube_"+str(ki)+".image")
             timecube    = np.array([iman.getchunk(dropdeg=True)])
             #print(timecube.shape)
             tfcube[ki] = np.transpose(timecube, (0,2,1))
         else:
-            iman.open("tfcube_"+str(ki)+".residual")
+            iman.open("tfcube_"+str(ki)+".image")
             timecube    = iman.getchunk(dropdeg=True)
             #print(timecube.shape)
             tfcube[ki] = np.transpose(timecube, (2,1,0))
