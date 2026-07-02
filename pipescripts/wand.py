@@ -344,10 +344,16 @@ if (argus.snapshot or argus.petrificus):
 
     for ivis in listofvis:
         times = np.loadtxt(pars['WorkDir']+pars['ImgUvDir']+ivis+"_mjds.txt")
-        timager (pars['WorkDir']+pars['ImgUvDir']+ivis, times, pars, ntime=-1)
-
-        cubename    = pars['OutDir']+pars['CubeDir']+"/"+ivis+"_tcube"
-        makefits (times, cubename, ntime=-1)
+        
+        if (pars['TavgChan'] < 1):
+            print('\n Averaging over all frequencies... \n')
+            timager (pars['WorkDir']+pars['ImgUvDir']+ivis, times, pars, ntime=pars['TNImg'])
+            cubename    = pars['OutDir']+pars['CubeDir']+"/"+ivis+"_tcube"
+        else:
+            tfimager (pars['WorkDir']+pars['ImgUvDir']+ivis, times, pars, ntime=pars['TNImg'])
+            cubename    = pars['OutDir']+pars['CubeDir']+"/"+ivis+"_tfcube"
+        
+        makefits (times, cubename, ntime=pars['TNImg'], nchan=pars['TavgChan'])
     
 
 #   Show patronus

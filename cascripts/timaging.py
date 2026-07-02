@@ -96,7 +96,7 @@ def timager (visfile, tmjds, pars=None, ntime=-1):
         stoptm  = casq.time(casq.quantity(mjdlim[1], 'd'),form=["ymd"]) 
 
         tstring = startm[0]+"~"+stoptm[0]
-        print(f"\n\n  Imaging time range {ki} / {len(mjdlims)}: {tstring}\n")
+        print(f"    Imaging time range {ki} / {len(mjdlims)}: {tstring}")
 
         ct.tclean(
             vis=visfile+".ms", \
@@ -154,7 +154,7 @@ def tfimager (visfile, tmjds, pars=None, ntime=-1):
         stoptm  = casq.time(casq.quantity(mjdlim[1], 'd'),form=["ymd"]) 
 
         tstring = startm[0]+"~"+stoptm[0]
-        print(f"\n\n  Imaging time range {ki} / {len(mjdlims)}: {tstring}\n")
+        print(f"     Imaging time range {ki} / {len(mjdlims)}: {tstring}")
 
         ct.tclean(
             vis=visfile+".ms", \
@@ -187,7 +187,7 @@ def tfimager (visfile, tmjds, pars=None, ntime=-1):
 
 
 
-def makefits (tmjds, cubename, ntime=-1):
+def makefits (tmjds, cubename, ntime=-1, nchan=-1):
 
     #   Combine image time series into a single FITS
 
@@ -200,23 +200,32 @@ def makefits (tmjds, cubename, ntime=-1):
     else:
         mjdarr  = tmjds
 
-    ct.exportfits(imagename="tcube_0.residual", fitsimage="tcube_0.fits", dropstokes=True, overwrite=True)
-
-    refcube = fits.open("tcube_0.fits")
+    if (nchan < 1):
+        ct.exportfits(imagename="tcube_0.residual", fitsimage="tcube_0.fits", dropstokes=True, overwrite=True)
+        refcube = fits.open("tcube_0.fits")
+    else:
+        ct.exportfits(imagename="tfcube_0.residual", fitsimage="tfcube_0.fits", dropstokes=True, overwrite=True)
+        refcube = fits.open("tfcube_0.fits")
+        
     imhdr   = refcube[0].header
     refcube.close() 
 
     tfcube  = np.zeros((len(mjdarr), imhdr['NAXIS3'], imhdr['NAXIS2'], imhdr['NAXIS1']), dtype='float32')
 
+    print(f"Reading {len(mjdarr)} images into cube {cubename}.fits...\n")
+
     for ki in range(0,len(mjdarr)):
         
-        print(f"Reading image {ki}")
-        iman.open("tcube_"+str(ki)+".residual")
-
-        timecube    = iman.getchunk(dropdeg=True)
-        imgchan     = timecube.shape[2]
-        #print(timecube.shape)
-        tfcube[ki] = np.transpose(timecube, (2,0,1))
+        if (nchan < 1):
+            iman.open("tcube_"+str(ki)+".residual")
+            timecube    = np.array([iman.getchunk(dropdeg=True)])
+            #print(timecube.shape)
+            tfcube[ki] = np.transpose(timecube, (0,2,1))
+        else:
+            iman.open("tfcube_"+str(ki)+".residual")
+            timecube    = iman.getchunk(dropdeg=True)
+            #print(timecube.shape)
+            tfcube[ki] = np.transpose(timecube, (2,1,0))
 
         iman.done()
 
@@ -244,7 +253,10 @@ def makefits (tmjds, cubename, ntime=-1):
 
     print("\n    Clearing images...\n")
     for ki in range(0,len(mjdarr)):
-        os.system("rm -rf tcube_"+str(ki)+"*")
+        if (nchan < 1):
+            os.system("rm -rf tcube_"+str(ki)+"*")
+        else:
+            os.system("rm -rf tfcube_"+str(ki)+"*")
 
 
     return(0)
