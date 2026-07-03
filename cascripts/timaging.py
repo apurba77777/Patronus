@@ -233,7 +233,7 @@ def makefits (tmjds, cubename, ntime=-1, nchan=-1):
 
             iman.open("tcube_"+str(ki)+".psf")
             psfcube    = np.array([iman.getchunk(dropdeg=True)])
-            print(psfcube.shape)
+            #print(psfcube.shape)
             pfcube[ki] = np.transpose(psfcube, (0,2,1))
             iman.done()
 
@@ -246,7 +246,7 @@ def makefits (tmjds, cubename, ntime=-1, nchan=-1):
 
             iman.open("tfcube_"+str(ki)+".psf")
             psfcube    = iman.getchunk(dropdeg=True)
-            print(psfcube.shape)
+            #print(psfcube.shape)
             pfcube[ki] = np.transpose(psfcube, (2,1,0))
             iman.done()   
 
