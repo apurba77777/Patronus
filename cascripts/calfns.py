@@ -74,6 +74,9 @@ def initrawuvfile (fitsname, pars, rfifreq=None, ovrt = False):
     cstart   = np.argmin(np.abs(chan_freqs - pars["FreqRange"][0])) 
     cend     = np.argmin(np.abs(chan_freqs - pars["FreqRange"][1])) 
 
+    if (cstart > cend):
+        cstart, cend = cend, cstart
+
     print(f"\n Extracting channel range {cstart} - {cend}\n")
     ct.mstransform(
         vis=fitsname+".ms", \
