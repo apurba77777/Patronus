@@ -39,7 +39,7 @@ def makehdr (fitshdr, imdhr, tmjds):
 
 
     dtsec   = np.nanmedian(tmjds[1:,0] - tmjds[:-1,0])
-    print(f"\n Time resolution = {dtsec} seconds\n")
+    print(f"Time resolution = {dtsec} seconds")
 
 
     fitshdr['TIMESYS']  = imdhr['TIMESYS']
@@ -218,6 +218,7 @@ def makefits (tmjds, cubename, ntime=-1, nchan=-1):
     refcube.close() 
 
     tfcube  = np.zeros((len(mjdarr), imhdr['NAXIS3'], imhdr['NAXIS2'], imhdr['NAXIS1']), dtype='float32')
+    pfcube  = np.zeros((len(mjdarr), imhdr['NAXIS3'], imhdr['NAXIS2'], imhdr['NAXIS1']), dtype='float32')
 
     print(f"Reading {len(mjdarr)} images into cube {cubename}.fits...\n")
 
@@ -228,13 +229,26 @@ def makefits (tmjds, cubename, ntime=-1, nchan=-1):
             timecube    = np.array([iman.getchunk(dropdeg=True)])
             #print(timecube.shape)
             tfcube[ki] = np.transpose(timecube, (0,2,1))
+            iman.done()
+
+            iman.open("tcube_"+str(ki)+".psf")
+            psfcube    = np.array([iman.getchunk(dropdeg=True)])
+            print(psfcube.shape)
+            pfcube[ki] = np.transpose(psfcube, (0,2,1))
+            iman.done()
+
         else:
             iman.open("tfcube_"+str(ki)+".image")
             timecube    = iman.getchunk(dropdeg=True)
             #print(timecube.shape)
             tfcube[ki] = np.transpose(timecube, (2,1,0))
+            iman.done()     
 
-        iman.done()
+            iman.open("tfcube_"+str(ki)+".psf")
+            psfcube    = iman.getchunk(dropdeg=True)
+            print(psfcube.shape)
+            pfcube[ki] = np.transpose(psfcube, (2,1,0))
+            iman.done()   
 
     iman.close()
     
@@ -254,9 +268,16 @@ def makefits (tmjds, cubename, ntime=-1, nchan=-1):
     tabhdu.header['EXTNAME']   = "TIME"
     tabhdu.header['TIMESYS']  = imhdr['TIMESYS']
 
-    hdulist.append(tabhdu)
-    
+    hdulist.append(tabhdu)    
     hdulist.writeto(cubename+".fits", overwrite=True)
+
+    #   PSF 4d cube
+    pfhdu       = fits.PrimaryHDU()
+    pfhdu.data  = pfcube    
+    makehdr(pfhdu.header, imhdr, tmjds)
+    phdulist    = fits.HDUList([pfhdu])
+    phdulist.append(tabhdu)    
+    phdulist.writeto(cubename+"_psf.fits", overwrite=True)
 
     print("\n    Clearing images...\n")
     for ki in range(0,len(mjdarr)):
