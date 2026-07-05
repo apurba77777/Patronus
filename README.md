@@ -14,4 +14,4 @@ Additionally, Patronus uses a number of Python packages listed in `templates/bas
 
 Basic instructions for using Patronus are given in the github Wiki. 
 
-This branch is under development.
+The Legilimens branch is under development.
