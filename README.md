@@ -1,4 +1,4 @@
-# Project for Analysis of Transients in Radio Observations and Not-so-Usual Spectrocopy 
+# Project for Analysis of Transients in Radio Observations and Not-so-Usual Spectrocopy
 
 Patronus is a collection of scripts conjured for interferometric data reduction and image-based transient search in the LIGER project using some simple muggle-friendly spells. Patronus also supports some advanced and dangerous magic. 
 
@@ -14,4 +14,4 @@ Additionally, Patronus uses a number of Python packages listed in `templates/bas
 
 Basic instructions for using Patronus are given in the github Wiki. 
 
-The legilimens branch is under development.
+This branch is under development.

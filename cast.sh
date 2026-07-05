@@ -2,18 +2,19 @@
 
 #   ***********************************************************
 #   
-#   Conjure spells to calibrate and image visibility data
+#   Cast spells to find transients
 #
 #   For basic instrctions, run with 
 #                               --help 
 #
 #                                           AB 
-#                                           Last updated 23/6/26
+#                                           Last updated 1/7/26
 #   
 #   ***********************************************************
 
 #   --------------------------------------------------------
 #   Default paths and input files
+
 confile=""
 pyex="python3"
 Pipe_Dir="../../patronus/"
@@ -43,11 +44,6 @@ howtoconjure()
    echo "--help             Print these options"
    echo "-c / --conf [C]    Configuration file (without .con)"
    echo "-s / --spell [S]   Spell"
-   echo "-i / --imnew [I]   Name extension of the (new) image"
-   echo "-j / --imold [I]   Name extension of the old image"
-   echo "-p / --pcal        Phase-only (selfcal)"
-   echo "--save             Save model column (imaging)"
-   echo "--interactive      Interactive masking (imaging)"
    echo "--obliviate        Clear existing files if required"
    echo "--flagrate         Write terminal messages to logfile"
    echo 
@@ -70,26 +66,6 @@ for arg in "$@"; do
             spl="--$2"
             echo "Casting spell ${spl}"
             shift 2;;
-        -i|--imnew)
-            imgext="--imgname $2"
-            echo "New image ${imgext}"
-            shift 2;;
-        -j|--imold)
-            imgext0="--oldimg $2"
-            echo "Old image ${imgext0}"
-            shift 2;;
-        -p|--pcal)
-            echo "Phase-only self-cal chosen"
-            scalmode="--calmode p"
-            shift;;
-        --save)
-            echo "Saving model column"
-            savemodel="--savemodel"
-            shift;;
-        --interactive)
-            echo "Interactive masking chosen"
-            intmask="--intmask"
-            shift;;
         --obliviate)
             echo "Existing knowledge will be forgotten..."
             ovr="--obliviate"
@@ -112,14 +88,9 @@ done
 
 #   Construct commands
 
-ankimgcmd="${pyex} -u ${Pipe_Dir}/pipescripts/wand.py \
+incmd="${pyex} -u ${Pipe_Dir}/pipescripts/incantation.py \
     --pipedir ${Pipe_Dir} \
-    --infile ${parfile} \
-    --flgin ${flgpar} \
-    --rfifile ${rfifile} \
-    ${imgext} \
-    ${imgext0} \
-    ${savemodel} ${intmask} ${scalmode} \
+    --infile ${searchpars} \
     ${spl} ${ovr}"
 
 
@@ -129,12 +100,12 @@ export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
 echo
 echo "Running command"    
-echo ${ankimgcmd} 
+echo ${incmd} 
 if [ "$sln" != "" ]
 then
-    ${ankimgcmd} |& tee -a ${logfile}
+    ${incmd} |& tee -a ${logfile}
 else
-    ${ankimgcmd}
+    ${incmd}
 fi
 
 echo

@@ -9,7 +9,7 @@ from cascripts.utils import *
 #	---------------------------------------------------------------------------------------------------------
 #
 #	The wand used to cast spells 
-#                                                   AB  [last updated: 23 June 2026]
+#                                                   AB  [last updated: 1 July 2026]
 #
 #   This programme can be used to calibrate and image (GMRT) visibility data
 #
@@ -53,20 +53,20 @@ from cascripts.utils import *
 #                                       lumos       //  List Usable Modes On Screen
 #                                       revelio     //  Reveal configuration parameters
 #
-#   Advanced spells and charms (Do not attempt before passing O W L)
+#   Advanced spells and charms (Should NOT be attempted before passing O. W. L.s)
 #                        
 #                                       accio       //  Accumulate Continuum Components in Image Output
 #                                       scourgify   //  Scrutinize Calibration Outputs and Ultimate Robustness of Gains with Image Files Yielded
 #                                       incendio    //  Image Normal Continuum Emission using Nice Data from Interferometric Observations
 #  
-#   Dangeroous spells and curses ( Extreme caution recommended !!)
+#   Dangerous spells and curses ( Extreme caution recommended !! Should NOT be attempted before passing N.E.W.T.s)
 #
 #                                       crucio      //  Calibrate Response for an Uncorrupted Channel Isolated from Observation 
 #                                       defodio     //  Determine Effects of Frequency Ousting Detected Interference in Observation
 #                                       confringo   //  Calibrate Observation for Normal and Frequency Response of the Instrument with Natural Good Objects
 #                                       imperio     //  Iterative Mapping of Persistent Emission in Radio using Interferometric Observations
 #                                       reducto     //  Reduce entire dataset to usable calibrated target outputs
-#                                       rictusempra //  Remove Image Components Through Uv Subtraction and Endeavour Mitigation of Persistent Radio Altercations
+#                                       rictusempra //  Remove Image Components Through Uv Subtraction and Endeavour Mitigation of Persistent Radio Aberrations 
 #                                       petrificus  //  Produce and Encapsulate Time Resolved Images into a Fits Image by Combining Unique Snapshots
 #
 #	--------------------------------------------------------------------------------------------------------
@@ -106,12 +106,12 @@ if (argus.lumos):
 #   --------------------------- Execute spells, charms and curses(!)   --------------------------------------------------
 
 #   Convert fits to MS
-if (argus.fitstoms or argus.crucio or argus.confringo or argus.reducto):  
+if (argus.fitstoms):  
     importrawuvfile(pars['RawUvFile'], pars['RawFlagFiles'], pars, ovrt=argus.obliviate)
 
 
 #   Initialize raw MS file
-if (argus.initrawms or argus.crucio or argus.confringo or argus.reducto):   
+if (argus.initrawms):   
     initrawuvfile(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars, rfifreq=argus.rfifile, ovrt=argus.obliviate)
 
 
@@ -263,6 +263,12 @@ if (argus.imperio or argus.reducto):
         #   Make image for this iteration
         listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg.ms" for vis in vislist ]
         oldmask     = pars['WorkDir']+pars['ImgDir']+'/'+pars['TargetName']+"_fscal_"+str(atmpt-1)+"_src_mask.mask"
+        
+        if ( (pars['MaskFile'] != None) and (pars['MaskFile'] != "") ):
+            if ( os.path.exists(pars['MaskFile'])):
+                oldmask     = pars['MaskFile']
+                print("Using given Mask file for cleaning...")
+
         imgtarget(listofvis, "fscal_"+str(atmpt), dosavemodel=True, dointeractive=argus.intmask, pars=pars, clnmask=oldmask)
 
         #   Find sources and make a clean mask
@@ -328,7 +334,7 @@ if (argus.metronome or argus.petrificus):
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_uvsub_f_avg" for vis in visuvsublist ]
 
     for ivis in listofvis:
-        maketime (ivis)
+        maketime (ivis, pars=pars)
 
 
 #   Make snapshot images
@@ -338,10 +344,16 @@ if (argus.snapshot or argus.petrificus):
 
     for ivis in listofvis:
         times = np.loadtxt(pars['WorkDir']+pars['ImgUvDir']+ivis+"_mjds.txt")
-        timager (pars['WorkDir']+pars['ImgUvDir']+ivis, times, pars, ntime=-1)
-
-        cubename    = pars['OutDir']+pars['CubeDir']+"/"+ivis+"_tcube"
-        makefits (times, cubename, ntime=-1)
+        
+        if (pars['TavgChan'] < 1):
+            print('\n Averaging over all frequencies... \n')
+            timager (pars['WorkDir']+pars['ImgUvDir']+ivis, times, pars, ntime=pars['TNImg'])
+            cubename    = pars['OutDir']+pars['CubeDir']+"/"+ivis+"_tcube"
+        else:
+            tfimager (pars['WorkDir']+pars['ImgUvDir']+ivis, times, pars, ntime=pars['TNImg'])
+            cubename    = pars['OutDir']+pars['CubeDir']+"/"+ivis+"_tfcube"
+        
+        makefits (times, cubename, ntime=pars['TNImg'], nchan=pars['TavgChan'])
     
 
 #   Show patronus
