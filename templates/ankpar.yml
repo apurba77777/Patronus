@@ -87,10 +87,11 @@ FlgUvsub:                                                   #   Applicable to UV
     - {what: 'vis_ind',  flagon: 'mean',  stat: 'mean',   data:   'am', tol: 3.0,   minfrac: 0.1, fitorder: 0}
     - {what: 'vis_ind',  flagon: 'mean',  stat: 'median', data:   'am', tol: 2.0,   minfrac: 0.1, fitorder: 1}
     - {what: 'chan_ind', flagon: 'rms',   stat: 'mean',   data:   'am', tol: 2.0,   minfrac: 0.1, fitorder: 0}
-    - {what: 'rec_ind',  flagon: 'rms',   stat: 'mean',   data:   'am', tol: 2.0,   minfrac: 0.1, fitorder: 0}
     - {what: 'chan_ind', flagon: 'rms',   stat: 'mean',   data:   'am', tol: 1.5,   minfrac: 0.1, fitorder: 2}
     - {what: 'chan_ind', flagon: 'rms',   stat: 'median', data:   're', tol: 1.2,   minfrac: 0.1, fitorder: 2}
     - {what: 'chan_ind', flagon: 'rms',   stat: 'median', data:   'im', tol: 1.2,   minfrac: 0.1, fitorder: 2}
+
+
 
 
 
