@@ -1,4 +1,4 @@
-# Project for Analysis of Transients in Radio Observations with Not-so Unique Software
+# Project for Analysis of Transients in Radio Observations and Not-so-Usual Spectrocopy
 
 Patronus is a collection of scripts conjured for interferometric data reduction and image-based transient search in the LIGER project using some simple muggle-friendly spells. Patronus also supports some advanced and dangerous magic. 
 
@@ -13,5 +13,3 @@ Patronus uses CASA ([https://casa.nrao.edu/](url)) for calibration and imaging o
 Additionally, Patronus uses a number of Python packages listed in `templates/basilisk.txt`. 
 
 Basic instructions for using Patronus are given in the github Wiki. 
-
-This branch is under development.
