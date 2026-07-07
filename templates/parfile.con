@@ -1,0 +1,12 @@
+# Patronus configuration file for Charizard
+# Provide full path to avoid confusion
+
+pyex="~/basilisk/bin/python3.12"              # Python executable
+Pipe_Dir="~/work/patronus/Patronus"           # Path to the pipeline 
+parfile="../inputfiles/gpp18_6jul26"          # Parameter file (without .yml)
+flgpar="../inputfiles/ankpar"                 # Flagging parameters(without .yml)
+rfifile="../inputfiles/rfifreqs.txt"          # List of bad frequency ranges
+searchpars="../inputfiles/srch_gpp18"         # Parameters for pulse search (wihout .yml)
+logfile="patronus.log"                        # Log file to write messages 
+
+
