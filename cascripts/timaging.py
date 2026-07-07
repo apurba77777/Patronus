@@ -123,6 +123,7 @@ def timager (visfile, tmjds, pars=None, ntime=-1):
             weighting='briggs',\
             robust=pars['TwtRobust'], \
             nsigma=pars['TinSigma'], \
+            gain=pars['TclnGain'], \
             niter=pars['TimNiter']
         )
         
@@ -183,6 +184,7 @@ def tfimager (visfile, tmjds, pars=None, ntime=-1):
             weighting='briggs',\
             robust=pars['TwtRobust'], \
             nsigma=pars['TinSigma'], \
+            gain=pars['TclnGain'], \
             niter=pars['TimNiter']
         )
         
