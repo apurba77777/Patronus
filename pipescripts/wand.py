@@ -132,7 +132,7 @@ if (argus.calch0):
 
 #   Flag single channel file
 if (argus.flagch0):  
-    flagsinglechan(pars, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+    flagsinglechan(pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
 
 #   Extract bpcal file
@@ -159,7 +159,7 @@ if (argus.crucio or argus.confringo or argus.reducto):
     
     for i in range(0, pars['CalIter']):
         print(f'\n Gain calibration iteration {i}...\n')
-        flagsinglechan(pars, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=True)
+        flagsinglechan(pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=True)
         calsinglechan(pars)
 
 
@@ -171,7 +171,7 @@ if (argus.defodio or argus.confringo or argus.reducto):
 
     for i in range(0, pars['BpIter']):
         print(f'\n Bandpass calibration iteration {i}...\n')
-        flagbpcal(pars['FluxCal'], pars, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=True)
+        flagbpcal(pars['FluxCal'], pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=True)
         calbpcal( pars['FluxCal'], pars)
 
 
@@ -237,7 +237,7 @@ if (argus.flagselfcal):
 
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]
     for ivis in listofvis:
-        flagcaltarget (ivis, pars, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+        flagcaltarget (ivis, pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
 
 #   Difficult magic ********* Self-calibrate until it converges
@@ -326,7 +326,7 @@ if (argus.flaguvsub or argus.rictusempra):
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_uvsub" for vis in visuvsublist ]
 
     for ivis in listofvis:
-        flagavguvsub (ivis, pars, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+        flagavguvsub (ivis, pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
 
 #   Make list of timestamps in MJD
