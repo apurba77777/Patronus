@@ -30,7 +30,9 @@ def avgtarget (targetvis, pars=None):
         keepflags=False, \
         hanning=True, \
         chanaverage=True, \
-        chanbin=pars['TarChanAvg']
+        chanbin=pars['TarChanAvg'], \
+        timeaverage=True, \
+        timebin=pars['CalTimeAvg']
     )
 
 

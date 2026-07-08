@@ -78,13 +78,21 @@ def initrawuvfile (fitsname, pars, rfifreq=None, ovrt = False):
         cstart, cend = cend, cstart
 
     print(f"\n Extracting channel range {cstart} - {cend}\n")
+    
+    cavgfactor = 1
+    if (pars['IniChanAvg'] > 1):
+        print(f"Averaging {pars['IniChanAvg']} channels...")
+        cavgfactor = pars['IniChanAvg']
+
     ct.mstransform(
         vis=fitsname+".ms", \
         outputvis=fitsname+"_temp.ms", \
         datacolumn="DATA", \
         keepflags=False, \
         spw="0:"+str(cstart)+"~"+str(cend), \
-        correlation=pars['CorrProds']
+        correlation=pars['CorrProds'], \
+        chanaverage=True, \
+        chanbin=cavgfactor
     )
 
     os.system("rm -rf "+fitsname+".ms")
@@ -119,9 +127,18 @@ def makesinglechan(fitsname, pars = None, ovrt =False):
             return (1)
 
     print(f"\n Creating single channel {chan0} file... \n")
-    ct.mstransform(vis=fitsname+".ms", outputvis=chan0file, datacolumn="DATA", keepflags=False, \
-                   spw="0:"+str(chan0), correlation=pars['CorrProds'], uvrange=pars['CalUvLim'], \
-                    field=pars['FluxCal']+","+pars['PhaseCal'])
+    ct.mstransform(
+        vis=fitsname+".ms", \
+        outputvis=chan0file, \
+        datacolumn="DATA", \
+        keepflags=False, \
+        spw="0:"+str(chan0), \
+        correlation=pars['CorrProds'], \
+        uvrange=pars['CalUvLim'], \
+        field=pars['FluxCal']+","+pars['PhaseCal'], \
+        timeaverage=True, \
+        timebin=pars['CalTimeAvg']
+    )
     print("\n Done!\n")
 
 
@@ -353,8 +370,17 @@ def exbpcal (fitsname, bpcal, pars=None):
     ct.applycal(vis=fitsname+".ms", field=bpcal, gaintable=[fluxfile], applymode='')
 
     print("Exporting BP cal...\n")
-    ct.mstransform(vis=fitsname+".ms", outputvis=bpcalfile, datacolumn="corrected", keepflags=False, \
-                   correlation=pars['CorrProds'], uvrange=pars['CalUvLim'], field=bpcal)
+    ct.mstransform(
+        vis=fitsname+".ms", \
+        outputvis=bpcalfile, \
+        datacolumn="corrected", \
+        keepflags=False, \
+        correlation=pars['CorrProds'], \
+        uvrange=pars['CalUvLim'], \
+        field=bpcal, \
+        timeaverage=True, \
+        timebin=pars['CalTimeAvg']
+    )
 
     print("Setting flux density of BP cal file...")
     setjyout = ct.setjy(vis=bpcalfile, field=bpcal)
