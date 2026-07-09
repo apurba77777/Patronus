@@ -347,6 +347,23 @@ def finalimg (targetvislist, dosavemodel=True, pars=None):
         fitsimage=pars['OutDir']+'/'+pars['FinImage']+"_alpha_error.fits", \
         overwrite=True
     )
+
+    sfimg   = sf.process_image(
+                pars['OutDir']+'/'+pars['FinImage']+"_continuum.fits", \
+                adaptive_rms_box = True, \
+                advanced_opts = True, \
+                group_by_isl = False, \
+                interactive = False, \
+                thresh_isl = 5.0, \
+                thresh_pix = 3.0
+            )
+
+    sfimg.write_catalog(
+        outfile=pars['OutDir']+'/'+pars['FinImage']+"_src_catalogue.fits", \
+        catalog_type='srl', \
+        format='fits', \
+        clobber=True
+    )
     
     print(" Done!\n")
 
