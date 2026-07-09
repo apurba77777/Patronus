@@ -374,7 +374,7 @@ def baselinesfrombinary(ANTS, data, scratchdir, flagparams):
 			del (temp00)
 			del (temparr)
 			
-			print('\nCopied	Scan	%d / %d		baseline	%d - %d'%(scan, nscan,bl[0],bl[1]))		
+			#print('\nCopied	Scan	%d / %d		baseline	%d - %d'%(scan, nscan,bl[0],bl[1]))		
 				
 	return 0
 
