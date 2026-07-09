@@ -78,13 +78,21 @@ def initrawuvfile (fitsname, pars, rfifreq=None, ovrt = False):
         cstart, cend = cend, cstart
 
     print(f"\n Extracting channel range {cstart} - {cend}\n")
+    
+    cavgdo = False 
+    if (pars['IniChanAvg'] > 1):
+        print(f"Initially averaging {pars['IniChanAvg']} channels")
+        cavgdo = True
+
     ct.mstransform(
         vis=fitsname+".ms", \
         outputvis=fitsname+"_temp.ms", \
         datacolumn="DATA", \
         keepflags=False, \
         spw="0:"+str(cstart)+"~"+str(cend), \
-        correlation=pars['CorrProds']
+        correlation=pars['CorrProds'], \
+        chanaverage=cavgdo, \
+        chanbin=pars['IniChanAvg']
     )
 
     os.system("rm -rf "+fitsname+".ms")
@@ -119,9 +127,24 @@ def makesinglechan(fitsname, pars = None, ovrt =False):
             return (1)
 
     print(f"\n Creating single channel {chan0} file... \n")
-    ct.mstransform(vis=fitsname+".ms", outputvis=chan0file, datacolumn="DATA", keepflags=False, \
-                   spw="0:"+str(chan0), correlation=pars['CorrProds'], uvrange=pars['CalUvLim'], \
-                    field=pars['FluxCal']+","+pars['PhaseCal'])
+
+    tavgdo = False 
+    if (pars['CalTimeAvg'] != ""):
+        print(f"Time-averaging to {pars['CalTimeAvg']}")
+        tavgdo = True
+
+    ct.mstransform(
+        vis=fitsname+".ms", \
+        outputvis=chan0file, \
+        datacolumn="DATA", \
+        keepflags=False, \
+        spw="0:"+str(chan0), \
+        correlation=pars['CorrProds'], \
+        uvrange=pars['CalUvLim'], \
+        field=pars['FluxCal']+","+pars['PhaseCal'], \
+        timeaverage=tavgdo, \
+        timebin=pars['CalTimeAvg']
+    )
     print("\n Done!\n")
 
 
@@ -353,8 +376,23 @@ def exbpcal (fitsname, bpcal, pars=None):
     ct.applycal(vis=fitsname+".ms", field=bpcal, gaintable=[fluxfile], applymode='')
 
     print("Exporting BP cal...\n")
-    ct.mstransform(vis=fitsname+".ms", outputvis=bpcalfile, datacolumn="corrected", keepflags=False, \
-                   correlation=pars['CorrProds'], uvrange=pars['CalUvLim'], field=bpcal)
+
+    tavgdo = False 
+    if (pars['CalTimeAvg'] != ""):
+        print(f"Time-averaging to {pars['CalTimeAvg']}")
+        tavgdo = True
+
+    ct.mstransform(
+        vis=fitsname+".ms", \
+        outputvis=bpcalfile, \
+        datacolumn="corrected", \
+        keepflags=False, \
+        correlation=pars['CorrProds'], \
+        uvrange=pars['CalUvLim'], \
+        field=bpcal, \
+        timeaverage=tavgdo, \
+        timebin=pars['CalTimeAvg']
+    )
 
     print("Setting flux density of BP cal file...")
     setjyout = ct.setjy(vis=bpcalfile, field=bpcal)
@@ -449,7 +487,7 @@ def flagbpcal (bpcal, pars=None, ankdir=None, ankin=None, ovrt=False):
         bpcalcmd = "python3 " + ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
                     " --parfile " + ankin + " --infilename " + bpcalfile + " --outfilename " + bpcalfile+"_f" + \
                     " --logfile " +pars['WorkDir']+pars['LogDir']+"/bpcal_"+bpcal + \
-                    " --flagmode uvbin --targetype=calbp --clearscratch --nthreads " + str(pars['FlgThreads'])
+                    " --flagmode baseline --targetype=calbp --clearscratch --nthreads " + str(pars['FlgThreads'])
 
         print("Running \n" + bpcalcmd)
         os.system(bpcalcmd)

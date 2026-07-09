@@ -7,16 +7,16 @@ Vkey:       "VV"                                            #   Keyword for v
 Wkey:       "WW"                                            #   Keyword for w
 UgridCal:   1                                               #   Gridsize in u for calibrators
 VgridCal:   1                                               #   Gridsize in v for calibrators
-UgridTar:   10                                              #   Gridsize in u for Target
-VgridTar:   10                                              #   Gridsize in v for Target
+UgridTar:   30                                              #   Gridsize in u for Target
+VgridTar:   30                                              #   Gridsize in v for Target
 
 Npols:      2                                               #	Number of polarizations
 N_ants:     30                                              #	Maximum number of antennas
 
 FlagMode:   "uvbin"                                         #	Flaging mode ('baseline' / 'uvbin') 
 
-ScanFlMean: ['rms', 1.5, 1.5, 0.01]                         #   [FLAGON, tolerance_mean, tolearnce_rms, min fraction (should be > 0.01)]]	
-                                                            #   ONLY for 'baseline' mode
+ScanFlMean: ['rms', 1.5, 1.5, 0.01]                         #   [FLAGON, tolerance_mean, tolearnce_rms, min fraction 
+                                                            #   (should be > 0.01)]   ONLY for 'baseline' mode
 ScanBrkSec: 300.0                                           #   Scan break time (minimum)
 BlockPow:   0.8                                             #	Power low for Block non-Gaussianity 
 
@@ -40,26 +40,14 @@ FlgCalCh0:                                                  #   Applicable to si
 FlgCalBp:                                                   #   Applicable to bandpass calibrators only   
     - {what: 'rec_ind',  flagon: 'rms',  stat: 'median',  data:   'am', tol: 5.0,   minfrac: 0.1, fitorder: 0}
     - {what: 'chan_ind', flagon: 'rms',  stat: 'median',  data:   'am', tol: 5.0,   minfrac: 0.1, fitorder: 0}
-    - {what: 'rec_ind',  flagon: 'rms',  stat: 'mean',    data:   'am', tol: 5.0,   minfrac: 0.1, fitorder: 0}
-    - {what: 'chan_ind', flagon: 'rms',  stat: 'mean',    data:   'am', tol: 5.0,   minfrac: 0.1, fitorder: 0}
-    - {what: 'rec_ind',  flagon: 'rms',  stat: 'mean',    data:   'am', tol: 2.0,   minfrac: 0.1, fitorder: 0}
-    - {what: 'chan_ind', flagon: 'rms',  stat: 'mean',    data:   'am', tol: 2.0,   minfrac: 0.1, fitorder: 0}   
-    - {what: 'chan_ind', flagon: 'rms',  stat: 'median',  data:   'am', tol: 1.5,   minfrac: 0.1, fitorder: 2}
-    - {what: 'chan_ind', flagon: 'rms',  stat: 'median',  data:   're', tol: 1.5,   minfrac: 0.1, fitorder: 2}
-    - {what: 'chan_ind', flagon: 'rms',  stat: 'median',  data:   'im', tol: 1.5,   minfrac: 0.1, fitorder: 2}
+    - {what: 'rec_ind',  flagon: 'rms',  stat: 'median',  data:   'am', tol: 2.0,   minfrac: 0.1, fitorder: 1}
+    - {what: 'chan_ind', flagon: 'rms',  stat: 'median',  data:   'am', tol: 2.0,   minfrac: 0.1, fitorder: 1}
     - {what: 'rec_ind',  flagon: 'rms',  stat: 'median',  data:   'am', tol: 1.5,   minfrac: 0.1, fitorder: 2}
-    - {what: 'rec_ind',  flagon: 'rms',  stat: 'median',  data:   're', tol: 1.5,   minfrac: 0.1, fitorder: 2}
-    - {what: 'rec_ind',  flagon: 'rms',  stat: 'median',  data:   'im', tol: 1.5,   minfrac: 0.1, fitorder: 2}
-    - {what: 'chan_ind', flagon: 'rms',  stat:  'mean',   data:   're', tol: 1.5,   minfrac: 0.1, fitorder: 2}
-    - {what: 'chan_ind', flagon: 'rms',  stat:  'mean',   data:   'im', tol: 1.5,   minfrac: 0.1, fitorder: 2}
-    - {what: 'rec_ind',  flagon: 'rms',  stat:  'mean',   data:   're', tol: 1.5,   minfrac: 0.1, fitorder: 2}
-    - {what: 'rec_ind',  flagon: 'rms',  stat:  'mean',   data:   'im', tol: 1.5,   minfrac: 0.1, fitorder: 2}
-    - {what: 'chan_ind', flagon: 'rms',  stat: 'median',  data:   'am', tol: 1.2,   minfrac: 0.1, fitorder: 2}
-    - {what: 'chan_ind', flagon: 'rms',  stat: 'median',  data:   're', tol: 1.2,   minfrac: 0.1, fitorder: 2}
-    - {what: 'chan_ind', flagon: 'rms',  stat: 'median',  data:   'im', tol: 1.2,   minfrac: 0.1, fitorder: 2}
+    - {what: 'rec_ind',  flagon: 'rms',  stat: 'mean',    data:   'am', tol: 1.5,   minfrac: 0.1, fitorder: 2}
+    - {what: 'chan_ind', flagon: 'rms',  stat: 'median',  data:   'am', tol: 1.5,   minfrac: 0.1, fitorder: 2}
     - {what: 'rec_ind',  flagon: 'rms',  stat: 'median',  data:   'am', tol: 1.2,   minfrac: 0.1, fitorder: 2}
-    - {what: 'rec_ind',  flagon: 'rms',  stat: 'median',  data:   're', tol: 1.2,   minfrac: 0.1, fitorder: 2}
-    - {what: 'rec_ind',  flagon: 'rms',  stat: 'median',  data:   'im', tol: 1.2,   minfrac: 0.1, fitorder: 2}
+    - {what: 'rec_ind',  flagon: 'rms',  stat: 'mean',    data:   'am', tol: 1.2,   minfrac: 0.1, fitorder: 2}
+
 
 
 
@@ -90,7 +78,6 @@ FlgUvsub:                                                   #   Applicable to UV
     - {what: 'chan_ind', flagon: 'rms',   stat: 'mean',   data:   'am', tol: 1.5,   minfrac: 0.1, fitorder: 2}
     - {what: 'chan_ind', flagon: 'rms',   stat: 'median', data:   're', tol: 1.2,   minfrac: 0.1, fitorder: 2}
     - {what: 'chan_ind', flagon: 'rms',   stat: 'median', data:   'im', tol: 1.2,   minfrac: 0.1, fitorder: 2}
-
 
 
 

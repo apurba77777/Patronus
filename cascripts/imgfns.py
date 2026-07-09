@@ -23,6 +23,12 @@ def avgtarget (targetvis, pars=None):
 
 
     print("Channel averaging...\n")
+
+    tavgdo = False 
+    if (pars['CalTimeAvg'] != ""):
+        print(f"Time-averaging to {pars['CalTimeAvg']}")
+        tavgdo = True
+
     ct.mstransform(
         vis=pars['WorkDir']+pars['UvMsDir']+'/'+targetvis+".ms", \
         outputvis=pars['WorkDir']+pars['ImgUvDir']+'/'+avgvis+".ms", \
@@ -30,7 +36,9 @@ def avgtarget (targetvis, pars=None):
         keepflags=False, \
         hanning=True, \
         chanaverage=True, \
-        chanbin=pars['TarChanAvg']
+        chanbin=pars['TarChanAvg'], \
+        timeaverage=tavgdo, \
+        timebin=pars['CalTimeAvg']
     )
 
 
@@ -339,6 +347,23 @@ def finalimg (targetvislist, dosavemodel=True, pars=None):
         fitsimage=pars['OutDir']+'/'+pars['FinImage']+"_alpha_error.fits", \
         overwrite=True
     )
+
+    sfimg   = sf.process_image(
+                pars['OutDir']+'/'+pars['FinImage']+"_continuum.fits", \
+                adaptive_rms_box = True, \
+                advanced_opts = True, \
+                group_by_isl = False, \
+                interactive = False, \
+                thresh_isl = 5.0, \
+                thresh_pix = 3.0
+            )
+
+    sfimg.write_catalog(
+        outfile=pars['OutDir']+'/'+pars['FinImage']+"_src_catalogue.fits", \
+        catalog_type='srl', \
+        format='fits', \
+        clobber=True
+    )
     
     print(" Done!\n")
 
@@ -618,6 +643,11 @@ def checkselfcal (imgold, imgnew, pars=None):
         print(f"  Residual / new = {diffrms / newrms} \n")
         return (hasconverged)
     
+    if (np.abs(newrms-oldrms)/oldrms > pars['TolFrac']):
+        hasconverged = False
+        print(f"  Fractional change = {np.abs(newrms-oldrms)/oldrms} \n")
+        return (hasconverged)
+    
     #plt.imshow(cropdiff.T / newrms, origin='lower', vmin=-3, vmax=5)
     #plt.show()
 
@@ -641,10 +671,8 @@ def checkselfcal (imgold, imgnew, pars=None):
     #print(newcat['Peak_flux'])
     #print(newcat['Xposn'])
 
-    xshift  = np.abs(oldcat['Xposn'] - newcat['Xposn']) / \
-                np.sqrt( oldcat['E_Xposn']*oldcat['E_Xposn'] + newcat['E_Xposn']*newcat['E_Xposn'] )
-    yshift  = np.abs(oldcat['Yposn'] - newcat['Yposn']) / \
-                np.sqrt( oldcat['E_Yposn']*oldcat['E_Yposn'] + newcat['E_Yposn']*newcat['E_Yposn'] )
+    xshift  = np.abs(oldcat['Xposn'] - newcat['Xposn']) 
+    yshift  = np.abs(oldcat['Yposn'] - newcat['Yposn'])
 
     #   Convergence in source position
 
