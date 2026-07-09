@@ -23,6 +23,12 @@ def avgtarget (targetvis, pars=None):
 
 
     print("Channel averaging...\n")
+
+    tavgdo = False 
+    if (pars['CalTimeAvg'] != ""):
+        print(f"Time-averaging to {pars['CalTimeAvg']}")
+        tavgdo = True
+
     ct.mstransform(
         vis=pars['WorkDir']+pars['UvMsDir']+'/'+targetvis+".ms", \
         outputvis=pars['WorkDir']+pars['ImgUvDir']+'/'+avgvis+".ms", \
@@ -31,7 +37,7 @@ def avgtarget (targetvis, pars=None):
         hanning=True, \
         chanaverage=True, \
         chanbin=pars['TarChanAvg'], \
-        timeaverage=True, \
+        timeaverage=tavgdo, \
         timebin=pars['CalTimeAvg']
     )
 

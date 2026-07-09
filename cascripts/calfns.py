@@ -79,10 +79,10 @@ def initrawuvfile (fitsname, pars, rfifreq=None, ovrt = False):
 
     print(f"\n Extracting channel range {cstart} - {cend}\n")
     
-    cavgfactor = 1
+    cavgdo = False 
     if (pars['IniChanAvg'] > 1):
-        print(f"Averaging {pars['IniChanAvg']} channels...")
-        cavgfactor = pars['IniChanAvg']
+        print(f"Initially averaging {pars['IniChanAvg']} channels")
+        cavgdo = True
 
     ct.mstransform(
         vis=fitsname+".ms", \
@@ -91,8 +91,8 @@ def initrawuvfile (fitsname, pars, rfifreq=None, ovrt = False):
         keepflags=False, \
         spw="0:"+str(cstart)+"~"+str(cend), \
         correlation=pars['CorrProds'], \
-        chanaverage=True, \
-        chanbin=cavgfactor
+        chanaverage=cavgdo, \
+        chanbin=pars['IniChanAvg']
     )
 
     os.system("rm -rf "+fitsname+".ms")
@@ -127,6 +127,12 @@ def makesinglechan(fitsname, pars = None, ovrt =False):
             return (1)
 
     print(f"\n Creating single channel {chan0} file... \n")
+
+    tavgdo = False 
+    if (pars['CalTimeAvg'] != ""):
+        print(f"Time-averaging to {pars['CalTimeAvg']}")
+        tavgdo = True
+
     ct.mstransform(
         vis=fitsname+".ms", \
         outputvis=chan0file, \
@@ -136,7 +142,7 @@ def makesinglechan(fitsname, pars = None, ovrt =False):
         correlation=pars['CorrProds'], \
         uvrange=pars['CalUvLim'], \
         field=pars['FluxCal']+","+pars['PhaseCal'], \
-        timeaverage=True, \
+        timeaverage=tavgdo, \
         timebin=pars['CalTimeAvg']
     )
     print("\n Done!\n")
@@ -370,6 +376,12 @@ def exbpcal (fitsname, bpcal, pars=None):
     ct.applycal(vis=fitsname+".ms", field=bpcal, gaintable=[fluxfile], applymode='')
 
     print("Exporting BP cal...\n")
+
+    tavgdo = False 
+    if (pars['CalTimeAvg'] != ""):
+        print(f"Time-averaging to {pars['CalTimeAvg']}")
+        tavgdo = True
+
     ct.mstransform(
         vis=fitsname+".ms", \
         outputvis=bpcalfile, \
@@ -378,7 +390,7 @@ def exbpcal (fitsname, bpcal, pars=None):
         correlation=pars['CorrProds'], \
         uvrange=pars['CalUvLim'], \
         field=bpcal, \
-        timeaverage=True, \
+        timeaverage=tavgdo, \
         timebin=pars['CalTimeAvg']
     )
 
