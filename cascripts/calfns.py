@@ -487,7 +487,7 @@ def flagbpcal (bpcal, pars=None, ankdir=None, ankin=None, ovrt=False):
         bpcalcmd = "python3 " + ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
                     " --parfile " + ankin + " --infilename " + bpcalfile + " --outfilename " + bpcalfile+"_f" + \
                     " --logfile " +pars['WorkDir']+pars['LogDir']+"/bpcal_"+bpcal + \
-                    " --flagmode uvbin --targetype=calbp --clearscratch --nthreads " + str(pars['FlgThreads'])
+                    " --flagmode baseline --targetype=calbp --clearscratch --nthreads " + str(pars['FlgThreads'])
 
         print("Running \n" + bpcalcmd)
         os.system(bpcalcmd)

@@ -181,8 +181,8 @@ if (argus.extarget or argus.defodio or argus.confringo or argus.reducto):
 
 
 #   Flag calibrated target file
-if (argus.flagtarget or argus.defodio or argus.confringo or argus.reducto): 
-    flagtarget(pars['TargetName'], pars, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+if (argus.flagtarget): 
+    flagtarget(pars['TargetName'], pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
 
 #   ------------------------    Imaging and selfcal tasks ---------------------------------------------------------
@@ -243,6 +243,10 @@ if (argus.flagselfcal):
 #   Difficult magic ********* Self-calibrate until it converges
 if (argus.imperio or argus.reducto):
     
+    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]
+    for ivis in listofvis:
+        flagcaltarget (ivis, pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+
     #   Make the zeroth image
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg.ms" for vis in vislist ]
     imgtarget(listofvis, "fscal_0", dosavemodel=False, dointeractive=argus.intmask, pars=pars, clnmask=None)

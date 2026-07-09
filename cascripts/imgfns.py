@@ -626,6 +626,11 @@ def checkselfcal (imgold, imgnew, pars=None):
         print(f"  Residual / new = {diffrms / newrms} \n")
         return (hasconverged)
     
+    if (np.abs(newrms-oldrms)/oldrms > pars['TolFrac']):
+        hasconverged = False
+        print(f"  Fractional change = {np.abs(newrms-oldrms)/oldrms} \n")
+        return (hasconverged)
+    
     #plt.imshow(cropdiff.T / newrms, origin='lower', vmin=-3, vmax=5)
     #plt.show()
 
@@ -649,10 +654,8 @@ def checkselfcal (imgold, imgnew, pars=None):
     #print(newcat['Peak_flux'])
     #print(newcat['Xposn'])
 
-    xshift  = np.abs(oldcat['Xposn'] - newcat['Xposn']) / \
-                np.sqrt( oldcat['E_Xposn']*oldcat['E_Xposn'] + newcat['E_Xposn']*newcat['E_Xposn'] )
-    yshift  = np.abs(oldcat['Yposn'] - newcat['Yposn']) / \
-                np.sqrt( oldcat['E_Yposn']*oldcat['E_Yposn'] + newcat['E_Yposn']*newcat['E_Yposn'] )
+    xshift  = np.abs(oldcat['Xposn'] - newcat['Xposn']) 
+    yshift  = np.abs(oldcat['Yposn'] - newcat['Yposn'])
 
     #   Convergence in source position
 
