@@ -3,6 +3,8 @@ import argparse as ap
 import yaml as ym
 from specscripts.ingredients import *
 from specscripts.auxfns import *
+from specscripts.compilecats import *
+from specscripts.processubcubes import *
 
 #	---------------------------------------------------------------------------------------------------------
 #
@@ -17,9 +19,12 @@ from specscripts.auxfns import *
 #                       --infile [param_YAML]       //  YAML file containing input parameters
 #                       --pipedir [pipe_direcory]   //  Path to the pipeline itself
 #
-#   Muggle-friendly potions (can be run without any prior knowledge of potion making)              
-#                           getdspec    //  Generate dynamic spectrum at a specific sky position
-#                           initrawms   //  Initialize raw MS
+#   Muggle-friendly potions (can be run without any prior knowledge of potion making)  
+#             
+#                           excat       //  Extract catalogue for spectroscopic analysis
+#                           exubcubes   //  Extract subcubes
+#                           smoothcubes //  Spatially smooth subcubes
+#                          
 #
 #   Simple & convenient charms          
 #                           obliviate   //  Clear existing files 
@@ -64,17 +69,38 @@ phials(pars)
 if (argus.lumos):  
     potion_ingredients()
 
-#   --------------------------- Tasks   ------------
+#   --------------------------- Potion brewing tasks   ----------------------------------
 
-
-#   Search at a specific sky position
-
-# if (argus.getdspec):  
+#   Extract COSMOS catalogue
+if (argus.excat):  
     
-#     fitslist   = [ pars['OutDir']+pars['CubeDir']+fname for fname in pars['FitsNames'] ]
+    srcs    = exkhastocat(pars)
+    if (pars['SrcType']=="galaxy"):
+        srcs    = srcs[srcs[:,14]==0]
+        print("Selecting galaxies only")
+    elif (pars['SrcType']=="agn"):
+        srcs    = srcs[srcs[:,14]==2]
+        print("Selecting AGNs only")
+    print('Extracted sources		= %d'%len(srcs))
+    np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CatFile'], srcs, \
+               fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
 
-#     for fitsname in fitslist:
-#         getdynspec (fitsname, pars)
+
+#	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV R   Type
+#	0	1	2	3	4	5	6	7	8	9	    10	11	12  13  14
+
+#   Extract subcubes
+if (argus.exubcubes):  
+    dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CatFile'])
+    (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
+    exsrcs  = exubcubes(detid, detz, posra, posdec, obschan, istart=30, pars=pars, ovrt=argus.obliviate, nobj=35)
 
 
+
+#   Smooth subcubes
+if (argus.smoothcubes):  
+    if (pars['SmKpc'] > 0):
+        print("\n Smoothing has not yet been implemented...\n")
+    else:
+        print("\n No smoothing required...\n")
 

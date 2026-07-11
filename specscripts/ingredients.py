@@ -30,7 +30,9 @@ def potion_args():
     parser.add_argument("--revelio", help = "Reveal configuration parameters", action='store_true')
 
     #   Search at a specific sky position
-    parser.add_argument("--getdspec", help = "Generate dynamic spectrum at a specific sky position", action='store_true')
+    parser.add_argument("--excat", help = "Extract catalogue for spectroscopic analysis", action='store_true')
+    parser.add_argument("--exubcubes", help = "Extract subcubes", action='store_true')
+    parser.add_argument("--smoothcubes", help = "Spatially smooth subcubes", action='store_true')
         
     args = parser.parse_args()
 
@@ -46,7 +48,7 @@ def potion_ingredients():
 
     print(" Muggle-friendly potions \n")
 
-    print("      --getdspec    - Generate dynamic spectrum at a specific sky position")
+    print("      --excat       - Extract catalogue for spectroscopic analysis")
 
     print("\n Simple & convenient charms \n")
 
