@@ -24,6 +24,7 @@ from specscripts.processubcubes import *
 #                           excat       //  Extract catalogue for spectroscopic analysis
 #                           exubcubes   //  Extract subcubes
 #                           smoothcubes //  Spatially smooth subcubes
+#                           intercubes  //  Spectrally interpolate subcubes
 #                          
 #
 #   Simple & convenient charms          
@@ -93,14 +94,26 @@ if (argus.excat):
 if (argus.exubcubes):  
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CatFile'])
     (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
-    exsrcs  = exubcubes(detid, detz, posra, posdec, obschan, istart=30, pars=pars, ovrt=argus.obliviate, nobj=35)
+    exsrcs  = exubcubes(detid, detz, posra, posdec, obschan, istart=0, pars=pars, ovrt=argus.obliviate, nobj=35)
+    dets    = dets[exsrcs]
+    print('Extracted sources		= %d'%len(dets))
+    np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'], dets, \
+               fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
 
 
 
-#   Smooth subcubes
+#   Spatially smooth subcubes
 if (argus.smoothcubes):  
     if (pars['SmKpc'] > 0):
         print("\n Smoothing has not yet been implemented...\n")
     else:
         print("\n No smoothing required...\n")
+
+
+#   Spectrally interpolate subcubes
+if (argus.intercubes):  
+    dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
+    (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
+    intercubes(detid, detz, posra, posdec, obschan, istart=0, pars=pars, ovrt=argus.obliviate, nobj=-1)
+    
 

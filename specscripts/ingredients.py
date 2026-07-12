@@ -33,6 +33,7 @@ def potion_args():
     parser.add_argument("--excat", help = "Extract catalogue for spectroscopic analysis", action='store_true')
     parser.add_argument("--exubcubes", help = "Extract subcubes", action='store_true')
     parser.add_argument("--smoothcubes", help = "Spatially smooth subcubes", action='store_true')
+    parser.add_argument("--intercubes", help = "Spectrally interpolate subcubes", action='store_true')
         
     args = parser.parse_args()
 
