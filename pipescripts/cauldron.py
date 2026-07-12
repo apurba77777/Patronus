@@ -25,6 +25,8 @@ from specscripts.processubcubes import *
 #                           exubcubes   //  Extract subcubes
 #                           smoothcubes //  Spatially smooth subcubes
 #                           intercubes  //  Spectrally interpolate subcubes
+#                           regcubes    //  Regrid subcubes to spatial pixels
+#                           redcubes    //  Reduce subcubes
 #                          
 #
 #   Simple & convenient charms          
@@ -110,10 +112,38 @@ if (argus.smoothcubes):
         print("\n No smoothing required...\n")
 
 
+
 #   Spectrally interpolate subcubes
 if (argus.intercubes):  
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
     (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
     intercubes(detid, detz, posra, posdec, obschan, istart=0, pars=pars, ovrt=argus.obliviate, nobj=-1)
+
+
+
+#   Regrid subcubes to spatial pixels
+if (argus.regcubes):  
+    if (pars['ReGrid']):        
+        print("\n Regridding has not yet been implemented...\n")
+    else:        
+        print("\n No regridding required...\n")
+
+
+
+#   Reduce subcubes and extract spectra
+if (argus.redcubes):  
+    dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
+    (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
+    if (pars['ReGrid']):
+        print("\n Regridding has not yet been implemented...\n")
+        sys.exit()
+    else:
+        getcubedir  = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['IscubeDir']
+        getnoisedir = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['InoiseDir']
+        redscubedir = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedCubes']
+        outspecdir  = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedSpecs']
+        coskip      = int(pars['BeamSec']/pars['BeamSec'])
+
+    reducecubes(getcubedir, getnoisedir, redscubedir, outspecdir, detid, istart=0, pars=pars, cskip=coskip, nobj=-1)
     
 

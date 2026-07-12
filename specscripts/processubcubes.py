@@ -2,6 +2,9 @@ import os,sys
 import subprocess
 from astropy.io import fits
 import numpy as np
+from scipy.optimize import curve_fit
+from scipy.stats import kstest
+from scipy.stats import anderson
 from astropy.wcs import WCS
 import casatasks as ct
 import casatools as ctools
@@ -191,6 +194,82 @@ def intercubes(detid, detz, posra, posdec, obschan, istart=0, pars=None, ovrt=Tr
         )
 
     iman.close()
+
+    return 
+#	----------------------------------------------------------------------------------------------------
+
+
+def reducecubes(getcubedir, getnoisedir, redscubedir, outspecdir, detid, istart=0, pars=None, cskip=1, nobj=-1):
+    
+    #   Reduce subcubes and extract spectra
+    
+    ntotal  = len(detid)
+    if (nobj > 0):
+        ntotal  = nobj
+
+    for i in range (istart, ntotal):
+        icube	=	fits.open(getcubedir+'/xubcube_'+str(detid[i])+'_'+str(pars['SmKpc'])+'.fits')
+        inoise	=	np.loadtxt(getnoisedir+'/spec_'+str(detid[i])+'_'+str(pars['SmKpc'])+'_noise.txt')	
+        idata	=	icube[0].data
+        #print(idata.shape)
+        imgarr	=	np.zeros(np.shape(idata),dtype=float)
+        velarr	=	np.linspace(pars['FSize']*pars['VelRes'], -pars['FSize']*pars['VelRes'], 2*pars['FSize']+1)		
+
+        inoise[inoise<=0.0]	= np.nan
+        inoise[pars['FSize']+pars['ChansL'][0] : pars['FSize']+pars['ChansL'][1]]	=	np.nan		
+        edgeinds	        = np.where(np.abs(velarr) > pars['HalfLen'])
+        inoise[edgeinds]	= np.nan
+
+        for m in range (0,imgarr.shape[1]):
+            for n in range (0,imgarr.shape[2]):	
+                yarr	= idata[:,m,n]	
+                gchans00= (np.isfinite(inoise)) & (np.isfinite(yarr))					
+                if (len(velarr[gchans00]) > (pars['FitOrder']+1)):
+                    if(pars['FitOrder']==3):
+                        popt,pcov		= curve_fit(cbase, velarr[gchans00], yarr[gchans00], sigma=inoise[gchans00])
+                        imgarr[:,m,n]	= yarr - cbase(velarr, *popt)	
+                    else:
+                        popt,pcov		= curve_fit(qbase, velarr[gchans00], yarr[gchans00], sigma=inoise[gchans00])
+                        imgarr[:,m,n]	= yarr - qbase(velarr, *popt)		
+                else:
+                    imgarr[:,m,n]	= np.nan
+
+        ispec	=	imgarr[:,int(imgarr.shape[1]/2),int(imgarr.shape[2]/2)]	
+
+        icube[0].data	= imgarr
+        icube.writeto(redscubedir+'/xubcube_'+str(detid[i])+'_'+str(pars['SmKpc'])+'.fits',overwrite=True)
+        icube.close()
+
+        #print('Reduced cube %d	of	%d'%(i,len(detid)))
+
+        endchans		= np.where(np.abs(velarr) >= pars['HalfLen'])
+        fchan			= np.where(inoise <= 0.0)
+        ispec[fchan]	= np.nan
+        inoise[fchan]	= np.nan
+        ispec[endchans]	= np.nan
+        inoise[endchans]= np.nan
+
+        tdata	= imgarr[:,::cskip,::cskip]		
+        temparr	= []
+
+        for k in range (0,len(ispec)):
+            if (np.isfinite(inoise[k])):
+                ksd,ksp			= kstest(tdata[k].flatten(),'norm',args=(0.0,np.nanstd(tdata[k])))
+                ads,adcv,adsl	= anderson(tdata[k].flatten(),dist='norm')		
+
+                if ( (ads > pars['AdCrit']) or (ksp < pars['KspCrit'])):
+                    ispec[k]	= np.nan
+                    inoise[k]	= np.nan
+
+        mednoise		= np.nanmedian(inoise)
+        badchans		= np.where(inoise > pars['NoiseDevFac']*mednoise)		
+        ispec[badchans]	= np.nan
+        inoise[badchans]= np.nan
+
+        comspec = np.array([velarr, inoise, inoise, ispec]).T		
+        np.savetxt(outspecdir+'/spec_'+str(detid[i])+'_'+str(pars['SmKpc'])+'.txt',comspec)
+
+        print('Reduced cube %d	of	%d'%(i,len(detid)))
 
     return 
 #	----------------------------------------------------------------------------------------------------

@@ -34,6 +34,8 @@ def potion_args():
     parser.add_argument("--exubcubes", help = "Extract subcubes", action='store_true')
     parser.add_argument("--smoothcubes", help = "Spatially smooth subcubes", action='store_true')
     parser.add_argument("--intercubes", help = "Spectrally interpolate subcubes", action='store_true')
+    parser.add_argument("--regcubes", help = "Regris subcubes to spatial pixels", action='store_true')
+    parser.add_argument("--redcubes", help = "Reduce subcubes", action='store_true')
         
     args = parser.parse_args()
 
@@ -105,23 +107,17 @@ def phials (pars):
         print("Creating ",pars['WorkDir']+pars['SubDir']+pars['IscubeDir'])
         os.mkdir(pars['WorkDir']+pars['SubDir']+pars['IscubeDir'])
     
-    if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['OscubeDir'])):
-        print("Found ",pars['WorkDir']+pars['SubDir']+pars['OscubeDir'])
+    if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['RegCubes'])):
+        print("Found ",pars['WorkDir']+pars['SubDir']+pars['RegCubes'])
     else:
-        print("Creating ",pars['WorkDir']+pars['SubDir']+pars['OscubeDir'])
-        os.mkdir(pars['WorkDir']+pars['SubDir']+pars['OscubeDir'])
+        print("Creating ",pars['WorkDir']+pars['SubDir']+pars['RegCubes'])
+        os.mkdir(pars['WorkDir']+pars['SubDir']+pars['RegCubes'])
     
-    if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['RedregCubes'])):
-        print("Found ",pars['WorkDir']+pars['SubDir']+pars['RedregCubes'])
+    if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['RedCubes'])):
+        print("Found ",pars['WorkDir']+pars['SubDir']+pars['RedCubes'])
     else:
-        print("Creating ",pars['WorkDir']+pars['SubDir']+pars['RedregCubes'])
-        os.mkdir(pars['WorkDir']+pars['SubDir']+pars['RedregCubes'])
-    
-    if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['RedintCubes'])):
-        print("Found ",pars['WorkDir']+pars['SubDir']+pars['RedintCubes'])
-    else:
-        print("Creating ",pars['WorkDir']+pars['SubDir']+pars['RedintCubes'])
-        os.mkdir(pars['WorkDir']+pars['SubDir']+pars['RedintCubes'])
+        print("Creating ",pars['WorkDir']+pars['SubDir']+pars['RedCubes'])
+        os.mkdir(pars['WorkDir']+pars['SubDir']+pars['RedCubes'])
     
     if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['SpecDir'])):
         print("Found ",pars['WorkDir']+pars['SubDir']+pars['SpecDir'])
@@ -135,17 +131,11 @@ def phials (pars):
         print("Creating ",pars['WorkDir']+pars['SubDir']+pars['IntSpecs'])
         os.mkdir(pars['WorkDir']+pars['SubDir']+pars['IntSpecs'])
     
-    if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['RedregSpecs'])):
-        print("Found ",pars['WorkDir']+pars['SubDir']+pars['RedregSpecs'])
+    if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['RedSpecs'])):
+        print("Found ",pars['WorkDir']+pars['SubDir']+pars['RedSpecs'])
     else:
-        print("Creating ",pars['WorkDir']+pars['SubDir']+pars['RedregSpecs'])
-        os.mkdir(pars['WorkDir']+pars['SubDir']+pars['RedregSpecs'])
-
-    if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['RedintSpecs'])):
-        print("Found ",pars['WorkDir']+pars['SubDir']+pars['RedintSpecs'])
-    else:
-        print("Creating ",pars['WorkDir']+pars['SubDir']+pars['RedintSpecs'])
-        os.mkdir(pars['WorkDir']+pars['SubDir']+pars['RedintSpecs'])
+        print("Creating ",pars['WorkDir']+pars['SubDir']+pars['RedSpecs'])
+        os.mkdir(pars['WorkDir']+pars['SubDir']+pars['RedSpecs'])
     
     if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['NoiseDir'])):
         print("Found ",pars['WorkDir']+pars['SubDir']+pars['NoiseDir'])
@@ -159,11 +149,11 @@ def phials (pars):
         print("Creating ",pars['WorkDir']+pars['SubDir']+pars['InoiseDir'])
         os.mkdir(pars['WorkDir']+pars['SubDir']+pars['InoiseDir'])
     
-    if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['RenoiseDir'])):
-        print("Found ",pars['WorkDir']+pars['SubDir']+pars['RenoiseDir'])
+    if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['RegnoiseDir'])):
+        print("Found ",pars['WorkDir']+pars['SubDir']+pars['RegnoiseDir'])
     else:
-        print("Creating ",pars['WorkDir']+pars['SubDir']+pars['RenoiseDir'])
-        os.mkdir(pars['WorkDir']+pars['SubDir']+pars['RenoiseDir'])
+        print("Creating ",pars['WorkDir']+pars['SubDir']+pars['RegnoiseDir'])
+        os.mkdir(pars['WorkDir']+pars['SubDir']+pars['RegnoiseDir'])
 
     return (0)
 #   ----------------------------------------------------------------------------------------------------------------
