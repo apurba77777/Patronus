@@ -21,18 +21,19 @@ from specscripts.processubcubes import *
 #
 #   Muggle-friendly potions (can be run without any prior knowledge of potion making)  
 #             
-#                           excat       //  Extract catalogue for spectroscopic analysis
-#                           exubcubes   //  Extract subcubes
-#                           smoothcubes //  Spatially smooth subcubes
-#                           intercubes  //  Spectrally interpolate subcubes
-#                           regcubes    //  Regrid subcubes to spatial pixels
-#                           redcubes    //  Reduce subcubes
+#                           excat           //  Extract catalogue for spectroscopic analysis
+#                           exubcubes       //  Extract subcubes
+#                           smoothcubes     //  Spatially smooth subcubes
+#                           intercubes      //  Spectrally interpolate subcubes
+#                           regcubes        //  Regrid subcubes to spatial pixels
+#                           redcubes        //  Reduce subcubes
+#                           getmastercat    //  Construct master catalogue
 #                          
 #
 #   Simple & convenient charms          
-#                           obliviate   //  Clear existing files 
-#                           lumos       //  List Usable Modes On Screen
-#                           revelio     //  Reveal configuration parameters
+#                           obliviate       //  Clear existing files 
+#                           lumos           //  List Usable Modes On Screen
+#                           revelio         //  Reveal configuration parameters
 #
 #   Advanced spells and charms (Should NOT be attempted before passing O. W. L.s)
 #                        
@@ -100,7 +101,7 @@ if (argus.exubcubes):
     dets    = dets[exsrcs]
     print('Extracted sources		= %d'%len(dets))
     np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'], dets, \
-               fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
+                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
 
 
 
@@ -147,3 +148,11 @@ if (argus.redcubes):
     reducecubes(getcubedir, getnoisedir, redscubedir, outspecdir, detid, istart=0, pars=pars, cskip=coskip, nobj=-1)
     
 
+
+#   Construct master catalogue
+if (argus.getmastercat):  
+    dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
+    (gdets, stackid) = conmastercat(dets, pars=pars)
+    print('Sources	= %d'%len(gdets))
+    np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/mastercat_'+pars['ColType']+'.cat', gdets, \
+                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')

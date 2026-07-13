@@ -95,9 +95,42 @@ def exkhastocat(pars):
     sedfile.close()		
     
     return (srcs)			
-#	----------------------------------------------------------------------------------------------------
+#	---------------------------------------------------------------------------------------------------
 
 
+def conmastercat(gdets, pars=None):
+    
+    #   Function to construct the master sample		
+
+    #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV R   Type
+    #	0	1	2	3	4	5	6	7	8	9	    10	11	12  13  14
+
+    if (pars['ColType']=="blue"):
+        stackid	= 'mastercat_blue'
+        nuvrlim	= [-10000.0,4.0]
+    elif (pars['ColType']=="red"):
+        stackid	= 'mastercat_red'
+        nuvrlim	= [4.0,100000.0]
+    else:
+        stackid	= 'mastercat_all'
+        nuvrlim	= [-100000.0,100000.0]
+
+    print('Sample size full		=	%d'%len(gdets))
+
+    gdets	= gdets[(gdets[:,12] - gdets[:,13]) > nuvrlim[0]]
+    gdets	= gdets[(gdets[:,12] - gdets[:,13]) < nuvrlim[1]]
+    print('Within NUV-r limit		=	%d'%len(gdets))
+
+    gdets	= gdets[gdets[:,4] >= pars['ZLim'][0]]
+    gdets	= gdets[gdets[:,4] <= pars['ZLim'][1]]
+    print('Within redshift range		=	%d'%len(gdets))
+
+    gdets	= gdets[gdets[:,11] >  pars['LsmLim'][0]]
+    gdets	= gdets[gdets[:,11] <= pars['LsmLim'][1]]
+    print('Within lSM limit		=	%d'%len(gdets))
+
+    return (gdets, stackid) 
+#	--------------------------------------------------------------------------------------------------
 
 
 

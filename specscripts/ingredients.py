@@ -29,13 +29,14 @@ def potion_args():
     parser.add_argument("--lumos", help = "List usable modes on screen", action='store_true')
     parser.add_argument("--revelio", help = "Reveal configuration parameters", action='store_true')
 
-    #   Search at a specific sky position
+    #   
     parser.add_argument("--excat", help = "Extract catalogue for spectroscopic analysis", action='store_true')
     parser.add_argument("--exubcubes", help = "Extract subcubes", action='store_true')
     parser.add_argument("--smoothcubes", help = "Spatially smooth subcubes", action='store_true')
     parser.add_argument("--intercubes", help = "Spectrally interpolate subcubes", action='store_true')
     parser.add_argument("--regcubes", help = "Regris subcubes to spatial pixels", action='store_true')
     parser.add_argument("--redcubes", help = "Reduce subcubes", action='store_true')
+    parser.add_argument("--getmastercat", help = "Construct master catalogue", action='store_true')
         
     args = parser.parse_args()
 

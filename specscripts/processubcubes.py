@@ -250,7 +250,6 @@ def reducecubes(getcubedir, getnoisedir, redscubedir, outspecdir, detid, istart=
         inoise[endchans]= np.nan
 
         tdata	= imgarr[:,::cskip,::cskip]		
-        temparr	= []
 
         for k in range (0,len(ispec)):
             if (np.isfinite(inoise[k])):
