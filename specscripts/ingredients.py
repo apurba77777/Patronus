@@ -37,6 +37,7 @@ def potion_args():
     parser.add_argument("--regcubes", help = "Regris subcubes to spatial pixels", action='store_true')
     parser.add_argument("--redcubes", help = "Reduce subcubes", action='store_true')
     parser.add_argument("--getmastercat", help = "Construct master catalogue", action='store_true')
+    parser.add_argument("--getfinecat", help = "Construct catalogue with well-behaved spectra", action='store_true')
         
     args = parser.parse_args()
 
@@ -94,7 +95,13 @@ def phials (pars):
         print("Found ",pars['WorkDir']+pars['ResplotDir'])
     else:
         print("Creating ",pars['WorkDir']+pars['ResplotDir'])
-        os.mkdir(pars['WorkDir']+pars['ResplotDir'])    
+        os.mkdir(pars['WorkDir']+pars['ResplotDir'])   
+
+    if (os.path.exists(pars['WorkDir']+pars['ResplotDir']+pars['SamPlotDir'])):
+        print("Found ",pars['WorkDir']+pars['ResplotDir']+pars['SamPlotDir'])
+    else:
+        print("Creating ",pars['WorkDir']+pars['ResplotDir']+pars['SamPlotDir'])
+        os.mkdir(pars['WorkDir']+pars['ResplotDir']+pars['SamPlotDir'])  
 
     if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['ScubeDir'])):
         print("Found ",pars['WorkDir']+pars['SubDir']+pars['ScubeDir'])

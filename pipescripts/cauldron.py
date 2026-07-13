@@ -5,6 +5,7 @@ from specscripts.ingredients import *
 from specscripts.auxfns import *
 from specscripts.compilecats import *
 from specscripts.processubcubes import *
+from specscripts.constructcats import *
 
 #	---------------------------------------------------------------------------------------------------------
 #
@@ -28,6 +29,7 @@ from specscripts.processubcubes import *
 #                           regcubes        //  Regrid subcubes to spatial pixels
 #                           redcubes        //  Reduce subcubes
 #                           getmastercat    //  Construct master catalogue
+#                           getfinecat      //  Construct catalogue with well-behaved spectra
 #                          
 #
 #   Simple & convenient charms          
@@ -97,7 +99,8 @@ if (argus.excat):
 if (argus.exubcubes):  
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CatFile'])
     (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
-    exsrcs  = exubcubes(detid, detz, posra, posdec, obschan, istart=0, pars=pars, ovrt=argus.obliviate, nobj=35)
+    detid   = detid.astype(int)
+    exsrcs  = exubcubes(detid, detz, posra, posdec, obschan, istart=0, pars=pars, ovrt=argus.obliviate, nobj=-1)
     dets    = dets[exsrcs]
     print('Extracted sources		= %d'%len(dets))
     np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'], dets, \
@@ -118,6 +121,7 @@ if (argus.smoothcubes):
 if (argus.intercubes):  
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
     (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
+    detid   = detid.astype(int)
     intercubes(detid, detz, posra, posdec, obschan, istart=0, pars=pars, ovrt=argus.obliviate, nobj=-1)
 
 
@@ -135,6 +139,7 @@ if (argus.regcubes):
 if (argus.redcubes):  
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
     (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
+    detid   = detid.astype(int)
     if (pars['ReGrid']):
         print("\n Regridding has not yet been implemented...\n")
         sys.exit()
@@ -152,14 +157,27 @@ if (argus.redcubes):
 #   Construct master catalogue
 if (argus.getmastercat):  
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
-    (gdets, stackid) = conmastercat(dets, pars=pars)
-    print('Sources	= %d'%len(gdets))
+    gdets   = conmastercat(dets, pars=pars)
+    print('\n     Sources	= %d'%len(gdets))
     np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/mastercat_'+pars['ColType']+'.cat', gdets, \
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
     
 
 
+#   Construct catalogue with well-behaved spectra
+if (argus.getfinecat):  
+    dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/mastercat_'+pars['ColType']+'.cat')
+    if (pars['ReGrid']):
+        print("\n Regridding has not yet been implemented...\n")
+        sys.exit()
+    else:
+        redscubedir = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedCubes']
+        outspecdir  = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedSpecs']
 
+    gdets   = confinecat(redscubedir, outspecdir, dets, pars=pars)
+    print('\n     Sources	= %d'%len(gdets))
+    np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/finecat_'+pars['ColType']+'.cat', gdets, \
+                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
 
 
 

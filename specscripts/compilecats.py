@@ -106,13 +106,10 @@ def conmastercat(gdets, pars=None):
     #	0	1	2	3	4	5	6	7	8	9	    10	11	12  13  14
 
     if (pars['ColType']=="blue"):
-        stackid	= 'mastercat_blue'
         nuvrlim	= [-10000.0,4.0]
     elif (pars['ColType']=="red"):
-        stackid	= 'mastercat_red'
         nuvrlim	= [4.0,100000.0]
     else:
-        stackid	= 'mastercat_all'
         nuvrlim	= [-100000.0,100000.0]
 
     print('Sample size full		=	%d'%len(gdets))
@@ -129,7 +126,7 @@ def conmastercat(gdets, pars=None):
     gdets	= gdets[gdets[:,11] <= pars['LsmLim'][1]]
     print('Within lSM limit		=	%d'%len(gdets))
 
-    return (gdets, stackid) 
+    return (gdets) 
 #	--------------------------------------------------------------------------------------------------
 
 
