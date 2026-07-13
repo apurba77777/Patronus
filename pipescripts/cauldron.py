@@ -156,3 +156,21 @@ if (argus.getmastercat):
     print('Sources	= %d'%len(gdets))
     np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/mastercat_'+pars['ColType']+'.cat', gdets, \
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
