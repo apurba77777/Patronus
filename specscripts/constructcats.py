@@ -16,7 +16,7 @@ from specscripts.samplotfns import *
 
 def confinecat(redscubedir, outspecdir, gdets, pars=None):
     
-    #   catalogue with well-behaved spectra	
+    #   Generate catalogue with well-behaved spectra	
 
     #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV R   Type
     #	0	1	2	3	4	5	6	7	8	9	    10	11	12  13  14
@@ -100,6 +100,55 @@ def confinecat(redscubedir, outspecdir, gdets, pars=None):
     noiseratplt(setrats, pars=pars)
 
     return (gdetsout) 
+#	--------------------------------------------------------------------------------------------------
+
+def confinecat(gdets, grefs, pars=None):
+    
+    #   catalogue with well-behaved spectra	
+
+    #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV R   Type
+    #	0	1	2	3	4	5	6	7	8	9	    10	11	12  13  14
+
+    print('Sample size full		=	%d'%len(gdets))
+
+    if (pars['ExclNbrs']):
+	    
+        if (pars['NbrKpc'] <= 0):
+            radinkpc    = pars['SmKpc']
+        else:
+            radinkpc    = pars['NbrKpc']
+
+        print("Excluding neighbours within "+str(radinkpc)+" kpc and "+str(pars['VelNbr'])+" km/s")
+
+        clearcat	= []
+
+        for i in range (0, len(gdets)):
+        
+            isclear     = True
+            nbrs		= 0
+            arcsecforkpc= (1+gdets[i,4])*radinkpc*180*3600/(d_com_gpc(gdets[i,4])*1.0e6*np.pi)
+        
+            for j in range (0, len(grefs)):
+            
+                if (gdets[i,1] != grefs[j,1]):					
+                    if (distang(grefs[j,2], gdets[i,2], grefs[j,3], gdets[i,3]) < arcsecforkpc):						
+                        dvel	= cc*1.0e-3*np.abs(gdets[i,4]-grefs[j,4]) / (1.0+gdets[i,4])					
+                        if (dvel < 2*pars['VelNbr']):
+                            isclear	=	False
+                            nbrs	=	nbrs+1
+	
+            if (isclear):
+                clearcat.append(gdets[i])
+        
+        clearcat	= np.array(clearcat)	
+        print("Clear galaxies	= %d"%len(clearcat))
+        gdets       = clearcat
+
+
+
+
+
+    return 
 #	--------------------------------------------------------------------------------------------------
 
 
