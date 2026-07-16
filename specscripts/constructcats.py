@@ -4,6 +4,7 @@ import numpy as np
 from astropy.wcs import WCS
 from scipy.stats import kstest
 from scipy.stats import anderson
+import matplotlib.pyplot as plt
 from specscripts.auxfns import *
 from specscripts.samplotfns import *
 
@@ -43,13 +44,13 @@ def confinecat(redscubedir, outspecdir, gdets, pars=None):
         baseinoise	=	basespecfull[:,2]
         basespec	=	basespecfull[:,3]
 
-        print(i, len(ispec), len(ispecraw))
-
-        if(len(ispec) >= pars['MincFrac']*len(ispecraw)):								#	Maximum allowed flagging criterion
+        #	Maximum allowed flagging criterion
+        if(len(ispec) >= pars['MincFrac']*len(ispecraw)):								
             kindices.append(i)
             ispecsnr	=	ispec/inoise
 
-            if((np.nanmax(np.abs(ispecsnr)) < pars['MaxOut']) and (np.nanmax(np.abs(ispec/fullnoise)) < pars['MaxOut'])):									#	Maximum allowed S/N criterion
+            #	Maximum allowed S/N criterion
+            if((np.nanmax(np.abs(ispecsnr)) < pars['MaxOut']) and (np.nanmax(np.abs(ispec/fullnoise)) < pars['MaxOut'])):									
                 oindices.append(i)
                 basesnr		=	basespec/baseinoise
                 snrnoise	=	np.nanstd(basesnr)
@@ -77,7 +78,7 @@ def confinecat(redscubedir, outspecdir, gdets, pars=None):
     gdets		=	gdets00
 
     for i in range (0,len(gdets)):
-        print("src	%d (%d / %d)"%(int(gdets[i,0]), i, len(gdets)))	
+        #print("src	%d (%d / %d)"%(int(gdets[i,0]), i, len(gdets)))	
         detid	=	int(gdets[i,1])		
         icube	=	fits.open(redscubedir+'/xubcube_'+str(detid)+'_'+str(pars['SmKpc'])+'.fits')
         idata	=	icube[0].data

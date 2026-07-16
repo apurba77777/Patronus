@@ -23,24 +23,24 @@ def noiseratplt(setrats, pars=None):
     
     #   Plot noise ratios
 
-    fig		=	plt.figure(figsize=(2.8,2.4))
-    ax 		= 	fig.add_axes([0.15, 0.14, 0.83, 0.84])
+    fig		=	plt.figure(figsize=(3.2,2.8))
+    ax 		= 	fig.add_axes([0.15, 0.15, 0.82, 0.84])
     ax.tick_params(axis="both",direction="in",bottom=True,right=True,top=True,left=True)
     ax.hist(setrats, bins=100)
-    ax.axvline(x=1.0/np.sqrt(pars['CavgFac']), c='k',ls='--')
+    #ax.axvline(x=1.0/np.sqrt(pars['CavgFac']), c='k',ls='--')
     ax.axvline(x=pars['RatLims'][0], c='r',ls='--',lw=0.5)
     ax.axvline(x=pars['RatLims'][1], c='r',ls='--',lw=0.5)
 
     #ax.set_ylim(ymax=78)
-    ax.set_xlim([0.12, 0.52])
-    ax.set_ylabel(r'Number of galaxies')
-    ax.yaxis.set_label_coords(-0.12, 0.5)
+    #ax.set_xlim([0.12, 0.52])
+    ax.set_ylabel(r'Number of galaxies', fontsize=10)
+    ax.yaxis.set_label_coords(-0.11, 0.5)
 
-    ax.set_xlabel(r'Noise (%d km s$^{-1}$) / Noise (%d km s$^{-1}$)'%(int(10*pars['VelRes']), int(pars['VelRes'])))
+    ax.set_xlabel(r'Noise (%d km s$^{-1}$) / Noise (%d km s$^{-1}$)'%(int(10*pars['VelRes']), int(pars['VelRes'])), \
+                  fontsize=10)
 
-    #plt.savefig("../resplots/extra/noiserat_"+stackid+".pdf",	transparent=True, format='pdf')
-    #plt.close()
-    plt.show()
+    plt.savefig("../resplots/extra/noiserat_"+stackid+".pdf",	transparent=True, format='pdf')
+    plt.close()
 
     return
 #	--------------------------------------------------------------------------------------------------

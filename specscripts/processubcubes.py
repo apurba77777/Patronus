@@ -6,6 +6,7 @@ from scipy.optimize import curve_fit
 from scipy.stats import kstest
 from scipy.stats import anderson
 from astropy.wcs import WCS
+import matplotlib.pyplot as plt
 import casatasks as ct
 import casatools as ctools
 from specscripts.auxfns import *
@@ -115,17 +116,17 @@ def intercubes(detid, detz, posra, posdec, obschan, istart=0, pars=None, ovrt=Tr
 
         specfile	= np.loadtxt(pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['SpecDir']+'/spec_'+str(detid[i])+'_'+str(pars['SmKpc'])+'.txt')
 
-        rfreqarr	=	specfile[:,2]
-        rvelarr		=	relvel(pars['RestFreq'], (1.0 + detz[i])*rfreqarr)
-        ivelarr0	=	np.arange( -pars['FSize']*pars['VelRes'], (pars['FSize']+1)*pars['VelRes'], pars['VelRes'], dtype=float)
-        ivelarr		=	ivelarr0[::-1]
+        rfreqarr	= specfile[:,2]
+        rvelarr		= relvel(pars['RestFreq'], (1.0 + detz[i])*rfreqarr)
+        ivelarr0	= np.arange( -pars['FSize']*pars['VelRes'], (pars['FSize']+1)*pars['VelRes'], pars['VelRes'], dtype=float)
+        ivelarr		= ivelarr0[::-1]
 
         iman.open(pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['IscubeDir']+"/subcube_"+str(detid[i])+"_"+str(pars['SmKpc'])+".im")
-        imarr		=	iman.getchunk()		
-        carr		=	np.copy(imarr)
-        ccarr		=	np.zeros(carr.shape, dtype='float32')
+        imarr		= iman.getchunk()		
+        carr		= np.copy(imarr)
+        ccarr		= np.zeros(carr.shape, dtype='float32')
 
-        gchans		=	np.ones(ivelarr.shape, dtype=int)
+        gchans		= np.ones(ivelarr.shape, dtype=int)
 
         for k in range (0, len(gchans)):		
 	
@@ -155,7 +156,7 @@ def intercubes(detid, detz, posra, posdec, obschan, istart=0, pars=None, ovrt=Tr
                     wl				=	(rvelarr[lowind]-ivelarr[k])/(rvelarr[lowind]-rvelarr[lowind+1])	
                     wr				=	(ivelarr[k]-rvelarr[lowind+1])/(rvelarr[lowind]-rvelarr[lowind+1])
                     ccarr[:,:,k]	=	(wl * carr[:,:,lowind]/pmax[lowind]) + (wr * carr[:,:,lowind+1]/pmax[lowind+1])				
-		
+
         iman.putchunk(ccarr)
         iman.done()
 
@@ -233,14 +234,17 @@ def reducecubes(getcubedir, getnoisedir, redscubedir, outspecdir, detid, istart=
                         imgarr[:,m,n]	= yarr - qbase(velarr, *popt)		
                 else:
                     imgarr[:,m,n]	= np.nan
-
-        ispec	=	imgarr[:,int(imgarr.shape[1]/2),int(imgarr.shape[2]/2)]	
-
+    
         icube[0].data	= imgarr
         icube.writeto(redscubedir+'/xubcube_'+str(detid[i])+'_'+str(pars['SmKpc'])+'.fits',overwrite=True)
         icube.close()
 
         #print('Reduced cube %d	of	%d'%(i,len(detid)))
+
+        icube	=	fits.open(getcubedir+'/xubcube_'+str(detid[i])+'_'+str(pars['SmKpc'])+'.fits')
+        idata	=	icube[0].data
+        ispec	=	idata[:,int(idata.shape[1]/2),int(idata.shape[2]/2)]	
+        inoise	=	np.loadtxt(getnoisedir+'/spec_'+str(detid[i])+'_'+str(pars['SmKpc'])+'_noise.txt')	
 
         endchans		= np.where(np.abs(velarr) >= pars['HalfLen'])
         fchan			= np.where(inoise <= 0.0)
@@ -249,21 +253,26 @@ def reducecubes(getcubedir, getnoisedir, redscubedir, outspecdir, detid, istart=
         ispec[endchans]	= np.nan
         inoise[endchans]= np.nan
 
-        tdata	= imgarr[:,::cskip,::cskip]		
+        # Tests for Gausiannity disabled for now
+        # tdata	= imgarr[:,::cskip,::cskip]		
 
-        for k in range (0,len(ispec)):
-            if (np.isfinite(inoise[k])):
-                ksd,ksp			= kstest(tdata[k].flatten(),'norm',args=(0.0,np.nanstd(tdata[k])))
-                ads,adcv,adsl	= anderson(tdata[k].flatten(),dist='norm')		
+        # for k in range (0,len(ispec)):
+        #     if (np.isfinite(inoise[k])):
+        #         ksd,ksp			= kstest(tdata[k].flatten(),'norm',args=(0.0,np.nanstd(tdata[k])))
+        #         ads,adcv,adsl	= anderson(tdata[k].flatten(),dist='norm')		
+        #         print(ksd,ksp)
+        #         print(ads,adcv,adsl)
+        #         if ( (ads > pars['AdCrit']) or (ksp < pars['KspCrit'])):
+        #             ispec[k]	= np.nan
+        #             inoise[k]	= np.nan
 
-                if ( (ads > pars['AdCrit']) or (ksp < pars['KspCrit'])):
-                    ispec[k]	= np.nan
-                    inoise[k]	= np.nan
-
-        mednoise		= np.nanmedian(inoise)
-        badchans		= np.where(inoise > pars['NoiseDevFac']*mednoise)		
-        ispec[badchans]	= np.nan
-        inoise[badchans]= np.nan
+        mednoise		    = np.nanmedian(inoise)
+        badchans		    = np.where(inoise > pars['NoiseDevFac']*mednoise)	
+        abadchans		    = np.where(inoise < mednoise/pars['NoiseDevFac'])	
+        ispec[badchans]	    = np.nan
+        inoise[badchans]    = np.nan
+        ispec[abadchans]    = np.nan
+        inoise[abadchans]   = np.nan
 
         comspec = np.array([velarr, inoise, inoise, ispec]).T		
         np.savetxt(outspecdir+'/spec_'+str(detid[i])+'_'+str(pars['SmKpc'])+'.txt',comspec)
