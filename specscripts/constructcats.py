@@ -102,9 +102,11 @@ def confinecat(redscubedir, outspecdir, gdets, pars=None):
     return (gdetsout) 
 #	--------------------------------------------------------------------------------------------------
 
-def confinecat(gdets, grefs, pars=None):
+
+def constackcat(gdets, grefs, pars=None):
     
-    #   catalogue with well-behaved spectra	
+    #   Construct catalogues for stacking
+    #   excluding galaxies with neighbours within a given radius and velocity range	
 
     #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV R   Type
     #	0	1	2	3	4	5	6	7	8	9	    10	11	12  13  14
@@ -144,11 +146,19 @@ def confinecat(gdets, grefs, pars=None):
         print("Clear galaxies	= %d"%len(clearcat))
         gdets       = clearcat
 
+    #   To bin or not to bin...
+
+    bgdets  = []
+
+    if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
+        print("\n   No binning of the sample... \n")
+        bgdets.append(gdets)
+    else:
+        print(f"\n   Binning sample in {pars['BinParam']} ({pars['BinEdges']})\n")
+        
 
 
-
-
-    return 
+    return (bgdets)
 #	--------------------------------------------------------------------------------------------------
 
 

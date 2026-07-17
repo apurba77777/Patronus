@@ -93,7 +93,6 @@ KspLim:       0.001                 #   K-S test p-value limit for spectra
 AdsLim:       1.44                  #   A-D test statistic limit for spectra
 
 CavgFac:      10                    #	Channel averaging for noise ratio
-#LimFac:       0.47                  #	Taken from Chowdhury et al. 2022
 RatLims:      [0.41, 0.47]          #	Allowed range for noise ratios
 
 
@@ -105,8 +104,14 @@ VelNbr:       300.0                 #   Velicity difference with a neighbour in 
 NbrKpc:       150                   #   Spatial separation with a close neighbour in kpc, 0==smkpc	
 NbrType:      'all'                 #   What type of galaxies to consider as nighbours 
 
+MbLim:		  [-100.0,0.0]     		#	NOT IN USE currently
 LsmLim:       [8.0,15.0]            #	Limits on log(M_*)
 ZLim:         [0.35,0.38]           #	Limits on redshift
+
+#	Binning
+
+BinParam:     "lsm"				    #	Parameter to bin (supports only "lsm", ""/Null--> no binning)
+BinEdges:	  Null				    #	Bin edges, Set = Null to disable binning
 
 
 #   Stacking related parameters ----------------------------------------------------
