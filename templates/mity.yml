@@ -1,0 +1,137 @@
+#   --------------------------------------
+#   Parameters for calibration & imaging
+#   --------------------------------------
+
+#   Directories ..............................................................
+
+CubeDir:      "/media/snowy/AA6F-46F3/current_works/cosmosmity/mitycubes/"
+WorkDir:      "../temp/"
+CatDir:       "../cats/"
+
+StacatDir:    "stacats/"                                    #	Within workdir
+SubDir:       "r5_subcubes/"                                #	Within workdir
+ResplotDir:   "resplots/"                                   #	Within workdir
+
+SamPlotDir:   "samplots/"                                   #   Within resplotdir
+
+ScubeDir:     "subcubes/"                                   #	Within subdir
+IscubeDir:    "subcubes_interpolated/"                      #   Spectrally interpolated
+RegCubes:     "subcubes_regridded/"                         #   Spatially regridded
+RedCubes:     "reduced_interpolated_cubes_1500/"            #   Reduced
+
+SpecDir:      "rawspecs/"                                   #	Within subdir
+IntSpecs:     "rawspecs_interpolated/"                      #   Spectrally interpolated
+RedSpecs:     "intreduced_specs_1500/"                      #   Reduced
+
+NoiseDir:     "noisespecs/"                                 #	Within subdir
+InoiseDir:    "noisespecs_interpolated/"                    #   Spectrally interpolated
+RegnoiseDir:  "noisespecs_regridded/"                       #   Reduced
+
+
+#	Catalogues and source cubes	-------------------------------------------------
+
+ImgCube:      "l1_r0p5_dirty_contsub_0000-1817"              #	Spectral cube without extension 
+SpzCat:       "specz_compilation_COSMOS_DR1.1_unique.fits"   #	Specz catalogue
+SedCat:       "lephare_results_specz_compilation_DR1.1.fits" #	Specz catalogue
+ChanFile:     "mightee_dirty_chanstat.txt"                   #	Channel status file
+
+
+#	Initial source extraction parameters	-------------------------------------	
+
+CenRa:        150.00                #   Centre of MIGHTEE-HI in deg
+CenDec:       2.2058333             #   Centre of MIGHTEE-HI in deg
+
+MaxRadeg:     0.6                   # 	Maximum radius in deg
+RestFreq:     1420.40575            #	Rest frequency in MHz
+PiXys:        1                     #	Pixel system of the image file
+ZTol:         0.001                 #   Redshift tolerance
+
+SrcType:      "galaxy"              #   galaxy / agn, ""--> all
+
+#	Derived source catalogues	-------------------------------------------------
+
+CatFile:      "mity.excat"          #	Extracted catalogue
+CubeCatFile:  "mity.cubecat"        #	New catalogue file
+FLen:         1818                  #	Length of the frequency axis
+PiXec:        2.0                   #	Size of one pixel in arcseconds
+BeamSec:      20.0                  #   Representative beam size in arcsec 
+
+#	Subcube processing parameters	---------------------------------------------
+
+SmKpc:        0                     #	Smoothing scale in kpc, 0 = No smoothing
+
+BxSize:       100                   #	Length of the box in pixels
+FSize:        61                    #	Half length of the spectral baseline
+N0Kpc:        150                   #	Inner diameter of annulus for noise estimation
+NKpc:         500                   #	Width of the annulus for noise estimation	
+
+#   Spectral interpolation
+VelRes:       35.0                  #	Velocity resolution in km/s (before Hanning smoothing)
+
+#   Spatial regridding
+ReGrid:       False                 #   Spatially regrid cubes?
+PixKpc:       15.0                  #	Size of output pixel in kpc (if regrid=true)
+
+#   Spectral baseline subtraction
+FitOrder:     2                     #	Spectral baseline polynomial order
+ChansL:       [-5, 5]               # 	Channels at the centre to exclude from the fit
+HalfLen:      1520.0                #	Half length of fitting length in km/s
+HalfWidth:    250.0                 #   Half width of the expected line in km/s
+
+
+#   Parameters related flagging of sub-cubes    ------------------------------------
+
+AvgLens:      [4]                   #	Spectral averaging lengths
+CritRatio:    [1.6]                 #	Critical noise ratio 
+NoiseDevFac:  1.5                   #	Noise deviation factor
+#KspCrit:      0.01                 #	Critical KS test P-value **** Ignored now
+#AdCrit:       1.4                  #	Critical value of AD statistic **** Ignored now
+
+MincFrac:     0.6                   #	minimum fraction of spectrum required to be unflagged
+MaxOut:       5.0                   #   Maximum outlier in the spectrum allowed
+KspLim:       0.001                 #   K-S test p-value limit for spectra
+AdsLim:       1.44                  #   A-D test statistic limit for spectra
+
+CavgFac:      10                    #	Channel averaging for noise ratio
+#LimFac:       0.47                  #	Taken from Chowdhury et al. 2022
+RatLims:      [0.41, 0.47]          #	Allowed range for noise ratios
+
+
+#   Stacking sample selection parameters    ----------------------------------------
+
+ColType:      "blue"                #   Colour selection
+ExclNbrs:     True                  #   Exclude galaxies with close neighbours?
+VelNbr:       300.0                 #   Velicity difference with a neighbour in km/s
+NbrKpc:       150                   #   Spatial separation with a close neighbour in kpc, 0==smkpc	
+NbrType:      'all'                 #   What type of galaxies to consider as nighbours 
+
+LsmLim:       [8.0,15.0]            #	Limits on log(M_*)
+ZLim:         [0.35,0.38]           #	Limits on redshift
+
+
+#   Stacking related parameters ----------------------------------------------------
+
+BSize:        41                    #	Half spatial box size
+RmsPow:       0                     #   Power loaw weighting scheme
+ExRad:        5                     #   Exclusion radius for plane RMS 
+ExEdge:       5                     #   Edge pixel to exclude for plane RMS
+ExclChans:    [-5, 5]               #   Channels to exclude for baseline fitting 
+ExAvgChans:   [-2, 2]                 
+
+Thresh:       1.5                   #   Threshold in sigma for integration
+Realn:        100                   #   Number of random realizations for randomly misaligned stacking 
+
+PSize:        30                    #	Plot size
+
+
+#   Individual detection related parameters ----------------------------------------
+
+MinIndLsm:    10.0
+MinIndZ:      0.38
+VintRange:    100.0
+
+
+
+
+
+
