@@ -104,14 +104,14 @@ VelNbr:       300.0                 #   Velicity difference with a neighbour in 
 NbrKpc:       150                   #   Spatial separation with a close neighbour in kpc, 0==smkpc	
 NbrType:      'all'                 #   What type of galaxies to consider as nighbours 
 
-MbLim:		  [-100.0,0.0]     		#	NOT IN USE currently
+MbLim:		    [-100.0,0.0]     		  #	NOT IN USE currently
 LsmLim:       [8.0,15.0]            #	Limits on log(M_*)
 ZLim:         [0.35,0.38]           #	Limits on redshift
 
 #	Binning
 
-BinParam:     "lsm"				    #	Parameter to bin (supports only "lsm", ""/Null--> no binning)
-BinEdges:	  Null				    #	Bin edges, Set = Null to disable binning
+BinParam:     "lsm"				          #	Parameter to bin (supports only "lsm", ""/Null--> no binning)
+BinEdges:	    Null				          #	Bin edges, Set = Null to disable binning
 
 
 #   Stacking related parameters ----------------------------------------------------

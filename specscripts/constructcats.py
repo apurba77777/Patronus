@@ -4,6 +4,8 @@ import numpy as np
 from astropy.wcs import WCS
 from scipy.stats import kstest
 from scipy.stats import anderson
+import pickle as pkl
+from collections import namedtuple
 import matplotlib.pyplot as plt
 from specscripts.auxfns import *
 from specscripts.samplotfns import *
@@ -13,6 +15,18 @@ from specscripts.samplotfns import *
 #       Functions to construct final catalogues 
 #
 #   ---------------------------------------------------------------------------------------------------
+
+sampleflds  = ('sampname','isclear','reskpc','ngal','sampcat','zlim','nuvrlim','lsmlim','mblim', \
+                    'meanstkcube','meanstkcubeavg', 'meanstkspec', 'meanstkspecavg','meanplnrmsarr','meanplnrmsavg', \
+                        'medstkcube','medstkcubeavg','medstkspec', 'medstkspecavg','medplnrmsarr','medplnrmsavg', \
+                            'meanlumint', 'meanlumintavg', 'meanmh9', 'meanmh9avg', \
+                                'emeanmhrand', 'emeanpln', 'emeanplnavg', 'emeanmhjk', 'emeanmhjkavg', \
+                                    'medlumint', 'medlumintavg', 'medmh9', 'medmh9avg', \
+                                        'emedmhrand', 'emedpln', 'emedplnavg', 'emedmhjk', 'emedmhjkavg')
+
+stksmp      = namedtuple('stksmp', sampleflds, defaults=(None,) * len(sampleflds))
+#   --------------------------------------------------------------------------------------------------
+
 
 def confinecat(redscubedir, outspecdir, gdets, pars=None):
     
@@ -148,17 +162,44 @@ def constackcat(gdets, grefs, pars=None):
 
     #   To bin or not to bin...
 
-    bgdets  = []
-
     if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
-        print("\n   No binning of the sample... \n")
-        bgdets.append(gdets)
+        print("\n   No binning required... \n")
+        asamp   = stksmp()
+        asamp   = asamp._replace(sampname = pars['StackName'], isclear = pars['ExclNbrs'], reskpc = pars['SmKpc'], \
+                                 ngal = len(gdets), sampcat  = gdets, zlim = pars['ZLim'], lsmlim = pars['LsmLim'], \
+                                    mblim = pars['MbLim'])
+	
+        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+".pkl", 'wb')	
+        pkl.dump(asamp,sampfile)
+        sampfile.close()	
     else:
         print(f"\n   Binning sample in {pars['BinParam']} ({pars['BinEdges']})\n")
+        bgdets  = []
+        if (pars['BinParam']=="lsm"):
+            bcol    = gdets[:,11]
+        elif (pars['BinParam']=="sfr"):
+            bcol    = gdets[:,10]
+        elif (pars['BinParam']=="nuvr"):
+            bcol    = gdets[:,12] - gdets[:,13]
+        else:
+            print(f"Binning in {pars["BinParam"]} is not yet supported...")
+            sys.exit()
+
+        for ib in range (0, len(pars['BinEdges'])-1):
+            bgdets.append( gdets[ (bcol - pars['BinEdges'][ib])*(bcol - pars['BinEdges'][ib+1]) < 0.0 ] )
+
+        for i in range (0, len(bgdets)):
+            asamp   = stksmp()
+            asamp   = asamp._replace(sampname = pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i), \
+                                     isclear = pars['ExclNbrs'], reskpc = pars['SmKpc'], ngal = len(bgdets[i]), \
+                                        sampcat  = bgdets[i], zlim = pars['ZLim'], lsmlim = pars['LsmLim'], \
+                                            mblim = pars['MbLim'])
         
+            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
+            pkl.dump(asamp,sampfile)
+            sampfile.close()
 
-
-    return (bgdets)
+    return 0
 #	--------------------------------------------------------------------------------------------------
 
 
