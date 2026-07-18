@@ -20,9 +20,10 @@ sampleflds  = ('sampname','isclear','reskpc','ngal','sampcat','zlim','nuvrlim','
                     'meanstkcube','meanstkcubeavg', 'meanstkspec', 'meanstkspecavg','meanplnrmsarr','meanplnrmsavg', \
                         'medstkcube','medstkcubeavg','medstkspec', 'medstkspecavg','medplnrmsarr','medplnrmsavg', \
                             'meanlumint', 'meanlumintavg', 'meanmh9', 'meanmh9avg', \
-                                'emeanmhrand', 'emeanpln', 'emeanplnavg', 'emeanmhjk', 'emeanmhjkavg', \
-                                    'medlumint', 'medlumintavg', 'medmh9', 'medmh9avg', \
-                                        'emedmhrand', 'emedpln', 'emedplnavg', 'emedmhjk', 'emedmhjkavg')
+                                'meanrandarr', 'meanrandarravg', 'medrandarr', 'medrandarravg', \
+                                    'emeanmhrand', 'emeanpln', 'emeanplnavg', 'emeanmhjk', 'emeanmhjkavg', \
+                                        'medlumint', 'medlumintavg', 'medmh9', 'medmh9avg', \
+                                            'emedmhrand', 'emedpln', 'emedplnavg', 'emedmhjk', 'emedmhjkavg')
 
 stksmp      = namedtuple('stksmp', sampleflds, defaults=(None,) * len(sampleflds))
 #   --------------------------------------------------------------------------------------------------
@@ -163,7 +164,7 @@ def constackcat(gdets, grefs, pars=None):
     #   To bin or not to bin...
 
     if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
-        print("\n   No binning required... ")
+        print("\n   No binning required... \n")
         asamp   = stksmp()
         asamp   = asamp._replace(sampname = pars['StackName'], isclear = pars['ExclNbrs'], reskpc = pars['SmKpc'], \
                                  ngal = len(gdets), sampcat  = gdets, zlim = pars['ZLim'], lsmlim = pars['LsmLim'], \

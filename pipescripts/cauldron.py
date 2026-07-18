@@ -33,6 +33,7 @@ from specscripts.spectralstack import *
 #                           getfinecat      //  Construct catalogue with well-behaved spectra
 #                           stackcats       //  Construct sample for stacking
 #                           stackcubes      //  Stack spectral cubes
+#                           stackerrs       //  Calculate errors
 #                          
 #
 #   Simple & convenient charms          
@@ -197,15 +198,28 @@ if (argus.stackcubes):
         sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+".pkl", 'rb')	
         gsamp		= pkl.load(sampfile)
         sampfile.close()
-        stackubes(gsamp, outspecdir, redscubedir, pars=pars)
+        mgsamp      = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
+        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+".pkl", 'wb')	
+        pkl.dump(mgsamp, sampfile)
+        sampfile.close()
     else:
         for i in range (0, len(pars['BinEdges'])-1):
             sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
             gsamp		= pkl.load(sampfile)
             sampfile.close()
-            stackubes(gsamp, outspecdir, redscubedir, pars=pars)
+            mgsamp      = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
+            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
+            pkl.dump(mgsamp, sampfile)
+            sampfile.close()
     
     
+#   Calculate errors
+if (argus.stackerrs):
+    if (pars['ReGrid']):
+        print("\n Regridding has not yet been implemented...\n")
+        sys.exit()
+    else:
+        outspecdir  = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedSpecs']
     
     
 
