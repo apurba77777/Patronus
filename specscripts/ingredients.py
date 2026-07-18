@@ -38,6 +38,8 @@ def potion_args():
     parser.add_argument("--redcubes", help = "Reduce subcubes", action='store_true')
     parser.add_argument("--getmastercat", help = "Construct master catalogue", action='store_true')
     parser.add_argument("--getfinecat", help = "Construct catalogue with well-behaved spectra", action='store_true')
+    parser.add_argument("--stackcats", help = "Construct sample for stacking", action='store_true')
+    parser.add_argument("--stackcubes", help = "Stack spectral cubes", action='store_true')
         
     args = parser.parse_args()
 

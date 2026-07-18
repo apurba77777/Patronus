@@ -163,7 +163,7 @@ def constackcat(gdets, grefs, pars=None):
     #   To bin or not to bin...
 
     if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
-        print("\n   No binning required... \n")
+        print("\n   No binning required... ")
         asamp   = stksmp()
         asamp   = asamp._replace(sampname = pars['StackName'], isclear = pars['ExclNbrs'], reskpc = pars['SmKpc'], \
                                  ngal = len(gdets), sampcat  = gdets, zlim = pars['ZLim'], lsmlim = pars['LsmLim'], \

@@ -39,7 +39,8 @@ def noiseratplt(setrats, pars=None):
     ax.set_xlabel(r'Noise (%d km s$^{-1}$) / Noise (%d km s$^{-1}$)'%(int(10*pars['VelRes']), int(pars['VelRes'])), \
                   fontsize=10)
 
-    plt.savefig("../resplots/extra/noiserat_"+stackid+".pdf",	transparent=True, format='pdf')
+    plt.savefig(pars['WorkDir']+pars['ResplotDir']+pars['SamPlotDir']+"/noiserat_"+pars['StackName']+".pdf", 
+                transparent=True, format='pdf')
     plt.close()
 
     return

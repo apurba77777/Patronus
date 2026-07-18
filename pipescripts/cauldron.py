@@ -6,6 +6,7 @@ from specscripts.auxfns import *
 from specscripts.compilecats import *
 from specscripts.processubcubes import *
 from specscripts.constructcats import *
+from specscripts.spectralstack import *
 
 #	---------------------------------------------------------------------------------------------------------
 #
@@ -30,6 +31,8 @@ from specscripts.constructcats import *
 #                           redcubes        //  Reduce subcubes
 #                           getmastercat    //  Construct master catalogue
 #                           getfinecat      //  Construct catalogue with well-behaved spectra
+#                           stackcats       //  Construct sample for stacking
+#                           stackcubes      //  Stack spectral cubes
 #                          
 #
 #   Simple & convenient charms          
@@ -91,7 +94,6 @@ if (argus.excat):
     np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CatFile'], srcs, \
                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
 
-
 #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV R   Type
 #	0	1	2	3	4	5	6	7	8	9	    10	11	12  13  14
 
@@ -107,14 +109,12 @@ if (argus.exubcubes):
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
 
 
-
 #   Spatially smooth subcubes
 if (argus.smoothcubes):  
     if (pars['SmKpc'] > 0):
         print("\n Smoothing has not yet been implemented...\n")
     else:
         print("\n No smoothing required...\n")
-
 
 
 #   Spectrally interpolate subcubes
@@ -125,14 +125,12 @@ if (argus.intercubes):
     intercubes(detid, detz, posra, posdec, obschan, istart=0, pars=pars, ovrt=argus.obliviate, nobj=-1)
 
 
-
 #   Regrid subcubes to spatial pixels
 if (argus.regcubes):  
     if (pars['ReGrid']):        
         print("\n Regridding has not yet been implemented...\n")
     else:        
         print("\n No regridding required...\n")
-
 
 
 #   Reduce subcubes and extract spectra
@@ -153,7 +151,6 @@ if (argus.redcubes):
     reducecubes(getcubedir, getnoisedir, redscubedir, outspecdir, detid, istart=0, pars=pars, cskip=coskip, nobj=-1)
     
 
-
 #   Construct master catalogue
 if (argus.getmastercat):  
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
@@ -162,7 +159,6 @@ if (argus.getmastercat):
     np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/mastercat_'+pars['ColType']+'.cat', gdets, \
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
     
-
 
 #   Construct catalogue with well-behaved spectra
 if (argus.getfinecat):  
@@ -180,8 +176,38 @@ if (argus.getfinecat):
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
 
 
+#   Construct sample for stacking
+if (argus.stackcats):  
+    refcat  = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/mastercat_'+pars['NbrType']+'.cat')
+    detcat  = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/finecat_'+pars['ColType']+'.cat')
+
+    constackcat(detcat, refcat, pars=pars)
 
 
+#   Stack spectral cubes
+if (argus.stackcubes): 
+    if (pars['ReGrid']):
+        print("\n Regridding has not yet been implemented...\n")
+        sys.exit()
+    else:
+        redscubedir = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedCubes']
+        outspecdir  = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedSpecs']
+    
+    if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
+        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+".pkl", 'rb')	
+        gsamp		= pkl.load(sampfile)
+        sampfile.close()
+        stackubes(gsamp, outspecdir, redscubedir, pars=pars)
+    else:
+        for i in range (0, len(pars['BinEdges'])-1):
+            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
+            gsamp		= pkl.load(sampfile)
+            sampfile.close()
+            stackubes(gsamp, outspecdir, redscubedir, pars=pars)
+    
+    
+    
+    
 
 
 
