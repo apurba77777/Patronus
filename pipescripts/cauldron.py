@@ -34,7 +34,7 @@ from specscripts.spectralstack import *
 #                           stackcats       //  Construct sample for stacking
 #                           stackcubes      //  Stack spectral cubes
 #                           stackerrs       //  Calculate errors
-#                          
+#                           stackmass       //  Calculate average mass
 #
 #   Simple & convenient charms          
 #                           obliviate       //  Clear existing files 
@@ -218,7 +218,20 @@ if (argus.stackcubes or argus.stackerrs):
             pkl.dump(mgsamp, sampfile)
             sampfile.close()
     
-    
+
+#   Calculate average mass
+if (argus.stackmass):   
+    if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
+        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+".pkl", 'rb')	
+        gsamp		= pkl.load(sampfile)
+        sampfile.close() 
+        stackmasses(gsamp, pars=pars)
+    else:
+        for i in range (0, len(pars['BinEdges'])-1):
+            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
+            gsamp		= pkl.load(sampfile)
+            sampfile.close() 
+            stackmasses(gsamp, pars=pars)
 
     
     
