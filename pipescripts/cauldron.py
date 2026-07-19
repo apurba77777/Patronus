@@ -185,8 +185,8 @@ if (argus.stackcats):
     constackcat(detcat, refcat, pars=pars)
 
 
-#   Stack spectral cubes
-if (argus.stackcubes): 
+#   Stack spectral cubes and/or calculate errors
+if (argus.stackcubes or argus.stackerrs): 
     if (pars['ReGrid']):
         print("\n Regridding has not yet been implemented...\n")
         sys.exit()
@@ -198,7 +198,10 @@ if (argus.stackcubes):
         sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+".pkl", 'rb')	
         gsamp		= pkl.load(sampfile)
         sampfile.close()
-        mgsamp      = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
+        if (argus.stackcubes):
+            mgsamp  = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
+        if (argus.stackerrs):
+            mgsamp  = stackerrors(gsamp, outspecdir, pars=pars)
         sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+".pkl", 'wb')	
         pkl.dump(mgsamp, sampfile)
         sampfile.close()
@@ -207,19 +210,16 @@ if (argus.stackcubes):
             sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
             gsamp		= pkl.load(sampfile)
             sampfile.close()
-            mgsamp      = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
+            if (argus.stackcubes):
+                mgsamp  = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
+            if (argus.stackerrs):
+                mgsamp  = stackerrors(gsamp, outspecdir, pars=pars)
             sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
             pkl.dump(mgsamp, sampfile)
             sampfile.close()
     
     
-#   Calculate errors
-if (argus.stackerrs):
-    if (pars['ReGrid']):
-        print("\n Regridding has not yet been implemented...\n")
-        sys.exit()
-    else:
-        outspecdir  = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedSpecs']
+
     
     
 

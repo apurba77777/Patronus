@@ -315,3 +315,42 @@ def specrms_lum_fluxwt_random_fullspec(allspecfull, allnoiseful, realn, rmspow):
 	return(ensrmsarr,avgrmsarr)
 #   --------------------------------------------------------------------------------------------------------------
 
+
+def intrms_lum_fluxwt_random(allspecfull, allnoiseful, realn, rmspow, chans, domed):
+	
+	#   Calculate random RMS noise on inegrated line luminosity
+
+	nspec	=	allnoiseful.shape[0]
+	speclen	=	allnoiseful.shape[1]
+	fsize	=	int(speclen/2)
+	indarr	=	np.random.randint(0,speclen,size=(realn,nspec))	
+	rmsarr	=	np.zeros((realn,speclen),dtype=float)
+	lumints	=	np.zeros(realn,dtype=float)
+		
+	for i in range (0,realn):		
+		tempspecarr		=	np.zeros((nspec,speclen),dtype=float)
+		wtotalarr		=	np.zeros(speclen,dtype=float)
+		wtarr			=	np.zeros((nspec,speclen),dtype=float)
+		
+		for k in range (0,nspec):			
+			indx0	=	indarr[i,k]
+			
+			rolnoise	=	np.roll(allnoiseful[k],indx0)
+			rolspec		=	np.roll(allspecfull[k],indx0)
+			
+			tempspecarr[k]	=	rolspec
+			wtarr[k]		=	1.0/(rolnoise**rmspow)
+			
+		wtotalarr	=	np.nansum(wtarr,axis=0)
+		tempspecarr	=	tempspecarr*wtarr
+		if (domed):
+			rmsarr[i]	=	np.nanmedian(tempspecarr,axis=0)
+		else:
+			rmsarr[i]	=	np.nansum(tempspecarr,axis=0)/wtotalarr
+	
+		lumints[i]	=	np.nansum(rmsarr[i,chans[0]:chans[1]+1])
+		
+	lumrms		=	np.nanstd(lumints)
+						
+	return(lumrms)
+#   --------------------------------------------------------------------------------------------------------------
