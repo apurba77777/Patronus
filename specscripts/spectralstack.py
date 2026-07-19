@@ -250,7 +250,7 @@ def stackmasses(gsamp, pars=None):
     meanlb	= 0.0
     meanmb	= 0.0
     meansm	= np.median(10.0**gdets[:,11])
-    medsfr	= gdets[:,10]
+    medsfr	= np.median(gdets[:,10])
 
     print("z = %.3f	Col = %.3f	NUV-r = %.3f"%(meanz, meancol, meannuvr))
     print("MB = %.3f	SM = %.2e   SFR = %.2e"%(meanmb, meansm, medsfr))    

@@ -11,7 +11,6 @@ CatDir:       "../cats/"
 StacatDir:    "stacats/"                                    #	Within workdir
 SubDir:       "r5_subcubes/"                                #	Within workdir
 ResplotDir:   "resplots/"                                   #	Within workdir
-
 SamPlotDir:   "samplots/"                                   #   Within resplotdir
 
 ScubeDir:     "subcubes/"                                   #	Within subdir
@@ -62,7 +61,7 @@ SmKpc:        0                     #	Smoothing scale in kpc, 0 = No smoothing
 
 BxSize:       100                   #	Length of the box in pixels
 FSize:        61                    #	Half length of the spectral baseline
-N0Kpc:        150                   #	Inner diameter of annulus for noise estimation
+N0Kpc:        120                   #	Inner diameter of annulus for noise estimation
 NKpc:         500                   #	Width of the annulus for noise estimation	
 
 #   Spectral interpolation
@@ -98,24 +97,26 @@ RatLims:      [0.41, 0.47]          #	Allowed range for noise ratios
 
 #   Stacking sample selection parameters    ----------------------------------------
 
+StackName:    "random"              #   Stack identifier
 ColType:      "blue"                #   Colour selection
 ExclNbrs:     True                  #   Exclude galaxies with close neighbours?
 VelNbr:       300.0                 #   Velicity difference with a neighbour in km/s
-NbrKpc:       150                   #   Spatial separation with a close neighbour in kpc, 0==smkpc	
+NbrKpc:       120                   #   Spatial separation with a close neighbour in kpc, 0==smkpc	
 NbrType:      'all'                 #   What type of galaxies to consider as nighbours 
 
-MbLim:		    [-100.0,0.0]     		  #	NOT IN USE currently
+MbLim:        [-100.0,0.0]          #	NOT IN USE currently
 LsmLim:       [8.0,15.0]            #	Limits on log(M_*)
 ZLim:         [0.35,0.38]           #	Limits on redshift
 
 #	Binning
 
-BinParam:     "lsm"				          #	Parameter to bin (supports only "lsm", ""/Null--> no binning)
-BinEdges:	    Null				          #	Bin edges, Set = Null to disable binning
+BinParam:     "lsm"                 #	Parameter to bin (lsm/sfr/nuvr, ""/Null--> no binning)
+BinEdges:     Null                  #	Bin edges, Set = Null to disable binning
 
 
 #   Stacking related parameters ----------------------------------------------------
 
+StackStat:    "mean"                #   mean / median
 BSize:        41                    #	Half spatial box size
 RmsPow:       0                     #   Power loaw weighting scheme
 ExRad:        5                     #   Exclusion radius for plane RMS 
@@ -127,14 +128,14 @@ Thresh:       1.5                   #   Threshold in sigma for integration
 Realn:        100                   #   Number of random realizations for randomly misaligned stacking 
 
 PSize:        30                    #	Plot size
-
+CLevels:      [0.5]                 #   Contour levels w.r.t. the peak
+ColMap:       "viridis"             #   Colourmap
 
 #   Individual detection related parameters ----------------------------------------
 
 MinIndLsm:    10.0
 MinIndZ:      0.38
 VintRange:    100.0
-
 
 
 
