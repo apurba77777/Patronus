@@ -32,6 +32,7 @@ scalmode=""
 ovr=""
 sln=""
 spl=""
+ifirst=""
 
 #   --------------------------------------------------------                                                    
 howtoconjure()
@@ -43,7 +44,8 @@ howtoconjure()
    echo "options:"
    echo "--help             Print these options"
    echo "-c / --conf [C]    Configuration file (without .con)"
-   echo "-p / --potion [P]   Potion to brew"
+   echo "-p / --potion [P]  Potion to brew"
+   echo "-i / --istart [I]  First item to process"
    echo "--obliviate        Clear existing files if required"
    echo "--flagrate         Write terminal messages to logfile"
    echo 
@@ -66,6 +68,10 @@ for arg in "$@"; do
             spl="--$2"
             echo "Brewing potion ${spl}"
             shift 2;;
+        -i|--istart)
+            ifirst="--istart $2"
+            echo "Starting from ${2}"
+            shift 2;;
         --obliviate)
             echo "Existing knowledge will be forgotten..."
             ovr="--obliviate"
@@ -84,7 +90,7 @@ done
 incmd="${pyex} -u ${Pipe_Dir}/pipescripts/cauldron.py \
     --pipedir ${Pipe_Dir} \
     --infile ${parfile} \
-    ${spl} ${ovr}"
+    ${ifirst} ${spl} ${ovr}"
 
 
 export PYTHONPATH=${PYTHONPATH}:${Pipe_Dir} 

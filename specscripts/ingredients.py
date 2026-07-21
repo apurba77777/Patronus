@@ -23,6 +23,7 @@ def potion_args():
     #   Input files, identifiers & parameters
     parser.add_argument("--infile", help = "YAML file with input params", type = str, default = None)
     parser.add_argument("--pipedir", help = "Directory to the pipeline", type = str, default = None)
+    parser.add_argument("--istart", help = "First item to process", type = int, default = 0)
 
     #   Options/utilities
     parser.add_argument("--obliviate", help = "Clear existing files ?", action='store_true')

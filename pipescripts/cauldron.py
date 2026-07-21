@@ -123,7 +123,7 @@ if (argus.intercubes):
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
     (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
     detid   = detid.astype(int)
-    intercubes(detid, detz, posra, posdec, obschan, istart=0, pars=pars, ovrt=argus.obliviate, nobj=-1)
+    intercubes(detid, detz, posra, posdec, obschan, istart=argus.istart, pars=pars, ovrt=argus.obliviate, nobj=-1)
 
 
 #   Regrid subcubes to spatial pixels
@@ -149,7 +149,7 @@ if (argus.redcubes):
         outspecdir  = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedSpecs']
         coskip      = int(pars['BeamSec']/pars['BeamSec'])
 
-    reducecubes(getcubedir, getnoisedir, redscubedir, outspecdir, detid, istart=0, pars=pars, cskip=coskip, nobj=-1)
+    reducecubes(getcubedir, getnoisedir, redscubedir, outspecdir, detid, istart=argus.istart, pars=pars, cskip=coskip, nobj=-1)
     
 
 #   Construct master catalogue
