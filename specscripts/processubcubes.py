@@ -39,6 +39,11 @@ def exubcubes(detid, detz, posra, posdec, obschan, istart=0, pars=None, ovrt=Tru
         
             print('Extracting source =	%d / %d	(%ld, RA = %f, dec = %f, z = %f)'%(i, ntotal, detid[i], ra, dec, detz[i]))
 
+            if (os.path.exists(pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['ScubeDir']+'/subcube_'+str(detid[i])+'_0.im')):
+                if (not ovrt):
+                    print("Outfile exists! Will not overwrite...")        
+                    continue
+
             ct.imsubimage(
                 imagename = pars['CubeDir']+'/'+pars['ImgCube']+'.image', \
                 outfile = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['ScubeDir']+'/subcube_'+str(detid[i])+'_0.im', \

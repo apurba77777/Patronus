@@ -154,16 +154,16 @@ if (argus.redcubes):
 
 #   Construct master catalogue
 if (argus.getmastercat):  
-    dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
+    dets    = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/{pars['CubeCatFile']}")
     gdets   = conmastercat(dets, pars=pars)
     print('\n     Sources	= %d'%len(gdets))
-    np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/mastercat_'+pars['ColType']+'.cat', gdets, \
+    np.savetxt(f"{pars['WorkDir']}/{pars['StacatDir']}/mastercat_{pars['StackName']}_{pars['ColType']}.cat", gdets, \
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
     
 
 #   Construct catalogue with well-behaved spectra
 if (argus.getfinecat):  
-    dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/mastercat_'+pars['ColType']+'.cat')
+    dets    = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/mastercat_{pars['StackName']}_{pars['ColType']}.cat")
     if (pars['ReGrid']):
         print("\n Regridding has not yet been implemented...\n")
         sys.exit()
@@ -173,14 +173,14 @@ if (argus.getfinecat):
 
     gdets   = confinecat(redscubedir, outspecdir, dets, pars=pars)
     print('\n     Sources	= %d'%len(gdets))
-    np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/finecat_'+pars['ColType']+'.cat', gdets, \
+    np.savetxt(f"{pars['WorkDir']}/{pars['StacatDir']}/finecat_{pars['StackName']}_{pars['ColType']}.cat", gdets, \
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
 
 
 #   Construct sample for stacking
 if (argus.stackcats):  
-    refcat  = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/mastercat_'+pars['NbrType']+'.cat')
-    detcat  = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/finecat_'+pars['ColType']+'.cat')
+    refcat  = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/mastercat_{pars['StackName']}_{pars['ColType']}.cat")
+    detcat  = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/finecat_{pars['StackName']}_{pars['ColType']}.cat")
 
     constackcat(detcat, refcat, pars=pars)
 
