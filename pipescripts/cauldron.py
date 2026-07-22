@@ -179,7 +179,7 @@ if (argus.getfinecat):
 
 #   Construct sample for stacking
 if (argus.stackcats):  
-    refcat  = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/mastercat_{pars['StackName']}_{pars['ColType']}.cat")
+    refcat  = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/mastercat_{pars['StackName']}_{pars['NbrType']}.cat")
     detcat  = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/finecat_{pars['StackName']}_{pars['ColType']}.cat")
 
     constackcat(detcat, refcat, pars=pars)
