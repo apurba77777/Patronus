@@ -323,21 +323,25 @@ def stackmasses(gsamp, pars=None):
     if (domedian):
         print("Saving median values...")
         gsamp	= gsamp._replace(medlumint = lumint/(4*np.pi), medlumintavg = lumintavg/(4*np.pi), 
-                               medmh9 = masslumv, medmh9avg = masslumvavg, emedpln = planerr, \
+                               medmh9 = masslumv/1.0e9, medmh9avg = masslumvavg/1.0e9, emedpln = planerr, \
                                 emedplnavg = planerravg, medstkspec = np.array([velarr,lumspec,planermsarr]).T, \
                                     medstkspecavg = np.array([velavg,lumspecavg,planermsavg]).T)
         
-        stackspecplt(gsamp.medstkspec, pars["VelRes"], gsamp.sampname, pars=pars)
-        stackspecplt(gsamp.medstkspecavg, 2 * pars["VelRes"], gsamp.sampname, pars=pars)
+        stackspecplt(gsamp.medstkspec, pars["VelRes"], gsamp.sampname, gsamp.medmh9, gsamp.emedmhrand/1.0e9, \
+                     np.log10(meansm), medsfr, pars=pars)
+        stackspecplt(gsamp.medstkspecavg, 2 * pars["VelRes"], gsamp.sampname, gsamp.medmh9avg, gsamp.emedmhrand/1.0e9, \
+                     np.log10(meansm), medsfr, pars=pars)
     else:
         print("Saving mean values...")
         gsamp	= gsamp._replace(meanlumint = lumint/(4*np.pi), meanlumintavg = lumintavg/(4*np.pi), \
-                               meanmh9 = masslumv, meanmh9avg = masslumvavg, emeanpln = planerr, \
+                               meanmh9 = masslumv/1.0e9, meanmh9avg = masslumvavg/1.0e9, emeanpln = planerr, \
                                 emeanplnavg = planerravg, meanstkspec = np.array([velarr,lumspec,planermsarr]).T, \
                                     meanstkspecavg = np.array([velavg,lumspecavg,planermsavg]).T)
 
-        stackspecplt(gsamp.meanstkspec, pars["VelRes"], gsamp.sampname, pars=pars)
-        stackspecplt(gsamp.meanstkspecavg, 2 * pars["VelRes"], gsamp.sampname, pars=pars)
+        stackspecplt(gsamp.meanstkspec, pars["VelRes"], gsamp.sampname, gsamp.meanmh9, gsamp.emeanmhrand/1.0e9, \
+                     np.log10(meansm), medsfr, pars=pars)
+        stackspecplt(gsamp.meanstkspecavg, 2 * pars["VelRes"], gsamp.sampname, gsamp.meanmh9avg, gsamp.emeanmhrand/1.0e9, \
+                     np.log10(meansm), medsfr, pars=pars)
 
     stackmaplt(hmap, pars["VelRes"], gsamp.sampname, pars=pars)
     stackmaplt(hmapavg, 2*pars["VelRes"], gsamp.sampname, pars=pars)
