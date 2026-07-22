@@ -31,6 +31,7 @@ from specscripts.spectralstack import *
 #                           redcubes        //  Reduce subcubes
 #                           getmastercat    //  Construct master catalogue
 #                           getfinecat      //  Construct catalogue with well-behaved spectra
+#                           samplot         //  Plot sample statistics
 #                           stackcats       //  Construct sample for stacking
 #                           stackcubes      //  Stack spectral cubes
 #                           stackerrs       //  Calculate errors
@@ -175,6 +176,12 @@ if (argus.getfinecat):
     print('\n     Sources	= %d'%len(gdets))
     np.savetxt(f"{pars['WorkDir']}/{pars['StacatDir']}/finecat_{pars['StackName']}_{pars['ColType']}.cat", gdets, \
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
+
+
+#   Plot sample statistica
+if (argus.samplot):
+    dets    = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/finecat_{pars['StackName']}_{pars['ColType']}.cat")
+    zlsmplt(dets, pars=pars)
 
 
 #   Construct sample for stacking
