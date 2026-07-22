@@ -51,6 +51,7 @@ def exkhastocat(pars):
     srczq	=	spdata['flag']								    #	source redshift quality, Good = 3,4,13,14
     sedz	=	sedata['zs']								    #	source redshifts
     srctype	=	spdata['photoz_type']						    #	source type, 0 = galaxy, 1 = star, 2 = AGN
+    srcsur  =   spdata['survey']                                #   Survey IDs
 
     srcnuv	=	sedata['MNUV']							        #	Abs NUV mag
     srcr	=	sedata['MR']								    #	Abs R mag
@@ -64,7 +65,7 @@ def exkhastocat(pars):
         sys.exit()
 
     for i in range (0,srcn):
-        if (np.isin(srczq[i], np.array([3,4,13,14]))):
+        if (np.isin(srczq[i], np.array(pars['ZQuality']))):
             if (np.abs(srcz[i] - sedz[i]) > pars['ZTol']):
                 print("Redshift mismatch !!!", i, srcz[i], sedz[i], srczq[i])
                 sys.exit()
