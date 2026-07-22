@@ -19,7 +19,7 @@ mpl.rcParams['axes.labelsize']=8
 #
 #   ---------------------------------------------------------------------------------------------------
 
-def stackspecplt(stackspec, velres, pars=None):
+def stackspecplt(stackspec, velres, sampname, pars=None):
     
     #   Plot stacked spectrum
 
@@ -35,7 +35,7 @@ def stackspecplt(stackspec, velres, pars=None):
     plt.xlabel('Velocity (km/s)')
     plt.ylabel('Luminosity density (Jy Mpc$^2$)')
     ax.yaxis.set_label_coords(-0.15, 0.5)
-    plt.savefig(f"{pars['WorkDir']}/{pars['ResplotDir']}/{pars['StackName']}_{pars["StackStat"]}_spec_{velres}_kms.pdf", \
+    plt.savefig(f"{pars['WorkDir']}/{pars['ResplotDir']}/{sampname}_{pars["StackStat"]}_spec_{velres}_kms.pdf", \
                                                         transparent=True, format='pdf')
     plt.close()
 
@@ -43,7 +43,7 @@ def stackspecplt(stackspec, velres, pars=None):
 #	--------------------------------------------------------------------------------------------------
 
 
-def stackmaplt(stackmap, velres, pars=None):
+def stackmaplt(stackmap, velres, sampname, pars=None):
     
     #   Plot stacked emission map
 
@@ -65,7 +65,7 @@ def stackmaplt(stackmap, velres, pars=None):
 
     plt.xlabel('RA offset (pixels)')
     plt.ylabel('Dec offset (pixels)')
-    plt.savefig(f"{pars['WorkDir']}/{pars['ResplotDir']}/{pars['StackName']}_{pars["StackStat"]}_map_{velres}_kms.pdf", \
+    plt.savefig(f"{pars['WorkDir']}/{pars['ResplotDir']}/{sampname}_{pars["StackStat"]}_map_{velres}_kms.pdf", \
                                                         transparent=True, format='pdf')
     plt.close()
 

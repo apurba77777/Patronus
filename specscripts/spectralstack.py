@@ -327,8 +327,8 @@ def stackmasses(gsamp, pars=None):
                                 emedplnavg = planerravg, medstkspec = np.array([velarr,lumspec,planermsarr]).T, \
                                     medstkspecavg = np.array([velavg,lumspecavg,planermsavg]).T)
         
-        stackspecplt(gsamp.medstkspec, pars["VelRes"], pars=pars)
-        stackspecplt(gsamp.medstkspecavg, 2 * pars["VelRes"], pars=pars)
+        stackspecplt(gsamp.medstkspec, pars["VelRes"], gsamp.sampname, pars=pars)
+        stackspecplt(gsamp.medstkspecavg, 2 * pars["VelRes"], gsamp.sampname, pars=pars)
     else:
         print("Saving mean values...")
         gsamp	= gsamp._replace(meanlumint = lumint/(4*np.pi), meanlumintavg = lumintavg/(4*np.pi), \
@@ -336,11 +336,11 @@ def stackmasses(gsamp, pars=None):
                                 emeanplnavg = planerravg, meanstkspec = np.array([velarr,lumspec,planermsarr]).T, \
                                     meanstkspecavg = np.array([velavg,lumspecavg,planermsavg]).T)
 
-        stackspecplt(gsamp.meanstkspec, pars["VelRes"], pars=pars)
-        stackspecplt(gsamp.meanstkspecavg, 2 * pars["VelRes"], pars=pars)
+        stackspecplt(gsamp.meanstkspec, pars["VelRes"], gsamp.sampname, pars=pars)
+        stackspecplt(gsamp.meanstkspecavg, 2 * pars["VelRes"], gsamp.sampname, pars=pars)
 
-    stackmaplt(hmap, pars["VelRes"], pars=pars)
-    stackmaplt(hmapavg, 2*pars["VelRes"], pars=pars)
+    stackmaplt(hmap, pars["VelRes"], gsamp.sampname, pars=pars)
+    stackmaplt(hmapavg, 2*pars["VelRes"], gsamp.sampname, pars=pars)
 
     return 
 #   ---------------------------------------------------------------------------------------------------
