@@ -170,7 +170,7 @@ def constackcat(gdets, grefs, pars=None):
                                  ngal = len(gdets), sampcat  = gdets, zlim = pars['ZLim'], lsmlim = pars['LsmLim'], \
                                     mblim = pars['MbLim'])
 	
-        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+".pkl", 'wb')	
+        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'wb')	
         pkl.dump(asamp,sampfile)
         sampfile.close()	
     else:
@@ -196,7 +196,7 @@ def constackcat(gdets, grefs, pars=None):
                                         sampcat  = bgdets[i], zlim = pars['ZLim'], lsmlim = pars['LsmLim'], \
                                             mblim = pars['MbLim'])
         
-            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
+            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
             pkl.dump(asamp,sampfile)
             sampfile.close()
 

@@ -195,26 +195,26 @@ if (argus.stackcubes or argus.stackerrs):
         outspecdir  = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedSpecs']
     
     if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
-        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+".pkl", 'rb')	
+        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'rb')	
         gsamp		= pkl.load(sampfile)
         sampfile.close()
         if (argus.stackcubes):
             mgsamp  = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
         if (argus.stackerrs):
             mgsamp  = stackerrors(gsamp, outspecdir, pars=pars)
-        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+".pkl", 'wb')	
+        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'wb')	
         pkl.dump(mgsamp, sampfile)
         sampfile.close()
     else:
         for i in range (0, len(pars['BinEdges'])-1):
-            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
+            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
             gsamp		= pkl.load(sampfile)
             sampfile.close()
             if (argus.stackcubes):
                 mgsamp  = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
             if (argus.stackerrs):
                 mgsamp  = stackerrors(gsamp, outspecdir, pars=pars)
-            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
+            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
             pkl.dump(mgsamp, sampfile)
             sampfile.close()
     
@@ -222,13 +222,13 @@ if (argus.stackcubes or argus.stackerrs):
 #   Calculate average mass
 if (argus.stackmass):   
     if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
-        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+".pkl", 'rb')	
+        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'rb')	
         gsamp		= pkl.load(sampfile)
         sampfile.close() 
         stackmasses(gsamp, pars=pars)
     else:
         for i in range (0, len(pars['BinEdges'])-1):
-            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
+            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
             gsamp		= pkl.load(sampfile)
             sampfile.close() 
             stackmasses(gsamp, pars=pars)

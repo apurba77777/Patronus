@@ -29,8 +29,9 @@ def stackubes(gsamp, getspecdir, getcubedir, pars=None):
     gdets   = gsamp.sampcat
     print('Total cubes to be stacked	=	%d'%(len(gdets)))		
 
-    allnoiseful	= []
-    allcubefull	= []
+    allnoiseful	= np.zeros((len(gdets), 1 + 2*int(pars['HalfLen']/pars['VelRes'])), dtype='float32')
+    allcubefull	= np.zeros((len(gdets), 1 + 2*int(pars['HalfLen']/pars['VelRes']), 2*pars['BSize'], 2*pars['BSize']), \
+                           dtype='float32')
     ngal		= 0
 
     for i in range (0, len(gdets)):
@@ -46,8 +47,7 @@ def stackubes(gsamp, getspecdir, getcubedir, pars=None):
         ivelarr	= ivelarr[ivelreg]
         inoise	= ispecful[ivelreg,2]
         inoise	= inoise/detpb		        #	Flux density noise correcting for primary beam
-
-        allnoiseful.append(inoise)					
+        allnoiseful[i]  = inoise					
 	
         icube	= fits.open(getcubedir+f'xubcube_{detid}_{pars['SmKpc']}.fits')	
         idata	= icube[0].data	
@@ -57,14 +57,9 @@ def stackubes(gsamp, getspecdir, getcubedir, pars=None):
 
         icarr	= icarr/detpb									    #	Flux density correcting for primary beam
         icarr	= icarr*(4*np.pi*dlgpc*dlgpc)/(1.0+detz)		    #	Luminosity density
-
-        allcubefull.append(icarr)
+        allcubefull[i]  = icarr
         icube.close()
-    
-    allnoiseful	= np.array(allnoiseful)
-    allcubefull	= np.array(allcubefull)
-        
-    #print(allnoiseful.shape, allcubefull.shape)	
+    	
     print(f"Cubes stacked	= {ngal}")	
 
     velarr,stackarr,velavg,stackavg	=	stackcube_lumz_fluxwt(allnoiseful, pars['VelRes'], allcubefull, \
@@ -101,8 +96,8 @@ def stackerrors(gsamp, getspecdir, pars=None):
     gdets   = gsamp.sampcat
     print('Total cubes to be stacked	=	%d'%(len(gdets)))		
 
-    allnoiseful	= []
-    allspecfull	= []
+    allnoiseful	= np.zeros((len(gdets), 1 + 2*int(pars['HalfLen']/pars['VelRes'])), dtype='float32')
+    allspecfull	= np.zeros((len(gdets), 1 + 2*int(pars['HalfLen']/pars['VelRes'])), dtype='float32')
     ngal		= 0
 
     for i in range (0, len(gdets)):
@@ -119,18 +114,14 @@ def stackerrors(gsamp, getspecdir, pars=None):
         inoise	= ispecful[ivelreg,2]
         inoise	= inoise/detpb		        #	Flux density noise correcting for primary beam
 
-        allnoiseful.append(inoise)					
+        allnoiseful[i]  = inoise					
 	
         icarr0  = ispecful[ivelreg,3]
         icarr0	= icarr0/detpb									    #	Flux density correcting for primary beam
         icarr0	= icarr0*(4*np.pi*dlgpc*dlgpc)/(1.0+detz)		    #	Luminosity density
 
-        allspecfull.append(icarr0)
+        allspecfull[i]  = icarr0
     
-    allnoiseful	= np.array(allnoiseful)
-    allspecfull	= np.array(allspecfull)    
-        
-    #print(allnoiseful.shape, allcubefull.shape)	
     print(f"Spectra stacked	= {ngal}")	
 
     if (domedian):
