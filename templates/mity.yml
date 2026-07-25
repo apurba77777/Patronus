@@ -5,12 +5,12 @@
 #   Directories ..............................................................
 
 CubeDir:      "/media/snowy/AA6F-46F3/current_works/cosmosmity/mitycubes/"
-WorkDir:      "../temp/"
+WorkDir:      "../stackmity/"
 CatDir:       "../cats/"
 
-StacatDir:    "stacats/"                                    #	Within workdir
-SubDir:       "r5_subcubes/"                                #	Within workdir
-ResplotDir:   "resplots/"                                   #	Within workdir
+StacatDir:    "stacats_allz/"                               #	Within workdir
+SubDir:       "r5_subcubes_allz/"                           #	Within workdir
+ResplotDir:   "resplots_allz/"                              #	Within workdir
 SamPlotDir:   "samplots/"                                   #   Within resplotdir
 
 ScubeDir:     "subcubes/"                                   #	Within subdir
@@ -31,9 +31,10 @@ RegnoiseDir:  "noisespecs_regridded/"                       #   Reduced
 
 ImgCube:      "l1_r0p5_dirty_contsub_0000-1817"              #	Spectral cube without extension 
 SpzCat:       "specz_compilation_COSMOS_DR1.1_unique.fits"   #	Specz catalogue
-SedCat:       "lephare_results_specz_compilation_DR1.1.fits" #	Specz catalogue
+SedCat:       "cigale_results_specz_compilation_DR1.1.fits"  #	Specz catalogue
 ChanFile:     "mightee_dirty_chanstat.txt"                   #	Channel status file
-
+ZQuality:     [4]                                            #  Redshift quality codes
+SurveyIds:    [18,20,31,38,136]                              #  Survey IDs to include 
 
 #	Initial source extraction parameters	-------------------------------------	
 
@@ -69,7 +70,7 @@ VelRes:       35.0                  #	Velocity resolution in km/s (before Hannin
 
 #   Spatial regridding
 ReGrid:       False                 #   Spatially regrid cubes?
-PixKpc:       15.0                  #	Size of output pixel in kpc (if regrid=true)
+PixKpc:       Null                  #	Size of output pixel in kpc (if regrid=true)
 
 #   Spectral baseline subtraction
 FitOrder:     2                     #	Spectral baseline polynomial order
@@ -83,8 +84,6 @@ HalfWidth:    250.0                 #   Half width of the expected line in km/s
 AvgLens:      [4]                   #	Spectral averaging lengths
 CritRatio:    [1.6]                 #	Critical noise ratio 
 NoiseDevFac:  1.5                   #	Noise deviation factor
-#KspCrit:      0.01                 #	Critical KS test P-value **** Ignored now
-#AdCrit:       1.4                  #	Critical value of AD statistic **** Ignored now
 
 MincFrac:     0.6                   #	minimum fraction of spectrum required to be unflagged
 MaxOut:       5.0                   #   Maximum outlier in the spectrum allowed
@@ -92,21 +91,22 @@ KspLim:       0.001                 #   K-S test p-value limit for spectra
 AdsLim:       1.44                  #   A-D test statistic limit for spectra
 
 CavgFac:      10                    #	Channel averaging for noise ratio
-RatLims:      [0.41, 0.47]          #	Allowed range for noise ratios
+RatLims:      [0.29, 0.42]          #	Allowed range for noise ratios
 
 
 #   Stacking sample selection parameters    ----------------------------------------
 
-StackName:    "random"              #   Stack identifier
+StackName:    "z3048"               #   Stack identifier
 ColType:      "blue"                #   Colour selection
+ColDef:       "nuvrj"               #   Definition of colour (nuvr / nuvrj / uvj)
 ExclNbrs:     True                  #   Exclude galaxies with close neighbours?
 VelNbr:       300.0                 #   Velicity difference with a neighbour in km/s
-NbrKpc:       120                   #   Spatial separation with a close neighbour in kpc, 0==smkpc	
+NbrKpc:       150                   #   Spatial separation with a close neighbour in kpc, 0==smkpc	
 NbrType:      'all'                 #   What type of galaxies to consider as nighbours 
 
 MbLim:        [-100.0,0.0]          #	NOT IN USE currently
 LsmLim:       [8.0,15.0]            #	Limits on log(M_*)
-ZLim:         [0.35,0.38]           #	Limits on redshift
+ZLim:         [0.30,0.48]           #	Limits on redshift
 
 #	Binning
 
@@ -127,7 +127,7 @@ ExAvgChans:   [-2, 2]
 Thresh:       1.5                   #   Threshold in sigma for integration
 Realn:        100                   #   Number of random realizations for randomly misaligned stacking 
 
-PSize:        30                    #	Plot size
+PSize:        36                    #	Plot size
 CLevels:      [0.5]                 #   Contour levels w.r.t. the peak
 ColMap:       "viridis"             #   Colourmap
 
