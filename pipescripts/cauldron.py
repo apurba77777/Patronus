@@ -94,10 +94,10 @@ if (argus.excat):
         print("Selecting AGNs only")
     print('Extracted sources		= %d'%len(srcs))
     np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CatFile'], srcs, \
-               fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
+               fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
 
-#	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV R   Type
-#	0	1	2	3	4	5	6	7	8	9	    10	11	12  13  14
+#	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV-r r-J  Type  U-V  V-J   SFR10  SFR100  lgm
+#	0	1	2	3	4	5	6	7	8	9	    10	11	12    13   14    15   16    17     18      19
 
 #   Extract subcubes
 if (argus.exubcubes):  
@@ -108,7 +108,7 @@ if (argus.exubcubes):
     dets    = dets[exsrcs]
     print('Extracted sources		= %d'%len(dets))
     np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'], dets, \
-                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
+                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
 
 
 #   Spatially smooth subcubes
@@ -159,7 +159,7 @@ if (argus.getmastercat):
     gdets   = conmastercat(dets, pars=pars)
     print('\n     Sources	= %d'%len(gdets))
     np.savetxt(f"{pars['WorkDir']}/{pars['StacatDir']}/mastercat_{pars['StackName']}_{pars['ColType']}.cat", gdets, \
-                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
+                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
     
 
 #   Construct catalogue with well-behaved spectra
@@ -175,7 +175,7 @@ if (argus.getfinecat):
     gdets   = confinecat(redscubedir, outspecdir, dets, pars=pars)
     print('\n     Sources	= %d'%len(gdets))
     np.savetxt(f"{pars['WorkDir']}/{pars['StacatDir']}/finecat_{pars['StackName']}_{pars['ColType']}.cat", gdets, \
-                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d')
+                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
 
 
 #   Plot sample statistica

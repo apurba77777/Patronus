@@ -33,8 +33,8 @@ def confinecat(redscubedir, outspecdir, gdets, pars=None):
     
     #   Generate catalogue with well-behaved spectra	
 
-    #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV R   Type
-    #	0	1	2	3	4	5	6	7	8	9	    10	11	12  13  14
+    #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV-r r-J  Type  U-V  V-J   SFR10  SFR100  lgm
+    #	0	1	2	3	4	5	6	7	8	9	    10	11	12    13   14    15   16    17     18      19
 
     print('Sample size full		=	%d'%len(gdets))
 
@@ -123,8 +123,8 @@ def constackcat(gdets, grefs, pars=None):
     #   Construct catalogues for stacking
     #   excluding galaxies with neighbours within a given radius and velocity range	
 
-    #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV R   Type
-    #	0	1	2	3	4	5	6	7	8	9	    10	11	12  13  14
+    #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV-r r-J  Type  U-V  V-J   SFR10  SFR100  lgm
+    #	0	1	2	3	4	5	6	7	8	9	    10	11	12    13   14    15   16    17     18      19
 
     print('Sample size full		=	%d'%len(gdets))
 
