@@ -121,12 +121,27 @@ def conmastercat(gdets, pars=None):
     #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV-r r-J  Type  U-V  V-J   SFR10  SFR100  lgm
     #	0	1	2	3	4	5	6	7	8	9	    10	11	12    13   14    15   16    17     18      19
 
-    if (pars['ColType']=="blue"):
-        nuvrlim	= [-10000.0,4.0]
-    elif (pars['ColType']=="red"):
-        nuvrlim	= [4.0,100000.0]
+    if (pars['ColDef']=="nuvr"):
+        if (pars['ColType']=="blue"):
+            gdets   = gdets[gdets[:,12] < 4.0]
+        elif (pars['ColType']=="red"):
+            gdets   = gdets[gdets[:,12] >= 4.0]    
+        else:
+            print("Selecting all colours")
+
+    elif (pars['ColDef']=="nuvrj"):
+        if (pars['ColType']=="blue"):
+            gdets   = gdets[np.where((gdets[:,12] < 3.1) | (gdets[:,12] < (3*gdets[:,13] + 1)))] 
+        elif (pars['ColType']=="red"):
+            gdets   = gdets[np.where((gdets[:,12] >= 3.1) & (gdets[:,12] >= (3*gdets[:,13] + 1)))]    
+        else:
+            print("Selecting all colours")
+
+    elif (pars['ColDef']=="uvj"):
+        print("UVJ not supported yet. Selecting all colours...")
+
     else:
-        nuvrlim	= [-100000.0,100000.0]
+        print("Unknown colour of the potion...")
 
     print('Sample size full		=	%d'%len(gdets))
 
