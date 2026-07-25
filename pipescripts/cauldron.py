@@ -40,17 +40,18 @@ from specscripts.spectralstack import *
 #   Simple & convenient charms          
 #                           obliviate       //  Clear existing files 
 #                           lumos           //  List Usable Modes On Screen
-#                           revelio         //  Reveal configuration parameters
+#                           veritaserum     //  Reveal configuration parameters
 #
 #   Advanced spells and charms (Should NOT be attempted before passing O. W. L.s)
 #                        
-#                           accio       //  Accumulate Continuum Components in Image Output
-#                           scourgify   //  Scrutinize Calibration Outputs and Ultimate Robustness of Gains with Image Files Yielded
-#                           incendio    //  Image Normal Continuum Emission using Nice Data from Interferometric Observations
+#                           !accio          //  Accumulate Continuum Components in Image Output
+#                           !scourgify      //  Scrutinize Calibration Outputs and Ultimate Robustness of Gains with Image Files Yielded
+#                           !incendio       //  Image Normal Continuum Emission using Nice Data from Interferometric Observations
 #  
 #   Dangerous spells and curses (Extreme caution recommended!! Should NOT be attempted before passing N.E.W.T.s)
 #
-#                           crucio      //  Calibrate Response for an Uncorrupted Channel Isolated from Observation 
+#                           polyjuice       //
+#                           amortentia      //  
 #
 #	--------------------------------------------------------------------------------------------------------
 
@@ -185,7 +186,7 @@ if (argus.samplot):
 
 
 #   Construct sample for stacking
-if (argus.stackcats):  
+if (argus.stackcats or argus.amortentia):  
     refcat  = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/mastercat_{pars['StackName']}_{pars['NbrType']}.cat")
     detcat  = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/finecat_{pars['StackName']}_{pars['ColType']}.cat")
 
@@ -193,7 +194,7 @@ if (argus.stackcats):
 
 
 #   Stack spectral cubes and/or calculate errors
-if (argus.stackcubes or argus.stackerrs): 
+if (argus.stackcubes or argus.stackerrs or argus.amortentia): 
     if (pars['ReGrid']):
         print("\n Regridding has not yet been implemented...\n")
         sys.exit()
@@ -205,29 +206,37 @@ if (argus.stackcubes or argus.stackerrs):
         sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'rb')	
         gsamp		= pkl.load(sampfile)
         sampfile.close()
-        if (argus.stackcubes):
+        if (argus.stackcubes or argus.amortentia):
             mgsamp  = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
-        if (argus.stackerrs):
+            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'wb')	
+            pkl.dump(mgsamp, sampfile)
+            sampfile.close()
+        if (argus.stackerrs or argus.amortentia):
             mgsamp  = stackerrors(gsamp, outspecdir, pars=pars)
-        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'wb')	
-        pkl.dump(mgsamp, sampfile)
-        sampfile.close()
+            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'wb')	
+            pkl.dump(mgsamp, sampfile)
+            sampfile.close()
+        
     else:
         for i in range (0, len(pars['BinEdges'])-1):
             sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
             gsamp		= pkl.load(sampfile)
             sampfile.close()
-            if (argus.stackcubes):
+            if (argus.stackcubes or argus.amortentia):
                 mgsamp  = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
-            if (argus.stackerrs):
+                sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
+                pkl.dump(mgsamp, sampfile)
+                sampfile.close()
+            if (argus.stackerrs or argus.amortentia):
                 mgsamp  = stackerrors(gsamp, outspecdir, pars=pars)
-            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
-            pkl.dump(mgsamp, sampfile)
-            sampfile.close()
+                sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
+                pkl.dump(mgsamp, sampfile)
+                sampfile.close()
+            
     
 
 #   Calculate average mass
-if (argus.stackmass):   
+if (argus.stackmass or argus.amortentia):   
     if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
         sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'rb')	
         gsamp		= pkl.load(sampfile)

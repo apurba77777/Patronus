@@ -44,6 +44,7 @@ def potion_args():
     parser.add_argument("--stackcubes", help = "Stack spectral cubes", action='store_true')
     parser.add_argument("--stackerrs", help = "Calculate errs", action='store_true')
     parser.add_argument("--stackmass", help = "Calculate average masses", action='store_true')
+    parser.add_argument("--amortentia", help = "..........", action='store_true')
         
     args = parser.parse_args()
 
