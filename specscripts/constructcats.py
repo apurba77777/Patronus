@@ -112,7 +112,7 @@ def confinecat(redscubedir, outspecdir, gdets, pars=None):
     setrats	= nujy[:,1]/nujy[:,0]
     gdetsout= np.array(gdetsout)
 
-    noiseratplt(setrats, pars=pars)
+    noiseratplt(setrats, gdetsout[:,4], pars=pars)
 
     return (gdetsout) 
 #	--------------------------------------------------------------------------------------------------

@@ -19,7 +19,7 @@ mpl.rcParams['axes.labelsize']=8
 #
 #   ---------------------------------------------------------------------------------------------------
 
-def stackspecplt(stackspec, velres, sampname, mh9, erand, lsm, sfr, pars=None):
+def stackspecplt(stackspec, velres, sampname, mh9, erand, lsm, sfr, nobj=0, pars=None):
     
     #   Plot stacked spectrum
 
@@ -32,10 +32,13 @@ def stackspecplt(stackspec, velres, sampname, mh9, erand, lsm, sfr, pars=None):
     plt.plot(stackspec[:,0], stackspec[:,2],'r--',lw=0.5)
     plt.plot(stackspec[:,0], -stackspec[:,2],'r--',lw=0.5)
 
+    plt.ylim([1.5*np.amin(stackspec[:,1]),1.2*np.amax(stackspec[:,1])])
+
     plt.figtext(0.21, 0.90, fr"log ($M_*$) = {lsm:.1f}", ha="left", fontsize=8)
     plt.figtext(0.21, 0.80, fr"SFR = {10.0**sfr:.2f}", ha="left", fontsize=8)
 
-    plt.figtext(0.95, 0.90, fr"({mh9:.1f}$\pm${erand:.1f})$\times 10^9$", ha="right", fontsize=8)
+    plt.figtext(0.95, 0.90, f"N = {nobj}", ha="right", fontsize=8)
+    plt.figtext(0.95, 0.80, fr"({mh9:.1f}$\pm${erand:.1f})$\times 10^9$", ha="right", fontsize=8)
 
     plt.xlabel('Velocity (km/s)')
     plt.ylabel('Luminosity density (Jy Mpc$^2$)')

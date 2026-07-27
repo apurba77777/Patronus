@@ -104,11 +104,11 @@ def phials (pars):
         print("Creating ",pars['WorkDir']+pars['ResplotDir'])
         os.mkdir(pars['WorkDir']+pars['ResplotDir'])   
 
-    if (os.path.exists(pars['WorkDir']+pars['ResplotDir']+pars['SamPlotDir'])):
-        print("Found ",pars['WorkDir']+pars['ResplotDir']+pars['SamPlotDir'])
+    if (os.path.exists(pars['WorkDir']+pars['SamPlotDir'])):
+        print("Found ",pars['WorkDir']+pars['SamPlotDir'])
     else:
-        print("Creating ",pars['WorkDir']+pars['ResplotDir']+pars['SamPlotDir'])
-        os.mkdir(pars['WorkDir']+pars['ResplotDir']+pars['SamPlotDir'])  
+        print("Creating ",pars['WorkDir']+pars['SamPlotDir'])
+        os.mkdir(pars['WorkDir']+pars['SamPlotDir'])  
 
     if (os.path.exists(pars['WorkDir']+pars['SubDir']+pars['ScubeDir'])):
         print("Found ",pars['WorkDir']+pars['SubDir']+pars['ScubeDir'])

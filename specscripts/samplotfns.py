@@ -19,7 +19,7 @@ mpl.rcParams['axes.labelsize']=12
 #
 #   ---------------------------------------------------------------------------------------------------
 
-def noiseratplt(setrats, pars=None):
+def noiseratplt(setrats, zgals, pars=None):
     
     #   Plot noise ratios
 
@@ -37,7 +37,22 @@ def noiseratplt(setrats, pars=None):
     ax.set_xlabel(r'Noise (%d km s$^{-1}$) / Noise (%d km s$^{-1}$)'%(int(10*pars['VelRes']), int(pars['VelRes'])), \
                   fontsize=10)
 
-    plt.savefig(pars['WorkDir']+pars['ResplotDir']+pars['SamPlotDir']+"/noiserat_"+pars['StackName']+"_"+pars['ColType']+".pdf", 
+    plt.savefig(pars['WorkDir']+pars['SamPlotDir']+"/noiserat_"+pars['StackName']+"_"+pars['ColType']+".pdf", 
+                transparent=True, format='pdf')
+    plt.close()
+
+    fig		= plt.figure(figsize=(3.2,2.8))
+    ax 		= fig.add_axes([0.15, 0.15, 0.82, 0.84])
+    ax.tick_params(axis="both",direction="in",bottom=True,right=True,top=True,left=True)
+    ax.plot(zgals, setrats, bins=100)
+
+    ax.set_xlabel(r'Redshift', fontsize=10)
+    ax.yaxis.set_label_coords(-0.11, 0.5)
+
+    ax.set_ylabel(r'Noise (%d km s$^{-1}$) / Noise (%d km s$^{-1}$)'%(int(10*pars['VelRes']), int(pars['VelRes'])), \
+                    fontsize=10)
+
+    plt.savefig(pars['WorkDir']+pars['SamPlotDir']+"/noiseratz_"+pars['StackName']+"_"+pars['ColType']+".pdf", 
                 transparent=True, format='pdf')
     plt.close()
 
@@ -62,7 +77,7 @@ def zlsmplt(detcat, pars=None):
     ax.yaxis.set_label_coords(-0.11, 0.5)
     ax.set_xlabel(r'Redshift (z)', fontsize=10)
 
-    plt.savefig(pars['WorkDir']+pars['ResplotDir']+pars['SamPlotDir']+"/zlsm_"+pars['StackName']+"_"+pars['ColType']+".pdf", 
+    plt.savefig(pars['WorkDir']+pars['SamPlotDir']+"/zlsm_"+pars['StackName']+"_"+pars['ColType']+".pdf", 
                 transparent=True, format='pdf')
     plt.close()
 
