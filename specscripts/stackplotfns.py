@@ -1,6 +1,7 @@
 import os,sys
 from astropy.io import fits
 import numpy as np
+import pandas as pd
 from astropy.wcs import WCS
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -79,3 +80,32 @@ def stackmaplt(stackmap, velres, sampname, pars=None):
 
     return
 #	--------------------------------------------------------------------------------------------------
+
+
+def resultable(gsamp, pars=None):
+    
+    #   Create a data-frame from the results
+
+    gsampd = pd.DataFrame([{'sampname': gsamp.sampname, 'ngal':gsamp.ngal, \
+                            'meanlumint': gsamp.meanlumint, 'medlumint': gsamp.medlumint, \
+                            'meanlumintavg': gsamp.meanlumintavg, 'medlumintavg': gsamp.medlumintavg, \
+                            'meanmh9': gsamp.meanmh9, 'medmh9': gsamp.medmh9, \
+                            'meanmh9avg': gsamp.meanmh9avg, 'medmh9avg': gsamp.medmh9avg, \
+                            'emeanmhrand': gsamp.emeanmhrand, 'emedmhrand': gsamp.emedmhrand, \
+                            'emeanpln': gsamp.emeanpln, 'emedpln': gsamp.emedpln, \
+                            'emeanplnavg': gsamp.emeanplnavg, 'emedplnavg': gsamp.emedplnavg, \
+                            'emeanmhjk': gsamp.emeanmhjk, 'emedmhjk': gsamp.emedmhjk, \
+                            'emeanmhjkavg': gsamp.emeanmhjkavg, 'emedmhjkavg': gsamp.emedmhjkavg, \
+                            'meanlb': gsamp.meanlb, 'medlb': gsamp.medlb, 'meanmb': gsamp.meanmb, 'medmb': gsamp.medmb, \
+                            'meanz': gsamp.meanz, 'medz': gsamp.medz, \
+                            'meanlsm': gsamp.meanlsm, 'medlsm': gsamp.medlsm, \
+                            'meansfr': gsamp.meansfr, 'medsfr': gsamp.medsfr, \
+                            'meanssfr': gsamp.meanssfr, 'medssfr': gsamp.medssfr, \
+                            'meansfr10': gsamp.meansfr10, 'medsfr10': gsamp.medsfr10, \
+                            'meansfr100': gsamp.meansfr100, 'medsfr100': gsamp.medsfr100, \
+                            'meanssfr10': gsamp.meanssfr10, 'medssfr10': gsamp.medssfr10, \
+                            'meanssfr100': gsamp.meanssfr100, 'medssfr100': gsamp.medssfr100}])    
+
+    return (gsampd)
+#	--------------------------------------------------------------------------------------------------
+

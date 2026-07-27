@@ -246,6 +246,19 @@ def stackmasses(gsamp, pars=None):
     print("z = %.3f	Col = %.3f	NUV-r = %.3f"%(meanz, meancol, meannuvr))
     print("MB = %.3f	SM = %.2e   SFR = %.2e"%(meanmb, meansm, medsfr))    
 
+    #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV-r r-J  Type  U-V  V-J   SFR10  SFR100  lgm
+    #	0	1	2	3	4	5	6	7	8	9	    10	11	12    13   14    15   16    17     18      19
+
+    gsamp	= gsamp._replace( meanlb=0.0, medlb=0.0, meanmb=0.0, medmb=0.0, \
+                              meanz=np.mean(gdets[:,4]), medz=np.median(gdets[:,4]), \
+                              meanlsm=np.log10(np.mean(10.0**gdets[:,11])), medlsm=np.median(gdets[:,11]), \
+                              meansfr=np.nanmean(gdets[:,10]), medsfr=np.nanmedian(gdets[:,10]), \
+                              meanssfr=np.nanmean(gdets[:,10]/(10**gdets[:,11])), medssfr=np.nanmedian(gdets[:,10]/(10**gdets[:,11])), \
+                              meansfr10=np.nanmean(gdets[:,17]), medsfr10=np.nanmedian(gdets[:,17]), \
+                              meansfr100=np.nanmean(gdets[:,18]), medsfr100=np.nanmedian(gdets[:,18]), \
+                              meanssfr10=np.nanmean(gdets[:,17]/(10**gdets[:,11])), medssfr10=np.nanmedian(gdets[:,17]/(10**gdets[:,11])), \
+                              meanssfr100=np.nanmean(gdets[:,18]/(10**gdets[:,11])), medssfr100=np.nanmedian(gdets[:,18]/(10**gdets[:,11])) )
+
     if (domedian):
         print("Fetching median cube ...")
         stackarr	= gsamp.medstkcube	
@@ -346,5 +359,5 @@ def stackmasses(gsamp, pars=None):
     stackmaplt(hmap, pars["VelRes"], gsamp.sampname, pars=pars)
     stackmaplt(hmapavg, 2*pars["VelRes"], gsamp.sampname, pars=pars)
 
-    return 
+    return (gsamp)
 #   ---------------------------------------------------------------------------------------------------

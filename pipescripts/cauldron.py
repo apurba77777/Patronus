@@ -1,6 +1,7 @@
 import os,sys
 import argparse as ap
 import yaml as ym
+import pandas as pd
 from specscripts.ingredients import *
 from specscripts.auxfns import *
 from specscripts.compilecats import *
@@ -241,13 +242,26 @@ if (argus.stackmass or argus.amortentia):
         sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'rb')	
         gsamp		= pkl.load(sampfile)
         sampfile.close() 
-        stackmasses(gsamp, pars=pars)
+        mgsamp      = stackmasses(gsamp, pars=pars)
+        results     = resultable(mgsamp, pars=pars)
+        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'wb')
+        pkl.dump(mgsamp, sampfile)
+        sampfile.close()
+        results.to_csv(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".txt")
     else:
+        reslist = []
         for i in range (0, len(pars['BinEdges'])-1):
             sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
             gsamp		= pkl.load(sampfile)
             sampfile.close() 
-            stackmasses(gsamp, pars=pars)
+            mgsamp      = stackmasses(gsamp, pars=pars)
+            reslist.append(resultable(mgsamp, pars=pars))
+            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
+            pkl.dump(mgsamp, sampfile)
+            sampfile.close()
+        results = pd.concat(reslist)
+        results.to_csv(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+".txt")
+    
 
     
     

@@ -17,13 +17,17 @@ from specscripts.samplotfns import *
 #   ---------------------------------------------------------------------------------------------------
 
 sampleflds  = ('sampname','isclear','reskpc','ngal','sampcat','zlim','nuvrlim','lsmlim','mblim', \
-                    'meanstkcube','meanstkcubeavg', 'meanstkspec', 'meanstkspecavg','meanplnrmsarr','meanplnrmsavg', \
-                        'medstkcube','medstkcubeavg','medstkspec', 'medstkspecavg','medplnrmsarr','medplnrmsavg', \
-                            'meanlumint', 'meanlumintavg', 'meanmh9', 'meanmh9avg', \
-                                'meanrandarr', 'meanrandarravg', 'medrandarr', 'medrandarravg', \
-                                    'emeanmhrand', 'emeanpln', 'emeanplnavg', 'emeanmhjk', 'emeanmhjkavg', \
-                                        'medlumint', 'medlumintavg', 'medmh9', 'medmh9avg', \
-                                            'emedmhrand', 'emedpln', 'emedplnavg', 'emedmhjk', 'emedmhjkavg')
+                'meanstkcube','meanstkcubeavg', 'meanstkspec', 'meanstkspecavg','meanplnrmsarr','meanplnrmsavg', \
+                'medstkcube','medstkcubeavg','medstkspec', 'medstkspecavg','medplnrmsarr','medplnrmsavg', \
+                'meanlumint', 'meanlumintavg', 'meanmh9', 'meanmh9avg', \
+                'meanrandarr', 'meanrandarravg', 'medrandarr', 'medrandarravg', \
+                'emeanmhrand', 'emeanpln', 'emeanplnavg', 'emeanmhjk', 'emeanmhjkavg', \
+                'medlumint', 'medlumintavg', 'medmh9', 'medmh9avg', \
+                'emedmhrand', 'emedpln', 'emedplnavg', 'emedmhjk', 'emedmhjkavg',\
+                    'meanlb', 'medlb', 'meanmb', 'medmb', 'meanz', 'medz', \
+                        'meanlsm', 'medlsm', 'meansfr', 'medsfr', 'meanssfr', 'medssfr', \
+                            'meansfr10', 'medsfr10', 'meansfr100', 'medsfr100', \
+                                'meanssfr10', 'medssfr10', 'meanssfr100', 'medssfr100')
 
 stksmp      = namedtuple('stksmp', sampleflds, defaults=(None,) * len(sampleflds))
 #   --------------------------------------------------------------------------------------------------
@@ -112,7 +116,7 @@ def confinecat(redscubedir, outspecdir, gdets, pars=None):
     setrats	= nujy[:,1]/nujy[:,0]
     gdetsout= np.array(gdetsout)
 
-    noiseratplt(setrats, gdetsout[:,4], pars=pars)
+    noiseratplt(setrats, gdets[:,4], pars=pars)
 
     return (gdetsout) 
 #	--------------------------------------------------------------------------------------------------

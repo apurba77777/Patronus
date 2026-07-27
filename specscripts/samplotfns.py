@@ -44,7 +44,7 @@ def noiseratplt(setrats, zgals, pars=None):
     fig		= plt.figure(figsize=(3.2,2.8))
     ax 		= fig.add_axes([0.15, 0.15, 0.82, 0.84])
     ax.tick_params(axis="both",direction="in",bottom=True,right=True,top=True,left=True)
-    ax.plot(zgals, setrats, bins=100)
+    ax.plot(zgals, setrats, 'bo', markersize=1)
 
     ax.set_xlabel(r'Redshift', fontsize=10)
     ax.yaxis.set_label_coords(-0.11, 0.5)
