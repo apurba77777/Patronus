@@ -235,7 +235,6 @@ if (argus.stackcubes or argus.stackerrs):
                     pkl.dump(mgsamp, sampfile)
             
     
-
 #   Calculate average mass
 if (argus.stackmass):   
     if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
@@ -264,7 +263,6 @@ if (argus.stackmass):
         results = pd.concat(reslist)
         results.to_csv(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+".txt")
     
-
     
 #   Stack spectral cubes, calculate errors and average mass
 if (argus.amortentia): 
