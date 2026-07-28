@@ -95,7 +95,7 @@ if (argus.excat):
         srcs    = srcs[srcs[:,14]==2]
         print("Selecting AGNs only")
     print('Extracted sources		= %d'%len(srcs))
-    np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CatFile'], srcs, \
+    np.savetxt(pars['CatDir']+'/'+pars['CatFile'], srcs, \
                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
 
 #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV-r r-J  Type  U-V  V-J   SFR10  SFR100  lgm
@@ -109,7 +109,7 @@ if (argus.exubcubes):
     exsrcs  = exubcubes(detid, detz, posra, posdec, obschan, istart=0, pars=pars, ovrt=argus.obliviate, nobj=-1)
     dets    = dets[exsrcs]
     print('Extracted sources		= %d'%len(dets))
-    np.savetxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'], dets, \
+    np.savetxt(pars['CatDir']+'/'+pars['CubeCatFile'], dets, \
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
 
 
@@ -157,7 +157,7 @@ if (argus.redcubes):
 
 #   Construct master catalogue
 if (argus.getmastercat):  
-    dets    = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/{pars['CubeCatFile']}")
+    dets    = np.loadtxt(f"{pars['CatDir']}/{pars['CubeCatFile']}")
     gdets   = conmastercat(dets, pars=pars)
     print('\n     Sources	= %d'%len(gdets))
     np.savetxt(f"{pars['WorkDir']}/{pars['StacatDir']}/mastercat_{pars['StackName']}_{pars['ColType']}.cat", gdets, \
@@ -195,7 +195,7 @@ if (argus.stackcats or argus.amortentia):
 
 
 #   Stack spectral cubes and/or calculate errors
-if (argus.stackcubes or argus.stackerrs or argus.amortentia): 
+if (argus.stackcubes or argus.stackerrs): 
     if (pars['ReGrid']):
         print("\n Regridding has not yet been implemented...\n")
         sys.exit()
@@ -204,67 +204,106 @@ if (argus.stackcubes or argus.stackerrs or argus.amortentia):
         outspecdir  = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedSpecs']
     
     if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
-        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'rb')	
-        gsamp		= pkl.load(sampfile)
-        sampfile.close()
-        if (argus.stackcubes or argus.amortentia):
+        samfilename = pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl"
+        with open(samfilename, 'rb') as sampfile:	
+            gsamp	= pkl.load(sampfile)
+        
+        if (argus.stackcubes):
             mgsamp  = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
-            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'wb')	
-            pkl.dump(mgsamp, sampfile)
-            sampfile.close()
-        if (argus.stackerrs or argus.amortentia):
+            with open(samfilename, 'wb') as sampfile:	
+                pkl.dump(mgsamp, sampfile)
+            
+        if (argus.stackerrs):
             mgsamp  = stackerrors(gsamp, outspecdir, pars=pars)
-            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'wb')	
-            pkl.dump(mgsamp, sampfile)
-            sampfile.close()
+            with open(samfilename, 'wb') as sampfile:	
+                pkl.dump(mgsamp, sampfile)
         
     else:
         for i in range (0, len(pars['BinEdges'])-1):
-            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
-            gsamp		= pkl.load(sampfile)
-            sampfile.close()
-            if (argus.stackcubes or argus.amortentia):
+            samfilename = pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl"
+            with open(samfilename, 'rb') as sampfile:	
+                gsamp	= pkl.load(sampfile)
+            
+            if (argus.stackcubes):
                 mgsamp  = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
-                sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
-                pkl.dump(mgsamp, sampfile)
-                sampfile.close()
-            if (argus.stackerrs or argus.amortentia):
+                with open(samfilename, 'wb') as sampfile:
+                    pkl.dump(mgsamp, sampfile)
+                
+            if (argus.stackerrs):
                 mgsamp  = stackerrors(gsamp, outspecdir, pars=pars)
-                sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
-                pkl.dump(mgsamp, sampfile)
-                sampfile.close()
+                with open(samfilename, 'wb') as sampfile:
+                    pkl.dump(mgsamp, sampfile)
             
     
 
 #   Calculate average mass
-if (argus.stackmass or argus.amortentia):   
+if (argus.stackmass):   
     if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
-        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'rb')	
-        gsamp		= pkl.load(sampfile)
-        sampfile.close() 
+        samfilename = pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl"
+        with open(samfilename, 'rb') as sampfile:	
+            gsamp	= pkl.load(sampfile)
+        
         mgsamp      = stackmasses(gsamp, pars=pars)
         results     = resultable(mgsamp, pars=pars)
-        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'wb')
-        pkl.dump(mgsamp, sampfile)
-        sampfile.close()
+        with open(samfilename, 'wb') as sampfile:
+            pkl.dump(mgsamp, sampfile)
+        
         results.to_csv(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".txt")
     else:
         reslist = []
         for i in range (0, len(pars['BinEdges'])-1):
-            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'rb')	
-            gsamp		= pkl.load(sampfile)
-            sampfile.close() 
+            samfilename = pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl"
+            with open(samfilename, 'rb') as sampfile:	
+                gsamp	= pkl.load(sampfile)
+
             mgsamp      = stackmasses(gsamp, pars=pars)
             reslist.append(resultable(mgsamp, pars=pars))
-            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
-            pkl.dump(mgsamp, sampfile)
-            sampfile.close()
+            with open(samfilename, 'wb') as sampfile:	
+                pkl.dump(mgsamp, sampfile)
+            
         results = pd.concat(reslist)
         results.to_csv(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+".txt")
     
 
     
+#   Stack spectral cubes, calculate errors and average mass
+if (argus.amortentia): 
+    if (pars['ReGrid']):
+        print("\n Regridding has not yet been implemented...\n")
+        sys.exit()
+    else:
+        redscubedir = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedCubes']
+        outspecdir  = pars['WorkDir']+'/'+pars['SubDir']+'/'+pars['RedSpecs']
     
+    if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
+        samfilename = pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl"
+        with open(samfilename, 'rb') as sampfile:	
+            gsamp	= pkl.load(sampfile)
+        
+        mgsamp  = stackubes(gsamp, outspecdir, redscubedir, pars=pars)
+        mgsamp  = stackerrors(mgsamp, outspecdir, pars=pars)
+        mgsamp  = stackmasses(mgsamp, pars=pars)
+        results = resultable(mgsamp, pars=pars)
+        with open(samfilename, 'wb') as sampfile:	
+            pkl.dump(mgsamp, sampfile)
+
+        results.to_csv(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".txt")
+        
+    else:
+        reslist = []
+        for i in range (0, len(pars['BinEdges'])-1):
+            samfilename = pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl"
+            with open(samfilename, 'rb') as sampfile:	
+                gsamp	= pkl.load(sampfile)
+                        
+            mgsamp  = stackubes(gsamp, outspecdir, redscubedir, pars=pars)       
+            mgsamp  = stackerrors(mgsamp, outspecdir, pars=pars)
+            mgsamp  = stackmasses(mgsamp, pars=pars)
+            reslist.append(resultable(mgsamp, pars=pars))
+            with open(samfilename, 'wb') as sampfile:
+                pkl.dump(mgsamp, sampfile)  
+        results = pd.concat(reslist)
+        results.to_csv(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+".txt")  
 
 
 

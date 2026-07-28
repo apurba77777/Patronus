@@ -169,14 +169,20 @@ def constackcat(gdets, grefs, pars=None):
 
     if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
         print("\n   No binning required... \n")
-        asamp   = stksmp()
+
+        samfilename = pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl"
+        if os.path.exists(samfilename):
+            with open(samfilename, 'rb') as sampfile:	
+                asamp	= pkl.load(sampfile)
+        else:
+            asamp   = stksmp()
         asamp   = asamp._replace(sampname = pars['StackName'], isclear = pars['ExclNbrs'], reskpc = pars['SmKpc'], \
                                  ngal = len(gdets), sampcat  = gdets, zlim = pars['ZLim'], lsmlim = pars['LsmLim'], \
                                     mblim = pars['MbLim'])
 	
-        sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl", 'wb')	
-        pkl.dump(asamp,sampfile)
-        sampfile.close()	
+        with open(samfilename, "wb") as sampfile:	
+            pkl.dump(asamp,sampfile)
+        	
     else:
         print(f"\n   Binning sample in {pars['BinParam']} ({pars['BinEdges']})\n")
         bgdets  = []
@@ -194,15 +200,21 @@ def constackcat(gdets, grefs, pars=None):
             bgdets.append( gdets[ (bcol - pars['BinEdges'][ib])*(bcol - pars['BinEdges'][ib+1]) < 0.0 ] )
 
         for i in range (0, len(bgdets)):
-            asamp   = stksmp()
+
+            samfilename = pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl"
+            if os.path.exists(samfilename):
+                with open(samfilename, 'rb') as sampfile:	
+                    asamp	= pkl.load(sampfile)
+            else:
+                asamp   = stksmp()
+            
             asamp   = asamp._replace(sampname = pars['StackName']+"_"+pars["BinParam"]+"bin_"+str(i), \
                                      isclear = pars['ExclNbrs'], reskpc = pars['SmKpc'], ngal = len(bgdets[i]), \
                                         sampcat  = bgdets[i], zlim = pars['ZLim'], lsmlim = pars['LsmLim'], \
                                             mblim = pars['MbLim'])
         
-            sampfile    = open(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl", 'wb')	
-            pkl.dump(asamp,sampfile)
-            sampfile.close()
+            with open(samfilename, "wb") as sampfile:	
+                pkl.dump(asamp,sampfile)
 
     return 0
 #	--------------------------------------------------------------------------------------------------
