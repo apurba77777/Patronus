@@ -83,3 +83,52 @@ def zlsmplt(detcat, pars=None):
 
     return
 #	--------------------------------------------------------------------------------------------------
+
+
+def mainseqplt(detcat, pars=None):
+    
+    #   Plot the main sequence
+
+    carr    = detcat[:,4]
+
+    fig		= plt.figure(figsize=(3.2,2.8))
+    ax 		= fig.add_axes([0.15, 0.15, 0.82, 0.84])
+    ax.tick_params(axis="both",direction="in",bottom=True,right=True,top=True,left=True)
+    
+    plt.scatter(detcat[:,11], np.log10(detcat[:,18]), c=carr, s=3, marker="o", cmap="managua", alpha=0.6)
+    plt.ylim([-3.2, 3.2])
+
+    ax.set_xlabel(r'log ($M_*$ / $M_{\odot}$)', fontsize=10)
+    ax.yaxis.set_label_coords(-0.11, 0.5)
+    ax.set_ylabel(r'log (SFR / $M_{\odot}$ $yr^{-1}$)', fontsize=10)
+
+    plt.savefig(pars['WorkDir']+pars['SamPlotDir']+"/mainseq_"+pars['StackName']+"_"+pars['ColType']+".pdf", 
+                transparent=True, format='pdf')
+    plt.close()
+
+    return
+#	--------------------------------------------------------------------------------------------------
+
+
+def zdist(detcats, sampid, pars=None):
+    
+    #   Plot the z distribution
+
+    npan    = len(detcats)
+    fig		= plt.figure(figsize=(3.2,2.5*npan))
+
+    for i in range(0,npan):
+        ax 		= fig.add_subplot(npan,1,i+1)
+        ax.tick_params(axis="both",direction="in",bottom=True,right=True,top=True,left=True)
+        ax.hist(detcats[i][:,4], bins=5, range=(pars['ZLim']))
+        ax.set_ylabel(r'Number', fontsize=10)    
+
+    ax.set_xlabel('z', fontsize=10)
+    plt.tight_layout()
+
+    plt.savefig(pars['WorkDir']+pars['SamPlotDir']+"/dist_z_"+sampid+"_"+pars['ColType']+".pdf", 
+                transparent=True, format='pdf')
+    plt.close()
+
+    return
+#	--------------------------------------------------------------------------------------------------

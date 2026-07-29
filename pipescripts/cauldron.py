@@ -32,8 +32,8 @@ from specscripts.spectralstack import *
 #                           redcubes        //  Reduce subcubes
 #                           getmastercat    //  Construct master catalogue
 #                           getfinecat      //  Construct catalogue with well-behaved spectra
-#                           samplot         //  Plot sample statistics
 #                           stackcats       //  Construct sample for stacking
+#                           samplot         //  Plot sample statistics
 #                           stackcubes      //  Stack spectral cubes
 #                           stackerrs       //  Calculate errors
 #                           stackmass       //  Calculate average mass
@@ -180,18 +180,31 @@ if (argus.getfinecat):
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
 
 
-#   Plot sample statistica
-if (argus.samplot):
-    dets    = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/finecat_{pars['StackName']}_{pars['ColType']}.cat")
-    zlsmplt(dets, pars=pars)
-
-
 #   Construct sample for stacking
 if (argus.stackcats or argus.amortentia):  
     refcat  = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/mastercat_{pars['StackName']}_{pars['NbrType']}.cat")
     detcat  = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/finecat_{pars['StackName']}_{pars['ColType']}.cat")
-
     constackcat(detcat, refcat, pars=pars)
+
+
+#   Plot sample statistica
+if (argus.samplot):
+    if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
+        samfilename = pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+".pkl"
+        with open(samfilename, 'rb') as sampfile:	
+            gsamp	= pkl.load(sampfile)
+        zlsmplt(gsamp.sampcat, pars=pars)
+        mainseqplt(gsamp.sampcat, pars=pars)
+        zdist([gsamp.sampcat], f'{pars['StackName']}_{pars['ColType']}', pars=pars)       
+        
+    else:
+        detcats = []
+        for i in range (0, len(pars['BinEdges'])-1):
+            samfilename = pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+"bin_"+str(i)+".pkl"
+            with open(samfilename, 'rb') as sampfile:	
+                gsamp	= pkl.load(sampfile)
+            detcats.append(gsamp.sampcat)
+        zdist(detcats, f"{pars['StackName']}_{pars['ColType']}_{pars['BinParam']}", pars=pars)             
 
 
 #   Stack spectral cubes and/or calculate errors
