@@ -27,6 +27,7 @@ def get_args():
     parser.add_argument("--flgin", help = "YAML file with flagging params", type = str, default = None)
     parser.add_argument("--rfifile", help = "File with list of RFI frequencies", type = str, default = None)
     parser.add_argument("--pipedir", help = "Directory to the pipeline", type = str, default = None)
+    parser.add_argument("--pypath", help = "Path to python executable", type = str, default = "python")
     parser.add_argument("--imgname", help = "Name of the image (only for imaging)", type = str, default = "random")
     parser.add_argument("--oldimg", help = "Old image (for checking selfcal)", type = str, default = "random")
     parser.add_argument("--savemodel", help = "Save model column?", action='store_true')
@@ -43,6 +44,9 @@ def get_args():
     parser.add_argument("--exbpcal", help = "Extract bandpass calibrator file", action='store_true')
     parser.add_argument("--calbpcal", help = "Calibrate bandpass", action='store_true')
     parser.add_argument("--flagbpcal", help = "Flag bandpass calibrator file", action='store_true')
+    parser.add_argument("--phcalbpcal", help = "Calibrate bandpass with phase cal", action='store_true')
+    parser.add_argument("--phflagbpcal", help = "Flag phase cal bandpass calibrator file", action='store_true')
+    parser.add_argument("--modpcalspec", help = "Model the phase cal spectrum", action='store_true')
     parser.add_argument("--extarget", help = "Extract calibrated target file", action='store_true')
     parser.add_argument("--flagtarget", help = "Flag calibrated target file", action='store_true')
     #   Imaging tasks

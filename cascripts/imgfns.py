@@ -312,7 +312,7 @@ def finalimg (targetvislist, dosavemodel=True, pars=None):
         specmode='mfs', \
         gridder='widefield', \
         wprojplanes=pars['WprojPln'], \
-        pblimit=-0.1, \
+        pblimit=0.1, \
         deconvolver='mtmfs', \
         scales=pars['DeconScls'], \
         smallscalebias=pars['SclBias'], \
@@ -408,7 +408,7 @@ def getuvsub (ivis, calfile, pars=None):
         specmode='mfs', \
         gridder='widefield', \
         wprojplanes=pars['WprojPln'], \
-        pblimit=-0.1, \
+        pblimit=0.1, \
         deconvolver='mtmfs', \
         scales=pars['DeconScls'], \
         smallscalebias=pars['SclBias'], \

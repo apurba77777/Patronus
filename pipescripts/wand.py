@@ -20,6 +20,7 @@ from cascripts.utils import *
 #                       --flgin [ankflag_YAML]      //  YAML file containing aNKflag parameters
 #                       --rfifile [RFI_text]        //  TEXT file with RFI frequency ranges
 #                       --pipedir [pipe_direcory]   //  Path to the pipeline itself
+#                       --pypath [pythonex]         //  Path to python executable
 #                       --imgname [image_name]      //  Name of the image (only for imaging)
 #                       --oldimg [old_image]        //  Old image (for checking selfcal)
 #                       --savemodel                 //  Save model column?
@@ -27,47 +28,52 @@ from cascripts.utils import *
 #                       --calmode [p/ap]            //  Self-calibration mode (p/ap)
 #
 #
-#   Muggle-friendly spells              fitstoms    //  Convert FITS to MS
-#                                       initrawms   //  Initialize raw MS
-#                                       makech0     //  Create single channel file
-#                                       fluxch0     //  Set flux density of single channel file
-#                                       calch0      //  Calibrate single channel file
-#                                       flagch0     //  Flag single channel file
-#                                       exbpcal     //  Extract bandpass calibrator file
-#                                       calbpcal    //  Calibrate bandpass
-#                                       flagbpcal   //  Flag bandpass calibrator file
-#                                       extarget    //  Extract calibrated target file
-#                                       flagtarget  //  Flag calibrated target file
+#   Muggle-friendly spells              
+#                       fitstoms    //  Convert FITS to MS
+#                       initrawms   //  Initialize raw MS
+#                       makech0     //  Create single channel file
+#                       fluxch0     //  Set flux density of single channel file
+#                       calch0      //  Calibrate single channel file
+#                       flagch0     //  Flag single channel file
+#                       exbpcal     //  Extract bandpass calibrator file
+#                       calbpcal    //  Calibrate bandpass
+#                       flagbpcal   //  Flag bandpass calibrator file
+#                       phcalbpcal  //  Calibrate bandpass with phase cal
+#                       phflagbpcal //  Flag phase cal bandpass calibrator file
+#                       modpcalspec //  Model the phase cal spectrum
+#                       extarget    //  Extract calibrated target file
+#                       flagtarget  //  Flag calibrated target file
 #
-#                                       avgtarget   //  Channel average target visibilities
-#                                       imgtarget   //  Image the calibrated target
-#                                       selfcal     //  Self calibrate
-#                                       flagselfcal //  Flag calibrated visibilities
-#                                       getuvsub    //  Subtract the final continuum model
-#                                       flaguvsub   //  Flag continuum subtracted visibilities
+#                       avgtarget   //  Channel average target visibilities
+#                       imgtarget   //  Image the calibrated target
+#                       selfcal     //  Self calibrate
+#                       flagselfcal //  Flag calibrated visibilities
+#                       getuvsub    //  Subtract the final continuum model
+#                       flaguvsub   //  Flag continuum subtracted visibilities
 #                                       
-#                                       metronome   //  Make list of timestamps in MJD
-#                                       snapshot    //  Make snapshot images/cubes
+#                       metronome   //  Make list of timestamps in MJD
+#                       snapshot    //  Make snapshot images/cubes
 #
-#   Simple & convenient charms          obliviate   //  Clear existing files 
-#                                       lumos       //  List Usable Modes On Screen
-#                                       revelio     //  Reveal configuration parameters
+#   Simple & convenient charms          
+#                       obliviate   //  Clear existing files 
+#                       lumos       //  List Usable Modes On Screen
+#                       revelio     //  Reveal configuration parameters
 #
 #   Advanced spells and charms (Should NOT be attempted before passing O. W. L.s)
 #                        
-#                                       accio       //  Accumulate Continuum Components in Image Output
-#                                       scourgify   //  Scrutinize Calibration Outputs and Ultimate Robustness of Gains with Image Files Yielded
-#                                       incendio    //  Image Normal Continuum Emission using Nice Data from Interferometric Observations
+#                       accio       //  Accumulate Continuum Components in Image Output
+#                       scourgify   //  Scrutinize Calibration Outputs and Ultimate Robustness of Gains with Image Files Yielded
+#                       incendio    //  Image Normal Continuum Emission using Nice Data from Interferometric Observations
 #  
 #   Dangerous spells and curses ( Extreme caution recommended !! Should NOT be attempted before passing N.E.W.T.s)
 #
-#                                       crucio      //  Calibrate Response for an Uncorrupted Channel Isolated from Observation 
-#                                       defodio     //  Determine Effects of Frequency Ousting Detected Interference in Observation
-#                                       confringo   //  Calibrate Observation for Normal and Frequency Response of the Instrument with Natural Good Objects
-#                                       imperio     //  Iterative Mapping of Persistent Emission in Radio using Interferometric Observations
-#                                       reducto     //  Reduce entire dataset to usable calibrated target outputs
-#                                       rictusempra //  Remove Image Components Through Uv Subtraction and Endeavour Mitigation of Persistent Radio Aberrations 
-#                                       petrificus  //  Produce and Encapsulate Time Resolved Images into a Fits Image by Combining Unique Snapshots
+#                       crucio      //  Calibrate Response for an Uncorrupted Channel Isolated from Observation 
+#                       defodio     //  Determine Effects of Frequency Ousting Detected Interference in Observation
+#                       confringo   //  Calibrate Observation for Normal and Frequency Response of the Instrument with Natural Good Objects
+#                       imperio     //  Iterative Mapping of Persistent Emission in Radio using Interferometric Observations
+#                       reducto     //  Reduce entire dataset to usable calibrated target outputs
+#                       rictusempra //  Remove Image Components Through Uv Subtraction and Endeavour Mitigation of Persistent Radio Aberrations 
+#                       petrificus  //  Produce and Encapsulate Time Resolved Images into a Fits Image by Combining Unique Snapshots
 #
 #	--------------------------------------------------------------------------------------------------------
 
@@ -132,12 +138,12 @@ if (argus.calch0):
 
 #   Flag single channel file
 if (argus.flagch0):  
-    flagsinglechan(pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+    flagsinglechan(pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
 
 #   Extract bpcal file
 if (argus.exbpcal):  
-    exbpcal(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars['FluxCal'], pars)
+    exbpcal(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars['FluxCal'], pars=pars)
 
 
 #   Calibrate bandpass
@@ -147,7 +153,24 @@ if (argus.calbpcal):
 
 #   Flag bandpass calibrator file
 if (argus.flagbpcal):  
-    flagbpcal(pars['FluxCal'], pars, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+    flagbpcal(pars['FluxCal'], pars, argus.pypath, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+
+
+#   Model the phase cal spectrum
+if (argus.modpcalspec):  
+    expcalnearest(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars['FluxCal'], pars['PhaseCal'], pars=pars, ovrt=argus.obliviate)
+    pcalspec    = pcalspec(pars['PhaseCal'], pars=pars)
+    phexbpcal(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars['PhaseCal'], pcalspec, pars=pars)
+
+
+#   Calibrate bandpass with phase cal
+if (argus.phcalbpcal):  
+    calbpcal( pars['PhaseCal'], pars)
+
+
+#   Flag phase cal bandpass calibrator file
+if (argus.phflagbpcal):  
+    flagbpcal(pars['PhaseCal'], pars, argus.pypath, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
 
 #   Difficult magic ********* Calibrate time dependent gain in single channel 
@@ -159,7 +182,7 @@ if (argus.crucio or argus.confringo or argus.reducto):
     
     for i in range(0, pars['CalIter']):
         print(f'\n Gain calibration iteration {i}...\n')
-        flagsinglechan(pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=True)
+        flagsinglechan(pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=True)
         calsinglechan(pars)
 
 
@@ -171,18 +194,31 @@ if (argus.defodio or argus.confringo or argus.reducto):
 
     for i in range(0, pars['BpIter']):
         print(f'\n Bandpass calibration iteration {i}...\n')
-        flagbpcal(pars['FluxCal'], pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=True)
+        flagbpcal(pars['FluxCal'], pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=True)
         calbpcal( pars['FluxCal'], pars)
+
+    if (pars['PhaseBpCal']):
+        expcalnearest(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars['FluxCal'], pars['PhaseCal'], pars=pars, ovrt=argus.obliviate)
+        pcalspec    = pcalspec(pars['PhaseCal'], pars=pars)
+        phexbpcal(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars['PhaseCal'], pcalspec, pars=pars)
+
+        for i in range(0, pars['BpIter']):
+            print(f'\n Phase cal Bandpass calibration iteration {i}...\n')
+            flagbpcal(pars['PhaseCal'], pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=True)
+            calbpcal( pars['PhaseCal'], pars)
 
 
 #   Extract calibrated target file
-if (argus.extarget or argus.defodio or argus.confringo or argus.reducto):  
-    extarget(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars['FluxCal'], pars)
+if (argus.extarget or argus.reducto): 
+    if (pars['PhaseBpCal']):
+        extarget(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars['PhaseCal'], pars)
+    else: 
+        extarget(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars['FluxCal'], pars)
 
 
 #   Flag calibrated target file
-if (argus.flagtarget): 
-    flagtarget(pars['TargetName'], pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+if (argus.flagtarget or argus.reducto): 
+    flagtarget(pars['TargetName'], pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
 
 #   ------------------------    Imaging and selfcal tasks ---------------------------------------------------------

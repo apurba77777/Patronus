@@ -1,5 +1,7 @@
 import os,sys
+import subprocess
 import numpy as np
+import matplotlib.pyplot as plt
 import casatasks as ct
 import casatools
 from casaplotms import plotms
@@ -240,7 +242,7 @@ def calsinglechan(pars = None):
 
 
 
-def flagsinglechan (pars=None, ankdir=None, ankin=None, ovrt=False):
+def flagsinglechan (pars=None, pyx="python", ankdir=None, ankin=None, ovrt=False):
     
     #   Flag calibrator data in the channel 0 file
 
@@ -271,7 +273,7 @@ def flagsinglechan (pars=None, ankdir=None, ankin=None, ovrt=False):
         if (not os.path.exists("glogout.dat")):
             os.system("cp "+ankdir+"/glogout.dat .")
 
-        fcalcmd = "python3 " + ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
+        fcalcmd = pyx +" "+ ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
                     " --parfile " + ankin + " --infilename " + fcalfile + " --outfilename " + fcalfile+"_f" + \
                     " --logfile " +pars['WorkDir']+pars['LogDir']+"/fcal_"+pars['FluxCal'] + \
                     " --flagmode uvbin --targetype=calch0 --clearscratch --nthreads " + str(pars['FlgThreads'])
@@ -279,7 +281,7 @@ def flagsinglechan (pars=None, ankdir=None, ankin=None, ovrt=False):
         print("Running \n" + fcalcmd)
         os.system(fcalcmd)
 
-        pcalcmd = "python3 " + ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
+        pcalcmd = pyx +" "+ ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
                     " --parfile " + ankin + " --infilename " + pcalfile + " --outfilename " + pcalfile+"_f" + \
                     " --logfile " +pars['WorkDir']+pars['LogDir']+"/pcal_"+pars['PhaseCal'] + \
                     " --flagmode uvbin --targetype=calch0 --clearscratch --nthreads " + str(pars['FlgThreads'])
@@ -400,6 +402,58 @@ def exbpcal (fitsname, bpcal, pars=None):
 
     print("\n Done!\n")
 
+    return (0)
+#   -----------------------------------------------------------------------------------------------------
+
+
+
+def phexbpcal (fitsname, pcal, specpar, pars=None):
+    
+    #   Extract the phase cal as bandpass calibrator
+
+    fluxfile    = pars['WorkDir']+pars['UvMsDir']+pars['ReducedName']+"_ch0.fl"
+    bpcalfile   = pars['WorkDir']+pars['UvMsDir']+pars['ReducedName']+"_bpcal_"+pcal+".ms"
+
+    os.system("rm -rf "+bpcalfile)
+    os.system("rm -rf "+bpcalfile+".*")
+
+    print("\nApplying calibration...\n")
+    ct.applycal(vis=fitsname+".ms", field=pcal, gaintable=[fluxfile], applymode='')
+
+    print("Exporting phase cal BP cal...\n")
+
+    tavgdo = False 
+    if (pars['CalTimeAvg'] != ""):
+        print(f"Time-averaging to {pars['CalTimeAvg']}")
+        tavgdo = True
+
+    ct.mstransform(
+        vis=fitsname+".ms", \
+        outputvis=bpcalfile, \
+        datacolumn="corrected", \
+        keepflags=False, \
+        correlation=pars['CorrProds'], \
+        uvrange=pars['CalUvLim'], \
+        field=pcal, \
+        timeaverage=tavgdo, \
+        timebin=pars['CalTimeAvg']
+    )
+
+    specslope   = specpar[:-1].tolist()
+
+    print("Setting flux density of BP cal file...")
+    setjyout = ct.setjy(
+        vis=bpcalfile, \
+        field=pcal, \
+        standard='manual', \
+        fluxdensity=[10.0**specpar[-1],0,0,0], \
+        reffreq='1GHz', \
+        spix=specslope
+    )
+
+    print(pcal," flux density ",setjyout)
+
+    print(" Done!\n")
 
     return (0)
 #   -----------------------------------------------------------------------------------------------------
@@ -417,7 +471,14 @@ def calbpcal (bpcal, pars=None):
         os.system("rm -rf "+bpassfile)
 
     print("\nCalculating bandpass...\n")
-    ct.bandpass(vis=bpcalfile, caltable=bpassfile, field=bpcal, refant=pars['RefAntenna'], minsnr=float(pars['MinSNR']))
+    ct.bandpass(
+        vis=bpcalfile, \
+        caltable=bpassfile, \
+        field=bpcal, \
+        solint='600s', \
+        refant=pars['RefAntenna'], \
+        minsnr=float(pars['MinSNR'])
+    )
 
     print("\nApplying bandpass...\n")
     ct.applycal(vis=bpcalfile, gaintable=[bpassfile], applymode='')
@@ -443,7 +504,7 @@ def calbpcal (bpcal, pars=None):
         rowindex=1, \
         plotindex=1, \
         clearplots=False, \
-        plotfile=pars['WorkDir']+pars['LogDir']+"/bpcal_"+pars['ReducedName']+".png", \
+        plotfile=pars['WorkDir']+pars['LogDir']+"/bpcal_"+pars['ReducedName']+"_"+bpcal+".png", \
         height=1000, \
         width=1000, \
         coloraxis='antenna1', \
@@ -459,7 +520,7 @@ def calbpcal (bpcal, pars=None):
 
 
 
-def flagbpcal (bpcal, pars=None, ankdir=None, ankin=None, ovrt=False):
+def flagbpcal (bpcal, pars=None, pyx="python", ankdir=None, ankin=None, ovrt=False):
     
     #   Flag bandpass calibrator data 
 
@@ -484,7 +545,7 @@ def flagbpcal (bpcal, pars=None, ankdir=None, ankin=None, ovrt=False):
         if (not os.path.exists("glogout.dat")):
             os.system("cp "+ankdir+"/glogout.dat .")
 
-        bpcalcmd = "python3 " + ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
+        bpcalcmd = pyx +" " + ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
                     " --parfile " + ankin + " --infilename " + bpcalfile + " --outfilename " + bpcalfile+"_f" + \
                     " --logfile " +pars['WorkDir']+pars['LogDir']+"/bpcal_"+bpcal + \
                     " --flagmode baseline --targetype=calbp --clearscratch --nthreads " + str(pars['FlgThreads'])
@@ -504,14 +565,14 @@ def flagbpcal (bpcal, pars=None, ankdir=None, ankin=None, ovrt=False):
                height=1000, width=1000, gridcols=1, showgui=False)
 
         plotms(vis=bpcalfile+"_f.ms", xaxis="frequency", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-                plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/bpcal_"+pars['ReducedName']+"_freq.png", \
+                plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/bpcal_"+pars['ReducedName']+"_"+bpcal+"_freq.png", \
                     height=1000, width=1000, overwrite=True, showgui=False)
 
         plotms(vis=bpcalfile+"_f.ms", xaxis="uvwave", yaxis="amp", gridrows=2, \
                height=1000, width=1000, gridcols=1, showgui=False)
 
         plotms(vis=bpcalfile+"_f.ms", xaxis="uvwave", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-                plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/bpcal_"+pars['ReducedName']+"_uv.png", \
+                plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/bpcal_"+pars['ReducedName']+"_"+bpcal+"_uv.png", \
                     height=1000, width=1000, overwrite=True, showgui=False)
 
         #   Open and edit the flags in the MS files
@@ -536,6 +597,121 @@ def flagbpcal (bpcal, pars=None, ankdir=None, ankin=None, ovrt=False):
     print(" Done!\n")
 
     return (0)
+#   -----------------------------------------------------------------------------------------------------
+
+
+
+def expcalnearest (fitsname, fcal, pcal, pars=None, ovrt=False):
+    
+    #   Extract phase cal scans nearest to the flux cal
+
+    fluxfile    = pars['WorkDir']+pars['UvMsDir']+pars['ReducedName']+"_ch0.fl"
+    bpassfile   = pars['WorkDir']+pars['UvMsDir']+pars['ReducedName']+"_bpcal_"+fcal+".bp"
+    npcalfile   = pars['WorkDir']+pars['UvMsDir']+pars['ReducedName']+"_npcal_"+pcal+".ms"
+
+    if (ovrt):
+        os.system(f"rm -rf {npcalfile}")
+
+    wmsmd   = casatools.msmetadata()
+    wmsmd.open(fitsname+".ms")
+    fcalscn = np.array(wmsmd.scansforfield(fcal))
+    pcalscn = np.array(wmsmd.scansforfield(pcal))
+    wmsmd.done()
+
+    minsep  = np.argmin(np.abs(pcalscn[:,None]-fcalscn))
+    nearscs = (pcalscn[:,None])[minsep].tolist()
+    sclist  = ""
+    if (len(nearscs) > 1):
+        sclist = ", ".join(nearscs)
+    else:
+        sclist = str(nearscs[0])
+
+    print(f"FLux cal scal IDs {fcalscn}")
+    print(f"Phase cal scal IDs {pcalscn}")
+    print(f"Nearest scan(s) {nearscs}")
+
+    print("\nApplying calibration...\n")
+    ct.applycal(
+        vis=fitsname+".ms", \
+        field=pcal, \
+        scan=sclist, \
+        gaintable=[fluxfile,bpassfile], \
+        applymode=''
+    )
+
+    print("Exporting Phase cal nearest scan(s)...\n")
+    
+    tavgdo = False 
+    if (pars['CalTimeAvg'] != ""):
+        print(f"Time-averaging to {pars['CalTimeAvg']}")
+        tavgdo = True
+    
+    ct.mstransform(
+        vis=fitsname+".ms", \
+        outputvis=npcalfile, \
+        datacolumn="corrected", \
+        keepflags=False, \
+        correlation=pars['CorrProds'], \
+        uvrange=pars['CalUvLim'], \
+        scan=sclist, \
+        timeaverage=tavgdo, \
+        timebin=pars['CalTimeAvg']
+    )
+
+    print("  Done!\n")
+
+    return (0)
+#   -----------------------------------------------------------------------------------------------------
+
+
+
+def pcalspec (pcal, pars=None):
+    
+    #   Find the spectrum of the phase cal
+
+    npcalfile   = pars['WorkDir']+pars['UvMsDir']+pars['ReducedName']+"_npcal_"+pcal+".ms"
+
+    wms         = casatools.ms()
+    wms.open(npcalfile)
+    wms.selectinit(datadescid=0)
+    darr        = wms.getdata(["amplitude","flag","axis_info"], ifraxis=True)
+    wms.done()
+
+    freqs       = (darr["axis_info"]["freq_axis"]["chan_freq"]/1.0E9).T
+    amparr      = darr["amplitude"]
+    amparr[darr["flag"]==True]  = np.nan
+    ampspecmed  = np.nanmedian(amparr, axis=(0,2,3))
+
+    logfghz     = np.log10(freqs[0])
+    madamp      = np.nanmedian(np.abs(ampspecmed - np.nanmedian(ampspecmed)))
+    ampspecmed[np.abs(ampspecmed - np.nanmedian(ampspecmed)) > pars['SpecOutMad']*madamp] = np.nan
+    specpar     = np.zeros((pars['SpecPoly']+1), dtype=float)
+
+    hasconverged= False 
+
+    while (not hasconverged):
+
+        gfreqs      = np.isfinite(ampspecmed)
+        specpar     = np.polyfit(logfghz[gfreqs], np.log10(ampspecmed[gfreqs]), pars['SpecPoly'])
+        devarr      = np.abs(ampspecmed - 10.0**(np.poly1d(specpar)(logfghz)))
+        madamp      = np.nanmedian(devarr)
+        if (max(devarr) < pars['SpecOutMad']*madamp):
+            hasconverged    = True
+        else:
+            ampspecmed[devarr > pars['SpecOutMad']*madamp] = np.nan
+
+    print(f"Phase cal spectrum {specpar}")
+
+    plt.plot(freqs[0], ampspecmed)
+    plt.plot(freqs[0], 10.0**(np.poly1d(specpar)(logfghz)), 'b--')
+    plt.xlabel("Frequency (GHz)")
+    plt.ylabel("Flux density (Jy)")
+    plt.savefig(pars['WorkDir']+pars['LogDir']+"/pcal_"+pars['ReducedName']+"_specfit.png")
+    plt.close()
+
+    np.savetxt(pars['WorkDir']+pars['UvMsDir']+"/pcal_"+pars['ReducedName']+"_specfit.txt", specpar)
+
+    return (specpar)
 #   -----------------------------------------------------------------------------------------------------
 
 
@@ -572,7 +748,7 @@ def extarget (fitsname, bpcal, pars=None):
 
 
 
-def flagtarget (targetname, pars=None, ankdir=None, ankin=None, ovrt=False):
+def flagtarget (targetname, pars=None, pyx="python", ankdir=None, ankin=None, ovrt=False):
     
     #   Flag calibrated target data 
 
@@ -597,7 +773,7 @@ def flagtarget (targetname, pars=None, ankdir=None, ankin=None, ovrt=False):
         if (not os.path.exists("glogout.dat")):
             os.system("cp "+ankdir+"/glogout.dat .")
 
-        tarcmd = "python3 " + ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
+        tarcmd = pyx +" "+ ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
                     " --parfile " + ankin + " --infilename " + tarfile + " --outfilename " + tarfile+"_f" + \
                     " --logfile " +pars['WorkDir']+pars['LogDir']+"/target_"+targetname + \
                     " --flagmode uvbin --targetype=normal --clearscratch --nthreads " + str(pars['FlgThreads'])

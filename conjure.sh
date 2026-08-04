@@ -117,6 +117,7 @@ ankimgcmd="${pyex} -u ${Pipe_Dir}/pipescripts/wand.py \
     --infile ${parfile} \
     --flgin ${flgpar} \
     --rfifile ${rfifile} \
+    --pypath ${pyex}
     ${imgext} \
     ${imgext0} \
     ${savemodel} ${intmask} ${scalmode} \
