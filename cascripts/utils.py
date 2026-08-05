@@ -205,7 +205,7 @@ def patronus_charm (args):
     wands   = [os.uname().sysname.lower(), platform.uname().system.lower(), platform.system().lower()] 
     spls    = [os.uname().nodename.lower(), socket.gethostname().lower(), platform.uname().node.lower()]
 
-    ptype   = ( (sum(ord(c) for c in caster) + sum(ord(c) for c in spls[0])) % 3 ) + 1
+    ptype   = ( (sum(ord(c) for c in caster) + sum(ord(c) for c in spls[0])) % 9 ) + 1
 
     if ( ("darwin" in ".".join(wands)) or ("mac" in ".".join(wands)) or ("mac" in ".".join(spls)) ):
         patid   = f"{args.pipedir}/patlib/ipat.txt"
@@ -218,8 +218,12 @@ def patronus_charm (args):
         patid   = patlist[np.random.randint(0,high=len(patlist))]
 
     elif ("charizard" in ".".join(spls)):
-        patlist = glob.glob(f"{args.pipedir}/patlib/p_{ptype}_*.txt")
+        patlist = glob.glob(f"{args.pipedir}/patlib/p_1_*.txt")
         patid   = patlist[np.random.randint(0,high=len(patlist))]
+
+    elif ("garfield" in ".".join(spls)):
+            patlist = glob.glob(f"{args.pipedir}/patlib/p_7_*.txt")
+            patid   = patlist[np.random.randint(0,high=len(patlist))]
     
     else:
         patlist = glob.glob(f"{args.pipedir}/patlib/p_{ptype}_*.txt")
