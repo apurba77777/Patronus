@@ -197,7 +197,7 @@ def selfcal (targetvis, calfile, gcmode=None, pars = None):
 
 
 
-def flagcaltarget (tarfile, pars=None, ankdir=None, ankin=None, ovrt=False):
+def flagcaltarget (tarfile, pars=None, pyx="python", ankdir=None, ankin=None, ovrt=False):
     
     #   Flag calibrated target data 
     
@@ -221,7 +221,7 @@ def flagcaltarget (tarfile, pars=None, ankdir=None, ankin=None, ovrt=False):
         if (not os.path.exists("glogout.dat")):
             os.system("cp "+ankdir+"/glogout.dat .")
 
-        tarcmd = "python3 " + ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
+        tarcmd = pyx +" " + ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
                     " --parfile " + ankin + " --infilename " + tarfile + " --outfilename " + tarfile+"_f" + \
                     " --logfile " +pars['WorkDir']+pars['LogDir']+"/sc_target_"+pars['TargetName'] + \
                     " --flagmode uvbin --targetype=normal --clearscratch --nthreads " + str(pars['FlgThreads'])
@@ -439,7 +439,7 @@ def getuvsub (ivis, calfile, pars=None):
 
 
 
-def flagavguvsub (tarfile, pars=None, ankdir=None, ankin=None, ovrt=False):
+def flagavguvsub (tarfile, pars=None, pyx="python", ankdir=None, ankin=None, ovrt=False):
     
     #   Flag calibrated continuum subtracted visibilities and average in channel
     
@@ -460,7 +460,7 @@ def flagavguvsub (tarfile, pars=None, ankdir=None, ankin=None, ovrt=False):
         if (not os.path.exists("glogout.dat")):
             os.system("cp "+ankdir+"/glogout.dat .")
 
-        tarcmd = "python3 " + ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
+        tarcmd = pyx +" " + ankdir + "/runank.py --ankdir " + ankdir + " --scratchdir ankscratch/ " + \
                     " --parfile " + ankin + " --infilename " + tarfile + " --outfilename " + tarfile+"_f" + \
                     " --logfile " +pars['WorkDir']+pars['LogDir']+"/uvsub_"+pars['TargetName'] + \
                     " --flagmode uvbin --targetype=uvsub --clearscratch --nthreads " + str(pars['FlgThreads'])
@@ -533,8 +533,9 @@ def findsrcs (imgname, pars=None):
 
     sfimg   = sf.process_image(
                 imgname+".fits", \
-                adaptive_rms_box = True, \
-                advanced_opts = True, \
+                rms_box=(int(min(pars['ImgSize'])/10), int(min(pars['ImgSize'])/40)), \
+                rms_map=True, \
+                thresh='fdr', \
                 group_by_isl = False, \
                 interactive = False, \
                 thresh_isl = pars['IslThresh'], \

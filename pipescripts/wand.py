@@ -209,7 +209,7 @@ if (argus.defodio or argus.confringo or argus.reducto):
 
 
 #   Extract calibrated target file
-if (argus.extarget or argus.reducto): 
+if (argus.extarget or argus.confringo or argus.reducto): 
     if (pars['PhaseBpCal']):
         extarget(pars['WorkDir']+pars['UvMsDir']+pars['ReducedName'], pars['PhaseCal'], pars)
     else: 
@@ -217,7 +217,7 @@ if (argus.extarget or argus.reducto):
 
 
 #   Flag calibrated target file
-if (argus.flagtarget or argus.reducto): 
+if (argus.flagtarget or argus.confringo or argus.reducto): 
     flagtarget(pars['TargetName'], pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
 
@@ -273,7 +273,7 @@ if (argus.flagselfcal):
 
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]
     for ivis in listofvis:
-        flagcaltarget (ivis, pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+        flagcaltarget (ivis, pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
 
 #   Difficult magic ********* Self-calibrate until it converges
@@ -281,7 +281,7 @@ if (argus.imperio or argus.reducto):
     
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]
     for ivis in listofvis:
-        flagcaltarget (ivis, pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+        flagcaltarget (ivis, pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
     #   Make the zeroth image
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg.ms" for vis in vislist ]
@@ -335,7 +335,7 @@ if (argus.imperio or argus.reducto):
 
         #   Flag calibrated visibilities
         for ivis in listofvis:
-            flagcaltarget (ivis, pars, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=True)
+            flagcaltarget (ivis, pars, argus.pypath, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=True)
 
         atmpt += 1
 
@@ -366,7 +366,7 @@ if (argus.flaguvsub or argus.rictusempra):
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_uvsub" for vis in visuvsublist ]
 
     for ivis in listofvis:
-        flagavguvsub (ivis, pars, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+        flagavguvsub (ivis, pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
 
 #   Make list of timestamps in MJD
