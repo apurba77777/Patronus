@@ -343,7 +343,8 @@ if (argus.imperio or argus.reducto):
 #   Attempt to produce the *final* continuum image
 if (argus.incendio or argus.reducto):      
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg.ms" for vis in vislist ]
-    finalimg(listofvis, dosavemodel=True, pars=pars)
+    #finalimg(listofvis, dosavemodel=True, pars=pars)
+    subandimg(listofvis, pars=pars)
 
 
 if (pars['VisUvSub'] == None):   

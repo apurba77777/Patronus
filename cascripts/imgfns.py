@@ -695,3 +695,85 @@ def checkselfcal (imgold, imgnew, pars=None):
 
     return (hasconverged)
 #   -----------------------------------------------------------------------------------------------------
+
+
+
+def subandimg (targetvislist, pars=None):
+    
+    #   Make sub-band images 
+    
+    if ((pars['SubRanges']==None) or (len(pars['SubRanges']) < 3)):
+        print("Not making sub-band imaging. It's a waste of time...")
+        return (0)
+
+    nbands  = len(pars['SubRanges']) - 1
+    print(f"\n  Making images for {nbands} sub-bands...")
+
+    print("******************************************************")
+    print(" Assuming same frequency settings for all visibilities")
+    print(" If not, good luck...")
+    print("******************************************************")
+
+    wmsmd   = casatools.msmetadata()
+    wmsmd.open(targetvislist[0])
+    chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
+    wmsmd.done()
+
+    hrad    = float(pars['ImgSize'][0])/2
+    finmask = 'Circle[['+str(hrad)+'pix, '+str(hrad)+'pix],'+str(hrad)+'pix]'
+
+    print("\nVisibilities -- ",targetvislist)
+
+    for i in range (0, nbands):
+        imgpre  = pars['WorkDir']+pars['ImgDir']+'/'+pars['FinImage']+"_sub_"+str(pars['SubRanges'][i])+"_"+str(pars['SubRanges'][i+1])        
+        print("Imagename -- ",imgpre)    
+    
+        print("Clearing existing image components...\n")
+        os.system("rm -rf "+imgpre+".*")
+
+        cl      = max(np.argmin(np.abs(chan_freqs - pars['SubRanges'][i])), 0) 
+        cr      = min(np.argmin(np.abs(chan_freqs - pars['SubRanges'][i+1])), len(chan_freqs)) 
+        chanstr = "0:"+str(min(cl,cr))+"~"+str(max(cl,cr) )
+
+        print(f"  Imaging frequence range [{pars['SubRanges'][i]} , {pars['SubRanges'][i+1]}], channels {chanstr}")
+
+        ct.tclean(
+            vis=targetvislist, \
+            imagename=imgpre, \
+            datacolumn="corrected", \
+            spw=chanstr, \
+            imsize=pars['ImgSize'], \
+            cell=pars['CellSize'], \
+            selectdata=True, \
+            field=pars['TargetName'],\
+            uvrange=pars['FinUvLim'], \
+            specmode='mfs', \
+            gridder='widefield', \
+            wprojplanes=pars['WprojPln'], \
+            pblimit=0.1, \
+            deconvolver='mtmfs', \
+            scales=pars['DeconScls'], \
+            smallscalebias=pars['SclBias'], \
+            weighting='briggs',\
+            robust=pars['ImRobust'], \
+            uvtaper=pars['ImUvTaper'], \
+            niter=pars['FiNiter'], \
+            nsigma=pars['FinSigma'], \
+            interactive=False, \
+            usemask='user', \
+            mask=finmask, \
+            pbmask=0.2       
+        )
+
+        print("Exporting final image to Output Directory...")
+
+        ct.exportfits(
+            imagename=imgpre+".image.tt0", \
+            fitsimage=pars['OutDir']+'/'+pars['FinImage']+"_sub_"+str(pars['SubRanges'][i])+"_"+str(pars['SubRanges'][i+1])+".fits", \
+            overwrite=True
+        )
+    
+    print(" Done!\n")
+
+    return (0)
+#   -----------------------------------------------------------------------------------------------------
