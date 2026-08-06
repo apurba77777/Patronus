@@ -3,6 +3,7 @@ import argparse as ap
 import yaml as ym
 from cascripts.utils import *
 from dynspecripts.transearch import *
+from dynspecripts.cubestats import *
 
 #	---------------------------------------------------------------------------------------------------------
 #
@@ -17,22 +18,24 @@ from dynspecripts.transearch import *
 #                       --infile [param_YAML]       //  YAML file containing input parameters
 #                       --pipedir [pipe_direcory]   //  Path to the pipeline itself
 #
-#   Muggle-friendly spells              getdspec    //  Generate dynamic spectrum at a specific sky position
-#                                       initrawms   //  Initialize raw MS
+#   Muggle-friendly spells              
+#                       getdspec    //  Generate dynamic spectrum at a specific sky position
+#                       mapnoise    //  Generate spatial map of noise
 #
-#   Simple & convenient charms          obliviate   //  Clear existing files 
-#                                       lumos       //  List Usable Modes On Screen
-#                                       revelio     //  Reveal configuration parameters
+#   Simple & convenient charms          
+#                       obliviate   //  Clear existing files 
+#                       lumos       //  List Usable Modes On Screen
+#                       revelio     //  Reveal configuration parameters
 #
 #   Advanced spells and charms (Should NOT be attempted before passing O. W. L.s)
 #                        
-#                                       accio       //  Accumulate Continuum Components in Image Output
-#                                       scourgify   //  Scrutinize Calibration Outputs and Ultimate Robustness of Gains with Image Files Yielded
-#                                       incendio    //  Image Normal Continuum Emission using Nice Data from Interferometric Observations
+#                       accio       //  Accumulate Continuum Components in Image Output
+#                       scourgify   //  Scrutinize Calibration Outputs and Ultimate Robustness of Gains with Image Files Yielded
+#                       incendio    //  Image Normal Continuum Emission using Nice Data from Interferometric Observations
 #  
 #   Dangerous spells and curses ( Extreme caution recommended !! Should NOT be attempted before passing N.E.W.T.s)
 #
-#                                       crucio      //  Calibrate Response for an Uncorrupted Channel Isolated from Observation 
+#                       crucio      //  Calibrate Response for an Uncorrupted Channel Isolated from Observation 
 #
 #	--------------------------------------------------------------------------------------------------------
 
@@ -64,15 +67,22 @@ if (argus.lumos):
 
 #   --------------------------- Tasks   ------------
 
+#   Generate a spatial map of noise
+if (argus.mapnoise):      
+    fitslist   = [ pars['OutDir']+pars['CubeDir']+fname for fname in pars['FitsNames'] ]
+    for fitsname in fitslist:
+        noisemap (fitsname, argus.pipedir+"/spew/", pars=pars)
+
+
+
+        
+
 
 #   Search at a specific sky position
-
-if (argus.getdspec):  
-    
+if (argus.getdspec):      
     fitslist   = [ pars['OutDir']+pars['CubeDir']+fname for fname in pars['FitsNames'] ]
-
     for fitsname in fitslist:
-        getdynspec (fitsname, pars)
+        getdynspec (fitsname, pars=pars)
 
 
 

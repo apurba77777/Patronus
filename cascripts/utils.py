@@ -257,6 +257,7 @@ def incan_args():
 
     #   Search at a specific sky position
     parser.add_argument("--getdspec", help = "Generate dynamic spectrum at a specific sky position", action='store_true')
+    parser.add_argument("--mapnoise", help = "Generate spatial map of noise", action='store_true')
     
     parser.add_argument("--expecto_patronum", help = "What it says...", action='store_true')
     

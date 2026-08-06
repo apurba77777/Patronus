@@ -6,7 +6,7 @@ from astropy.wcs import WCS
 from astropy.coordinates import SkyCoord
 
 #   --------------------------------------------------------------------------------------------------------------------------
-#   Function for transient search 
+#   Functions for transient search 
 #
 #                                              AB  [last updated: 1 July 2026] 
 #
