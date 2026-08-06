@@ -4,10 +4,15 @@ CFLAGS=-I. -fopenmp
 c = $(CC) $(CFLAGS) 
 s = $(CC) -O0 -shared -fPIC $(CFLAGS) 
 
-CUBEOBJ=cubestatfns.so cubestatfns.c
+STATOBJ=cubestatfns.so cubestatfns.c
+
+SRCHOBJ=cubesrchfns.so cubesrchfns.c
 
 cubestat:
-	$s -o $(CUBEOBJ) $(CLIBS)
+	$s -o $(STATOBJ) $(CLIBS)
+
+cubesrch:
+	$s -o $(SRCHOBJ) $(CLIBS)
 
 clean:
 	rm *.so

@@ -14,36 +14,41 @@ from astropy.coordinates import SkyCoord
 #   --------------------------------------------------------------------------------------------------------------------------
 
 
-def noisemap (cubedata, spewdir, pars=None):
+def cleancube (cubedata, cubepsf, spewdir, nsmap, pars=None):
 
-    #   Generate noise map for the cube
+    #   Clean the data cube
 
-    spew        = ctp.CDLL( os.path.abspath(f"{spewdir}/cubestatfns.so") ) 
+    spew        = ctp.CDLL( os.path.abspath(f"{spewdir}/cubesrchfns.so") ) 
     #int calcubenoise (double *datac, int datadim, int *dimlens, double *noise)
 
-    tdata       = np.ascontiguousarray(cubedata, dtype='float32')    
-    spatnoise   = np.ascontiguousarray(np.zeros((tdata.shape[0], tdata.shape[1]), dtype='float32'))
+    tdata       = np.ascontiguousarray(cubedata, dtype='float32') 
+    pdata       = np.ascontiguousarray(cubepsf, dtype='float32')    
+    spatnoise   = np.ascontiguousarray(nsmap, dtype='float32')
     datadims    = np.ascontiguousarray(tdata.shape, dtype='intc')
 
     print(f"\nCube dimensions {tdata.shape} type {tdata.dtype}")
     
-    spew.calcubenoise.argtypes = [
+    spew.cubecln.argtypes = [
+        ctp.POINTER(ctp.c_float),
         ctp.POINTER(ctp.c_float),
         ctp.c_int,
         ctp.POINTER(ctp.c_int),
         ctp.POINTER(ctp.c_float),
-        ctp.c_int
+        ctp.c_int,
+        ctp.c_float
     ]
 
-    spew.calcubenoise.restype = ctp.c_int
+    spew.cubecln.restype = ctp.c_int
 
     tdataptr    = tdata.ctypes.data_as(ctp.POINTER(ctp.c_float))
+    pdataptr    = pdata.ctypes.data_as(ctp.POINTER(ctp.c_float))
     noiseptr    = spatnoise.ctypes.data_as(ctp.POINTER(ctp.c_float))
     dimptr      = datadims.ctypes.data_as(ctp.POINTER(ctp.c_int))
 
-    retval      = spew.calcubenoise(tdataptr, np.intc(tdata.ndim), dimptr, noiseptr, np.intc(pars['Threads']))
+    retval      = spew.cubecln(tdataptr, pdataptr, np.intc(tdata.ndim), dimptr, noiseptr, \
+                               np.intc(pars['Threads']), np.single(pars['SigThresh']))
 
-    spatnoise   = np.reshape(spatnoise, (tdata.shape[0], tdata.shape[1]))
+    spatnoise   = np.reshape(spatnoise, (tdata.shape[1], tdata.shape[2]))
     
     fig     = plt.figure(figsize=(5,4))     
     ax5     = fig.add_subplot(111)

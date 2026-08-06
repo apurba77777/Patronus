@@ -1,0 +1,32 @@
+#   -------------------------------------------------------------
+#   Parameters for Pulse serch --> Lugia (J1832)
+#   -------------------------------------------------------------
+
+#   Directories 
+
+OutDir:       "../processing/reduced/"
+
+CubeDir:      "tcubes/"               #   Directory for cubes (within OutDir)
+PlotDir:      "plots/"                #   Directory for cubes (within OutDir)
+CanDir:       "cands/"                #   Directory for candidates (within OutDir)
+
+#   Data cubes
+
+FitsNames:                            #   List of FITSfiles (without FITS)
+    - "26nov24_b3_J1832_uvsub_f_avg_tcube"            
+
+
+#   Computational parameters
+
+Threads:      4                       #   Threads to use 
+
+
+#   Inspect a specific sky position
+
+SrcRA:        278.2019121             #   In degrees    
+SrcDec:       -9.1875825              #   In degrees
+
+
+#   Search related parameters
+
+SigThresh:    8.0                     #   Threshold in units of SD

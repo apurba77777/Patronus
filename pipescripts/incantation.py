@@ -4,6 +4,7 @@ import yaml as ym
 from cascripts.utils import *
 from dynspecripts.transearch import *
 from dynspecripts.cubestats import *
+from dynspecripts.cubesrch import *
 
 #	---------------------------------------------------------------------------------------------------------
 #
@@ -71,7 +72,17 @@ if (argus.lumos):
 if (argus.mapnoise):      
     fitslist   = [ pars['OutDir']+pars['CubeDir']+fname for fname in pars['FitsNames'] ]
     for fitsname in fitslist:
-        noisemap (fitsname, argus.pipedir+"/spew/", pars=pars)
+        tfdata      = fits.getdata(fitsname+".fits", ext=0)
+        psfdata     = fits.getdata(fitsname+"_psf.fits", ext=0)
+        
+        #cubedata    = np.transpose(np.nanmean(tfdata, axis=1), axes=(2,1,0))
+        #nsmap       = noisemap (cubedata, argus.pipedir+"/spew/", pars=pars)
+        #np.save(fitsname+'_noisemap.npy', nsmap)
+        cubedata    = np.nanmean(tfdata, axis=1)
+        cubepsf     = np.nanmean(psfdata, axis=1)
+        nsmap       = np.load(fitsname+'_noisemap.npy')
+        cleancube (cubedata, cubepsf, argus.pipedir+"/spew/", nsmap, pars=pars)
+
 
 
 
