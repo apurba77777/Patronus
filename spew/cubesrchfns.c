@@ -6,6 +6,8 @@
 #include <omp.h>
 #include <gsl/gsl_sort_float.h>
 #include <gsl/gsl_statistics_float.h>
+#include <gsl/gsl_sf_exp.h>
+#include <gsl/gsl_math.h>
 
 /* ----------------------------------------------------------------------------------------------------
 
@@ -16,25 +18,37 @@
 -------------------------------------------------------------------------------------------------------*/
 
 
-int cubecln (float *datac, float *datap, int datadim, int *dimlens, float *noise, int thrds, float sigthresh) {
+int cubecln (float *datac, float *datap, int datadim, int *dimlens, float *noise, int thrds, float sigthresh, float restbeam, int spikemax) {
 
-//  Function to clean cubes in place ******** under development **************
+//  Function to clean cubes in place 
 
-//      datac   = datacube
-//      datadim = number of dimensions
-//      dimlens = Array of dimension lengths (Time first)
-//      noise   = Noise map  
+//      datac       = datacube
+//      datap       = PSF cube
+//      datadim     = number of dimensions
+//      dimlens     = Array of dimension lengths (Time first)
+//      noise       = Noise map
+//      thrds       = Number of threads
+//      sigthresh   = Threshold in unit of noise RMS 
+//      restbeam    = FWHM of restoring beam in pixels
+//      spikemax    = Maximum spikes to clean per time   
 
-    int     t, i, j, i0, j0, l, m, n, p, x, y, kmax, qmax;
-    float   maxval;
+    gsl_set_error_handler_off();
+
+    int     t, i, j, i0, j0, l, m, n, p, x, y, spi, kmax, qmax;
+    float   maxval,psfmax,drr;
 
     printf("\nCleaning a %d dimensional array (",datadim);
     for(i = 0; i < datadim; i++)
         printf(" %d ",dimlens[i]);
     printf(")\n\n");
 
-    //#pragma omp parallel for num_threads(thrds) private(j,p)
+    #pragma omp parallel for num_threads(thrds) private(i,j,i0,j0,l,m,n,p,x,y,spi,kmax,qmax,maxval,psfmax,drr)
     for(t = 0; t < dimlens[0]; t++) {
+
+        int     spikex[spikemax], spikey[spikemax] ;
+        float   sflux[spikemax] ;
+
+        spi     = 0;
 
         p       = dimlens[2] * dimlens[1] * t ;
         maxval  = gsl_stats_float_max(datac + p, 1, dimlens[2] * dimlens[1]);
@@ -42,25 +56,172 @@ int cubecln (float *datac, float *datap, int datadim, int *dimlens, float *noise
         i0      = kmax / dimlens[2] ;
         j0      = kmax % dimlens[2] ;
 
-        if (maxval > noise[kmax]*sigthresh) {
+        /*.......................... Clean spikes above threshold .......................*/
+
+        while (maxval > noise[kmax]*sigthresh) {
             printf("Cleaning at %d  %f  %d (%d %d) \n",t,(maxval/noise[kmax]),kmax,i0,j0);
             
-            qmax= gsl_stats_float_max_index(datap + p, 1, dimlens[2] * dimlens[1]);
-            l   = qmax / dimlens[2] ;
-            m   = qmax % dimlens[2] ;
+            psfmax  = gsl_stats_float_max(datap + p, 1, dimlens[2] * dimlens[1]);
+            qmax    = gsl_stats_float_max_index(datap + p, 1, dimlens[2] * dimlens[1]);
+            l       = qmax / dimlens[2] ;
+            m       = qmax % dimlens[2] ;
+            
+            spikex[spi] = i0;
+            spikey[spi] = j0;
+            sflux[spi]  = maxval;
+            spi++;
 
-            printf("PSF max at %d %d \n",l,m);
+            if ( spi >= spikemax ) {
+                printf("Triggers exceed limit (%d) at t = %d \n",spikemax,t);
+                break;
+            } 
 
             for(i = MAX(0, (i0-l)); i < MIN((i0-l+dimlens[1]), dimlens[1]); i++) {
                 for(j = MAX(0, (j0-m)); j < MIN((j0-m+dimlens[2]), dimlens[2]); j++) {
 
-                    x   = MAX(0, (l-i0)) ;
-                    y   = MAX(0, (m-j0)) ;
+                    x   = MAX(0, (l-i0)) + (i - MAX(0, (i0-l))) ; 
+                    y   = MAX(0, (m-j0)) + (j - MAX(0, (j0-m))) ;
                     
-                    datac[i*dimlens[2] + j] = datac[i*dimlens[2] + j] - datap[x*dimlens[2] + y];
+                    datac[p + i*dimlens[2] + j] = datac[p + i*dimlens[2] + j] 
+                                    - (maxval/psfmax) * datap[p + x*dimlens[2] + y];
                 }
-            }      
-        }    
+            }   
+            
+            maxval  = gsl_stats_float_max(datac + p, 1, dimlens[2] * dimlens[1]);
+            kmax    = gsl_stats_float_max_index(datac + p, 1, dimlens[2] * dimlens[1]);
+            i0      = kmax / dimlens[2] ;
+            j0      = kmax % dimlens[2] ;
+            //printf("Now max at %d  %f  %d (%d %d) \n",t,(maxval/noise[kmax]),kmax,i0,j0);
+        }   
+
+        /*------------------- Restore spikes as circular Gaussians ----------------------*/        
+        
+        for ( n = 0; n < spi; n++) {
+
+            i0      = spikex[n] ;
+            j0      = spikey[n] ;
+            maxval  = sflux[n] ;
+
+            for(i = MAX(0, (i0-l)); i < MIN((i0-l+dimlens[1]), dimlens[1]); i++) {
+                for(j = MAX(0, (j0-m)); j < MIN((j0-m+dimlens[2]), dimlens[2]); j++) {
+
+                    x   = MAX(0, (l-i0)) + (i - MAX(0, (i0-l))) ; 
+                    y   = MAX(0, (m-j0)) + (j - MAX(0, (j0-m))) ;
+
+                    drr = ((float) (i - i0))*((float) (i - i0)) +
+                            ((float) (j - j0))*((float) (j - j0)) ; 
+                    
+                    datac[p + i*dimlens[2] + j] = datac[p + i*dimlens[2] + j] 
+                                    + (float) maxval*gsl_sf_exp( - 4 * M_LN2 * drr / (restbeam*restbeam));
+                }
+            } 
+        }
+    }
+    
+    printf("\n   Returning noise map \n");
+
+    return 0;
+} 
+//  -------------------------------------------------------------------------------------------------------
+
+
+
+int srchspike (float *datac, float *spikes, int datadim, int *dimlens, float *noise, int thrds, float sigthresh, float restbeam, int spikemax) {
+
+//  Function to search for spikes in a cube
+
+//      datac       = datacube
+//      spikes      = Array of spikes
+//      datadim     = number of dimensions
+//      dimlens     = Array of dimension lengths (Time first)
+//      noise       = Noise map
+//      thrds       = Number of threads
+//      sigthresh   = Threshold in unit of noise RMS 
+//      restbeam    = FWHM of restoring beam in pixels
+//      spikemax    = Maximum spikes to clean per time   
+
+    int     t, i, j, i0, j0, l, m, n, p, x, y, spi, kmax, qmax;
+    float   maxval,psfmax,drr;
+
+    printf("\nCleaning a %d dimensional array (",datadim);
+    for(i = 0; i < datadim; i++)
+        printf(" %d ",dimlens[i]);
+    printf(")\n\n");
+
+    //#pragma omp parallel for num_threads(thrds) private(i,j,i0,j0,l,m,n,p,x,y,spi,kmax,qmax,maxval,psfmax,drr)
+    for(t = 0; t < dimlens[0]; t++) {
+
+        int     spikex[spikemax], spikey[spikemax] ;
+        float   sflux[spikemax] ;
+
+        spi     = 0;
+
+        p       = dimlens[2] * dimlens[1] * t ;
+        maxval  = gsl_stats_float_max(datac + p, 1, dimlens[2] * dimlens[1]);
+        kmax    = gsl_stats_float_max_index(datac + p, 1, dimlens[2] * dimlens[1]);
+        i0      = kmax / dimlens[2] ;
+        j0      = kmax % dimlens[2] ;
+
+        /*.......................... Clean spikes above threshold .......................*/
+
+        while (maxval > noise[kmax]*sigthresh) {
+            printf("Cleaning at %d  %f  %d (%d %d) \n",t,(maxval/noise[kmax]),kmax,i0,j0);
+            
+            psfmax  = gsl_stats_float_max(datap + p, 1, dimlens[2] * dimlens[1]);
+            qmax    = gsl_stats_float_max_index(datap + p, 1, dimlens[2] * dimlens[1]);
+            l       = qmax / dimlens[2] ;
+            m       = qmax % dimlens[2] ;
+            
+            spikex[spi] = i0;
+            spikey[spi] = j0;
+            sflux[spi]  = maxval;
+            spi++;
+
+            if ( spi >= spikemax ) {
+                printf("Triggers exceed limit (%d) at t = %d \n",spikemax,t);
+                break;
+            } 
+
+            for(i = MAX(0, (i0-l)); i < MIN((i0-l+dimlens[1]), dimlens[1]); i++) {
+                for(j = MAX(0, (j0-m)); j < MIN((j0-m+dimlens[2]), dimlens[2]); j++) {
+
+                    x   = MAX(0, (l-i0)) + (i - MAX(0, (i0-l))) ; 
+                    y   = MAX(0, (m-j0)) + (j - MAX(0, (j0-m))) ;
+                    
+                    datac[p + i*dimlens[2] + j] = datac[p + i*dimlens[2] + j] 
+                                    - (maxval/psfmax) * datap[p + x*dimlens[2] + y];
+                }
+            }   
+            
+            maxval  = gsl_stats_float_max(datac + p, 1, dimlens[2] * dimlens[1]);
+            kmax    = gsl_stats_float_max_index(datac + p, 1, dimlens[2] * dimlens[1]);
+            i0      = kmax / dimlens[2] ;
+            j0      = kmax % dimlens[2] ;
+            //printf("Now max at %d  %f  %d (%d %d) \n",t,(maxval/noise[kmax]),kmax,i0,j0);
+        }   
+
+        /*------------------- Restore spikes as circular Gaussians ----------------------*/        
+        
+        for ( n = 0; n < spi; n++) {
+
+            i0      = spikex[n] ;
+            j0      = spikey[n] ;
+            maxval  = sflux[n] ;
+
+            for(i = MAX(0, (i0-l)); i < MIN((i0-l+dimlens[1]), dimlens[1]); i++) {
+                for(j = MAX(0, (j0-m)); j < MIN((j0-m+dimlens[2]), dimlens[2]); j++) {
+
+                    x   = MAX(0, (l-i0)) + (i - MAX(0, (i0-l))) ; 
+                    y   = MAX(0, (m-j0)) + (j - MAX(0, (j0-m))) ;
+
+                    drr = ((float) (i - i0))*((float) (i - i0)) +
+                            ((float) (j - j0))*((float) (j - j0)) ; 
+                    
+                    datac[p + i*dimlens[2] + j] = datac[p + i*dimlens[2] + j] 
+                                    + (float) maxval*gsl_sf_exp( - 4 * M_LN2 * drr / (restbeam*restbeam));
+                }
+            } 
+        }
     }
     
     printf("\n   Returning noise map \n");
