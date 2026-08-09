@@ -81,7 +81,7 @@ def searchcube (cubedata, spewdir, nsmap, pars=None):
         ctp.c_float,
         ctp.c_float,
         ctp.c_int,
-        ctp.c_int
+        ctp.c_int, 
     ]
 
     spew.srchspike.restype = ctp.c_int
@@ -103,7 +103,7 @@ def searchcube (cubedata, spewdir, nsmap, pars=None):
     spikes      = spikes[spikes[:,4] > pars['SigThresh']]
     print(f"\n  Found {len(spikes)} objects")
 
-    for i in range(0, len(spikes)):
+    for i in range(0, 1):#len(spikes)):
         fig     = plt.figure(figsize=(5,4))     
         ax5     = fig.add_subplot(111)
         

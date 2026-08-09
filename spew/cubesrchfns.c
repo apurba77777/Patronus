@@ -126,19 +126,74 @@ int cubecln (float *datac, float *datap, int datadim, int *dimlens, float *noise
 
 
 
+int subgaussian (float *imarr, float maxval, float restbeam, int i0, int j0, int dlen1, int dlen2) {
+
+    //  Funtction to subtract a Gaussian from an image 
+
+    int     i, j;
+    float   drr;
+
+    for(i = 0; i < dlen1; i++) {
+        for(j = 0; j < dlen2; j++) {
+
+            drr = ((float) (i - i0))*((float) (i - i0)) + ((float) (j - j0))*((float) (j - j0)) ; 
+        
+            imarr[i*dlen2 + j] = imarr[i*dlen2 + j] - (float) maxval*gsl_sf_exp( - 4 * M_LN2 * drr / (restbeam*restbeam));
+        }
+    }
+
+    return(0);
+}
+//  -------------------------------------------------------------------------------------------------------
+
+
+
+float calclocalnoise (float *imarr, int locnoise, int i0, int j0, int dlen1, int dlen2) {
+
+    //  Calculate local noise in a plane
+
+    int     i, l, m, iloc, rsize;
+    float   rmsloc;
+
+    float *locimg = (float *) malloc( locnoise*locnoise*sizeof(float));            
+
+    l   = locnoise / 2 ;
+    m   = locnoise / 2 ;
+    iloc= 0 ;
+
+    rsize   = MIN((j0-m+locnoise), dlen2) -  MAX(0, (j0-m)) ;
+
+    for (i = MAX(0, (i0-l)); i < MIN((i0-l+locnoise), dlen1); i++) {
+            
+        memcpy(locimg + iloc*rsize, imarr + i*dlen2 + MAX(0, (j0-m)), rsize*sizeof(float)) ;
+        iloc++;
+    }
+
+    double *work = (double *) malloc( iloc*rsize*sizeof(double));
+    rmsloc       = (float) gsl_stats_float_mad(locimg, 1, iloc*rsize, work) ;
+    
+    free(locimg) ;
+    free(work) ;
+
+    return(rmsloc);
+}
+//  -------------------------------------------------------------------------------------------------------
+
+
+
 int srchspike (float *datac, float *spikes, int datadim, int *dimlens, float *noise, int thrds, float sigthresh, float imgthresh, float restbeam, int spikemax, int locnoise) {
 
-//  Function to search for spikes in a cube
+    //  Function to search for spikes in a cube
 
-//      datac       = datacube
-//      spikes      = Array of spikes
-//      datadim     = number of dimensions
-//      dimlens     = Array of dimension lengths (Time first)
-//      noise       = Noise map
-//      thrds       = Number of threads
-//      sigthresh   = Threshold in unit of noise RMS 
-//      restbeam    = FWHM of restoring beam in pixels
-//      spikemax    = Maximum spikes to clean per time   
+    //  datac       = datacube
+    //  spikes      = Array of spikes
+    //  datadim     = number of dimensions
+    //  dimlens     = Array of dimension lengths (Time first)
+    //  noise       = Noise map
+    //  thrds       = Number of threads
+    //  sigthresh   = Threshold in unit of noise RMS 
+    //  restbeam    = FWHM of restoring beam in pixels
+    //  spikemax    = Maximum spikes to clean per time   
 
     int     t, i, j, i0, j0, l, m, p, spi, kmax, qmax;
     float   maxval,drr;
@@ -165,33 +220,8 @@ int srchspike (float *datac, float *spikes, int datadim, int *dimlens, float *no
         /*.......................... Search for spikes above threshold .......................*/
 
         while ( maxval > noise[kmax]*sigthresh ) { 
-
-            int     iloc, rsize;
             float   rmsloc;
-
-            float *locimg = (float *) malloc( locnoise*locnoise*sizeof(float));            
-
-            l   = locnoise / 2 ;
-            m   = locnoise / 2 ;
-            iloc= 0 ;
-
-            rsize   = MIN((j0-m+locnoise), dimlens[2]) -  MAX(0, (j0-m)) ;
-
-            /*-------------------------- Estimate local spatial noise ----------------------------*/
-
-            for (i = MAX(0, (i0-l)); i < MIN((i0-l+locnoise), dimlens[1]); i++) {
-                    
-                memcpy(locimg + iloc*rsize, plnim + i*dimlens[2] + MAX(0, (j0-m)), rsize*sizeof(float)) ;
-                iloc++;
-            }
-
-            double *work = (double *) malloc( iloc*rsize*sizeof(double));
-            rmsloc       = (float) gsl_stats_float_mad(locimg, 1, iloc*rsize, work) ;
-            
-            free(locimg) ;
-            free(work) ;
-
-            //printf("%f %f \n", noise[kmax],rmsloc);
+            rmsloc  = calclocalnoise (plnim, locnoise, i0, j0, dimlens[1], dimlens[2]);
 
             if ( maxval > rmsloc*imgthresh ) {
                 printf("Spike at %d  %f/%f  %d (%d %d) \n",t,(maxval/noise[kmax]),(maxval/rmsloc),kmax,i0,j0);
@@ -211,18 +241,7 @@ int srchspike (float *datac, float *spikes, int datadim, int *dimlens, float *no
                 }
             }
 
-            /*......................... Subtract the source locally ..........................*/
-
-            for(i = 0; i < dimlens[1]; i++) {
-                for(j = 0; j < dimlens[2]; j++) {
-
-                    drr = ((float) (i - i0))*((float) (i - i0)) +
-                        ((float) (j - j0))*((float) (j - j0)) ; 
-                
-                    plnim[i*dimlens[2] + j] = plnim[i*dimlens[2] + j] - 
-                                (float) maxval*gsl_sf_exp( - 4 * M_LN2 * drr / (restbeam*restbeam));
-                }
-            }
+            subgaussian (plnim, maxval, restbeam, i0, j0, dimlens[1], dimlens[2]) ;
 
             maxval  = gsl_stats_float_max( (float *) plnim, 1, dimlens[2]*dimlens[1]);
             kmax    = gsl_stats_float_max_index( (float *) plnim, 1, dimlens[2]*dimlens[1]);
