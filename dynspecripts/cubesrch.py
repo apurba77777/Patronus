@@ -28,15 +28,6 @@ def cleancube (cubedata, cubepsf, spewdir, nsmap, pars=None):
     datadims    = np.ascontiguousarray(tdata.shape, dtype='intc')
 
     print(f"\nCube dimensions {tdata.shape} type {tdata.dtype}")
-
-    fig     = plt.figure(figsize=(5,4))     
-    ax5     = fig.add_subplot(111)
-
-    #plt.imshow(spatnoise, origin='lower', interpolation='none', aspect='auto', cmap='plasma')
-    plt.imshow(tdata[201], origin='lower', interpolation='none', aspect='auto', cmap='plasma')
-    plt.colorbar()
-    plt.tight_layout()
-    plt.show()  
     
     spew.cubecln.argtypes = [
         ctp.POINTER(ctp.c_float),
@@ -60,15 +51,6 @@ def cleancube (cubedata, cubepsf, spewdir, nsmap, pars=None):
     retval      = spew.cubecln(tdataptr, pdataptr, np.intc(tdata.ndim), dimptr, noiseptr, np.intc(pars['Threads']), \
                             np.single(pars['SigThresh']), np.single(pars['RestBeam']), np.intc(pars['MaxSrc']))
     
-    fig     = plt.figure(figsize=(5,4))     
-    ax5     = fig.add_subplot(111)
-
-    #plt.imshow(spatnoise, origin='lower', interpolation='none', aspect='auto', cmap='plasma')
-    plt.imshow(tdata[202], origin='lower', interpolation='none', aspect='auto', cmap='plasma')
-    plt.colorbar()
-    plt.tight_layout()
-    plt.show()   
-
     return(0)
 #   -----------------------------------------------------------------------------------------------------
 
@@ -79,10 +61,10 @@ def searchcube (cubedata, spewdir, nsmap, pars=None):
 
     spew        = ctp.CDLL( os.path.abspath(f"{spewdir}/cubesrchfns.so") ) 
     #int srchspike (float *datac, float *spikes, int datadim, int *dimlens, float *noise, 
-    #                                    int thrds, float sigthresh, float restbeam, int spikemax)
+    #                int thrds, float sigthresh, float imgthresh, float restbeam, int spikemax, int locnoise)
 
     tdata       = np.ascontiguousarray(cubedata, dtype='float32') 
-    spikes      = np.ascontiguousarray(np.zeros( pars['MaxSrc']*cubedata.shape[0]*4, dtype='float32'))    
+    spikes      = np.ascontiguousarray(np.zeros( pars['MaxSrc']*cubedata.shape[0]*6, dtype='float32'))    
     spatnoise   = np.ascontiguousarray(nsmap, dtype='float32')
     datadims    = np.ascontiguousarray(tdata.shape, dtype='intc')
 
@@ -97,6 +79,8 @@ def searchcube (cubedata, spewdir, nsmap, pars=None):
         ctp.c_int,
         ctp.c_float,
         ctp.c_float,
+        ctp.c_float,
+        ctp.c_int,
         ctp.c_int
     ]
 
@@ -108,16 +92,25 @@ def searchcube (cubedata, spewdir, nsmap, pars=None):
     dimptr      = datadims.ctypes.data_as(ctp.POINTER(ctp.c_int))
 
     retval      = spew.srchspike(tdataptr, spikeptr, np.intc(tdata.ndim), dimptr, noiseptr, np.intc(pars['Threads']), \
-                            np.single(pars['SigThresh']), np.single(pars['RestBeam']), np.intc(pars['MaxClnSrc']))
+                                np.single(pars['SigThresh']), np.single(pars['ImgThresh']), np.single(pars['RestBeam']), \
+                                    np.intc(pars['MaxSrc']), np.intc(pars['LocNoise']))
     
-    # fig     = plt.figure(figsize=(5,4))     
-    # ax5     = fig.add_subplot(111)
 
-    # #plt.imshow(spatnoise, origin='lower', interpolation='none', aspect='auto', cmap='plasma')
-    # plt.imshow(tdata[202], origin='lower', interpolation='none', aspect='auto', cmap='plasma')
-    # plt.colorbar()
-    # plt.tight_layout()
-    # plt.show()   
+    spikes      = np.reshape(spikes,(cubedata.shape[0]*pars['MaxSrc'], 6))
+    #   t   px  py  maxv    tsnr    psnr
+    #   0   1   2   3       4       5
+
+    spikes      = spikes[spikes[:,4] > pars['SigThresh']]
+    print(f"\n  Found {len(spikes)} objects")
+
+    for i in range(0, len(spikes)):
+        fig     = plt.figure(figsize=(5,4))     
+        ax5     = fig.add_subplot(111)
+        
+        plt.imshow(tdata[int(spikes[i,0])], origin='lower', interpolation='none', aspect='auto', cmap='plasma')
+        plt.colorbar()
+        plt.tight_layout()
+        plt.show()   
 
     return(0)
 #   -----------------------------------------------------------------------------------------------------

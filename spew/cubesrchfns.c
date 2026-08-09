@@ -58,7 +58,7 @@ int cubecln (float *datac, float *datap, int datadim, int *dimlens, float *noise
 
         /*.......................... Clean spikes above threshold .......................*/
 
-        while (maxval > noise[kmax]*sigthresh) {
+        while (maxval > noise[kmax]*sigthresh*0.8) {
             printf("Cleaning at %d  %f  %d (%d %d) \n",t,(maxval/noise[kmax]),kmax,i0,j0);
             
             psfmax  = gsl_stats_float_max(datap + p, 1, dimlens[2] * dimlens[1]);
@@ -126,7 +126,7 @@ int cubecln (float *datac, float *datap, int datadim, int *dimlens, float *noise
 
 
 
-int srchspike (float *datac, float *spikes, int datadim, int *dimlens, float *noise, int thrds, float sigthresh, float restbeam, int spikemax) {
+int srchspike (float *datac, float *spikes, int datadim, int *dimlens, float *noise, int thrds, float sigthresh, float imgthresh, float restbeam, int spikemax, int locnoise) {
 
 //  Function to search for spikes in a cube
 
@@ -140,91 +140,99 @@ int srchspike (float *datac, float *spikes, int datadim, int *dimlens, float *no
 //      restbeam    = FWHM of restoring beam in pixels
 //      spikemax    = Maximum spikes to clean per time   
 
-    int     t, i, j, i0, j0, l, m, n, p, x, y, spi, kmax, qmax;
-    float   maxval,psfmax,drr;
+    int     t, i, j, i0, j0, l, m, p, spi, kmax, qmax;
+    float   maxval,drr;
 
     printf("\nCleaning a %d dimensional array (",datadim);
     for(i = 0; i < datadim; i++)
         printf(" %d ",dimlens[i]);
     printf(")\n\n");
 
-    //#pragma omp parallel for num_threads(thrds) private(i,j,i0,j0,l,m,n,p,x,y,spi,kmax,qmax,maxval,psfmax,drr)
+    #pragma omp parallel for num_threads(thrds) private(i,j,i0,j0,l,m,p,spi,kmax,qmax,maxval,drr)
     for(t = 0; t < dimlens[0]; t++) {
 
-        int     spikex[spikemax], spikey[spikemax] ;
-        float   sflux[spikemax] ;
-
-        spi     = 0;
-
         p       = dimlens[2] * dimlens[1] * t ;
-        maxval  = gsl_stats_float_max(datac + p, 1, dimlens[2] * dimlens[1]);
-        kmax    = gsl_stats_float_max_index(datac + p, 1, dimlens[2] * dimlens[1]);
+        float *plnim = (float *) malloc(dimlens[1]*dimlens[2]*sizeof(float));
+
+        spi     = 0 ;
+        memcpy( plnim, datac + p, dimlens[2]*dimlens[1]*sizeof(float));
+
+        maxval  = gsl_stats_float_max( (float *) plnim, 1, dimlens[2]*dimlens[1]);
+        kmax    = gsl_stats_float_max_index( (float *) plnim, 1, dimlens[2]*dimlens[1]);
         i0      = kmax / dimlens[2] ;
         j0      = kmax % dimlens[2] ;
 
-        /*.......................... Clean spikes above threshold .......................*/
+        /*.......................... Search for spikes above threshold .......................*/
 
-        while (maxval > noise[kmax]*sigthresh) {
-            printf("Cleaning at %d  %f  %d (%d %d) \n",t,(maxval/noise[kmax]),kmax,i0,j0);
-            
-            psfmax  = gsl_stats_float_max(datap + p, 1, dimlens[2] * dimlens[1]);
-            qmax    = gsl_stats_float_max_index(datap + p, 1, dimlens[2] * dimlens[1]);
-            l       = qmax / dimlens[2] ;
-            m       = qmax % dimlens[2] ;
-            
-            spikex[spi] = i0;
-            spikey[spi] = j0;
-            sflux[spi]  = maxval;
-            spi++;
+        while ( maxval > noise[kmax]*sigthresh ) { 
 
-            if ( spi >= spikemax ) {
-                printf("Triggers exceed limit (%d) at t = %d \n",spikemax,t);
-                break;
-            } 
+            int     iloc, rsize;
+            float   rmsloc;
 
-            for(i = MAX(0, (i0-l)); i < MIN((i0-l+dimlens[1]), dimlens[1]); i++) {
-                for(j = MAX(0, (j0-m)); j < MIN((j0-m+dimlens[2]), dimlens[2]); j++) {
+            float *locimg = (float *) malloc( locnoise*locnoise*sizeof(float));            
 
-                    x   = MAX(0, (l-i0)) + (i - MAX(0, (i0-l))) ; 
-                    y   = MAX(0, (m-j0)) + (j - MAX(0, (j0-m))) ;
+            l   = locnoise / 2 ;
+            m   = locnoise / 2 ;
+            iloc= 0 ;
+
+            rsize   = MIN((j0-m+locnoise), dimlens[2]) -  MAX(0, (j0-m)) ;
+
+            /*-------------------------- Estimate local spatial noise ----------------------------*/
+
+            for (i = MAX(0, (i0-l)); i < MIN((i0-l+locnoise), dimlens[1]); i++) {
                     
-                    datac[p + i*dimlens[2] + j] = datac[p + i*dimlens[2] + j] 
-                                    - (maxval/psfmax) * datap[p + x*dimlens[2] + y];
-                }
-            }   
+                memcpy(locimg + iloc*rsize, plnim + i*dimlens[2] + MAX(0, (j0-m)), rsize*sizeof(float)) ;
+                iloc++;
+            }
+
+            double *work = (double *) malloc( iloc*rsize*sizeof(double));
+            rmsloc       = (float) gsl_stats_float_mad(locimg, 1, iloc*rsize, work) ;
             
-            maxval  = gsl_stats_float_max(datac + p, 1, dimlens[2] * dimlens[1]);
-            kmax    = gsl_stats_float_max_index(datac + p, 1, dimlens[2] * dimlens[1]);
-            i0      = kmax / dimlens[2] ;
-            j0      = kmax % dimlens[2] ;
-            //printf("Now max at %d  %f  %d (%d %d) \n",t,(maxval/noise[kmax]),kmax,i0,j0);
-        }   
+            free(locimg) ;
+            free(work) ;
 
-        /*------------------- Restore spikes as circular Gaussians ----------------------*/        
-        
-        for ( n = 0; n < spi; n++) {
+            //printf("%f %f \n", noise[kmax],rmsloc);
 
-            i0      = spikex[n] ;
-            j0      = spikey[n] ;
-            maxval  = sflux[n] ;
+            if ( maxval > rmsloc*imgthresh ) {
+                printf("Spike at %d  %f/%f  %d (%d %d) \n",t,(maxval/noise[kmax]),(maxval/rmsloc),kmax,i0,j0);
 
-            for(i = MAX(0, (i0-l)); i < MIN((i0-l+dimlens[1]), dimlens[1]); i++) {
-                for(j = MAX(0, (j0-m)); j < MIN((j0-m+dimlens[2]), dimlens[2]); j++) {
+                spikes[t*spikemax*6 + spi*6]    = (float) t ;
+                spikes[t*spikemax*6 + spi*6 + 1]= (float) i0 ;
+                spikes[t*spikemax*6 + spi*6 + 2]= (float) j0 ;
+                spikes[t*spikemax*6 + spi*6 + 3]= maxval ;
+                spikes[t*spikemax*6 + spi*6 + 4]= maxval / noise[kmax] ;
+                spikes[t*spikemax*6 + spi*6 + 5]= maxval / rmsloc ;
 
-                    x   = MAX(0, (l-i0)) + (i - MAX(0, (i0-l))) ; 
-                    y   = MAX(0, (m-j0)) + (j - MAX(0, (j0-m))) ;
+                spi++;
+
+                if ( spi >= spikemax ) {
+                    printf("Triggers exceed limit (%d) at t = %d \n",spikemax,t);
+                    break;
+                }
+            }
+
+            /*......................... Subtract the source locally ..........................*/
+
+            for(i = 0; i < dimlens[1]; i++) {
+                for(j = 0; j < dimlens[2]; j++) {
 
                     drr = ((float) (i - i0))*((float) (i - i0)) +
-                            ((float) (j - j0))*((float) (j - j0)) ; 
-                    
-                    datac[p + i*dimlens[2] + j] = datac[p + i*dimlens[2] + j] 
-                                    + (float) maxval*gsl_sf_exp( - 4 * M_LN2 * drr / (restbeam*restbeam));
+                        ((float) (j - j0))*((float) (j - j0)) ; 
+                
+                    plnim[i*dimlens[2] + j] = plnim[i*dimlens[2] + j] - 
+                                (float) maxval*gsl_sf_exp( - 4 * M_LN2 * drr / (restbeam*restbeam));
                 }
-            } 
+            }
+
+            maxval  = gsl_stats_float_max( (float *) plnim, 1, dimlens[2]*dimlens[1]);
+            kmax    = gsl_stats_float_max_index( (float *) plnim, 1, dimlens[2]*dimlens[1]);
+            i0      = kmax / dimlens[2] ;
+            j0      = kmax % dimlens[2] ;
+            //printf("Now max at %d  %f  %d (%d %d) \n",t,(maxval/noise[kmax]),kmax,i0,j0);        
         }
+
+        free(plnim);
     }
-    
-    printf("\n   Returning noise map \n");
 
     return 0;
 } 

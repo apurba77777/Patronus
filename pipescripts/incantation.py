@@ -82,6 +82,7 @@ if (argus.mapnoise):
         cubepsf     = np.nanmean(psfdata, axis=1)
         nsmap       = np.load(fitsname+'_noisemap.npy')
         cleancube (cubedata, cubepsf, argus.pipedir+"/spew/", nsmap, pars=pars)
+        searchcube (cubedata, argus.pipedir+"/spew/", nsmap, pars=pars)
         
 
 
