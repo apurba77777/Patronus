@@ -50,7 +50,7 @@ def cleancube (cubedata, cubepsf, spewdir, nsmap, pars=None):
 
     retval      = spew.cubecln(tdataptr, pdataptr, np.intc(tdata.ndim), dimptr, noiseptr, np.intc(pars['Threads']), \
                             np.single(pars['SigThresh']), np.single(pars['RestBeam']), np.intc(pars['MaxSrc']))
-    
+
     return(0)
 #   -----------------------------------------------------------------------------------------------------
 
@@ -103,7 +103,7 @@ def searchcube (cubedata, spewdir, nsmap, pars=None):
     spikes      = spikes[spikes[:,4] > pars['SigThresh']]
     print(f"\n  Found {len(spikes)} objects")
 
-    for i in range(0, 1):#len(spikes)):
+    for i in range(0, len(spikes)):
         fig     = plt.figure(figsize=(5,4))     
         ax5     = fig.add_subplot(111)
         

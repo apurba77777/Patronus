@@ -118,7 +118,7 @@ int cubecln (float *datac, float *datap, int datadim, int *dimlens, float *noise
         }
     }
     
-    printf("\n   Returning noise map \n");
+    printf("\n   Cleaning done!!! \n");
 
     return 0;
 } 
@@ -198,7 +198,7 @@ int srchspike (float *datac, float *spikes, int datadim, int *dimlens, float *no
     int     t, i, j, i0, j0, l, m, p, spi, kmax, qmax;
     float   maxval,drr;
 
-    printf("\nCleaning a %d dimensional array (",datadim);
+    printf("\nSearching in a %d dimensional array (",datadim);
     for(i = 0; i < datadim; i++)
         printf(" %d ",dimlens[i]);
     printf(")\n\n");

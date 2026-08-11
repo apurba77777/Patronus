@@ -22,6 +22,8 @@ from dynspecripts.cubesrch import *
 #   Muggle-friendly spells              
 #                       getdspec    //  Generate dynamic spectrum at a specific sky position
 #                       mapnoise    //  Generate spatial map of noise
+#                       cleensweep  //  Clean and search for transients at the original time resolution
+#                       acleensweep //  Clean and search for transients after time averaging
 #
 #   Simple & convenient charms          
 #                       obliviate   //  Clear existing files 
@@ -66,23 +68,49 @@ niffler(pars)
 if (argus.lumos):  
     incan_spells()
 
-#   --------------------------- Tasks   ------------
+#   --------------------------- Spells   ----------------------------------------------
+
+fitslist   = [ pars['OutDir']+pars['CubeDir']+fname for fname in pars['FitsNames'] ]
 
 #   Generate a spatial map of noise
 if (argus.mapnoise):      
-    fitslist   = [ pars['OutDir']+pars['CubeDir']+fname for fname in pars['FitsNames'] ]
     for fitsname in fitslist:
         tfdata      = fits.getdata(fitsname+".fits", ext=0)
+        cubedata    = np.transpose(np.nanmean(tfdata, axis=1), axes=(2,1,0))
+        nsmap       = noisemap (cubedata, argus.pipedir+"/spew/", pars=pars)
+        np.save(fitsname+'_noisemap.npy', nsmap)
+
+
+#   Clean and search for transients at the original time resolution
+if (argus.cleansweep):      
+    for fitsname in fitslist:    
+        tfdata      = fits.getdata(fitsname+".fits", ext=0)
         psfdata     = fits.getdata(fitsname+"_psf.fits", ext=0)
-        
-        #cubedata    = np.transpose(np.nanmean(tfdata, axis=1), axes=(2,1,0))
-        #nsmap       = noisemap (cubedata, argus.pipedir+"/spew/", pars=pars)
-        #np.save(fitsname+'_noisemap.npy', nsmap)
         cubedata    = np.nanmean(tfdata, axis=1)
         cubepsf     = np.nanmean(psfdata, axis=1)
         nsmap       = np.load(fitsname+'_noisemap.npy')
         cleancube (cubedata, cubepsf, argus.pipedir+"/spew/", nsmap, pars=pars)
         searchcube (cubedata, argus.pipedir+"/spew/", nsmap, pars=pars)
+
+
+#   Clean and search for transients after time averaging
+if (argus.acleansweep):      
+    for fitsname in fitslist:    
+        hdulist     = fits.open(fitsname+".fits")
+        tfdata      = hdulist[0].data
+        mjdtime     = hdulist[1].data['MJDSEC']
+        dtsec       = hdulist[0].header['CDELT4']
+        hdulisp     = fits.open(fitsname+"_psf.fits")
+        psfdata     = hdulisp[0].data
+        cubedata    = np.nanmean(tfdata, axis=1)
+        cubepsf     = np.nanmean(psfdata, axis=1)
+        hdulist.close()
+        hdulisp.close()
+        nsmap       = np.load(fitsname+'_noisemap.npy') / np.sqrt(4)
+
+        avgcube, avgpsf, avgmjdsec  = timeavg (cubedata, psfdata, mjdtime, dtsec, tavgfac=4, tshift=0, pars=None)
+        cleancube (avgcube, avgpsf, argus.pipedir+"/spew/", nsmap, pars=pars)
+        searchcube (avgcube, argus.pipedir+"/spew/", nsmap, pars=pars)
         
 
 

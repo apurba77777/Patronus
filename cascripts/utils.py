@@ -258,7 +258,10 @@ def incan_args():
     #   Search at a specific sky position
     parser.add_argument("--getdspec", help = "Generate dynamic spectrum at a specific sky position", action='store_true')
     parser.add_argument("--mapnoise", help = "Generate spatial map of noise", action='store_true')
-    
+    parser.add_argument("--cleansweep", help = "Clean and search for transients at the original time resolution", action='store_true')
+    parser.add_argument("--acleansweep", help = "Clean and search for transients after time averaging", action='store_true')
+
+
     parser.add_argument("--expecto_patronum", help = "What it says...", action='store_true')
     
     args = parser.parse_args()

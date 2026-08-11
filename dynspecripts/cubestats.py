@@ -58,4 +58,45 @@ def noisemap (cubedata, spewdir, pars=None):
 
 
 
+def timeavg (cubedata, psfdata, mjdsecs, dtsec, tavgfac=1, tshift=0, pars=None):
+
+    #   Average datacubes in time
+
+    if (tavgfac <= 1):
+        print("No averaging required...")
+        return(cubedata, mjdsecs)
+
+    print(f"Original time resolution = {dtsec: .2f} seconds ")
+
+    avgmjdsecs  = []
+    bindices    = []
+    tstart      = tshift
+
+    while (tstart < len(mjdsecs)):
+        mjd0        = mjdsecs[tstart] - 0.5*dtsec
+        tindices    = [tstart]
+        ti          = 1
+
+        while ( (tstart + ti < len(mjdsecs)) and ((mjdsecs[tstart + ti] - mjd0) <= dtsec*tavgfac)):
+            tindices.append(tstart + ti)
+            ti      = ti + 1
+
+        if (len(tindices) == tavgfac):
+            bindices.append(tindices)
+            avgmjdsecs.append(np.nanmedian(mjdsecs[tindices]))
+        tstart      = tstart + ti
+
+    avgmjdsecs  = np.array(avgmjdsecs)
+    print(f"After averaging length = {len(avgmjdsecs)} \
+                \n  resolution = {np.nanmedian(avgmjdsecs[1:] - avgmjdsecs[:-1]): .2f} sec")   
+
+    avgcube     = np.zeros((len(avgmjdsecs), cubedata.shape[1], cubedata.shape[2]), dtype='float32')
+    avgpsf      = np.zeros((len(avgmjdsecs), cubedata.shape[1], cubedata.shape[2]), dtype='float32')
+
+    for i in range(0, len(avgmjdsecs)):
+        avgcube[i]  = np.nanmean(cubedata[bindices[i]], axis=0)
+        avgpsf[i]   = np.nanmean(psfdata[bindices[i]], axis=0)        
+
+    return(avgcube, avgpsf, avgmjdsecs)
+#   -----------------------------------------------------------------------------------------------------
 
