@@ -6,27 +6,31 @@
 
 OutDir:       "../processing/reduced/"
 
-CubeDir:      "tcubes/"               #   Directory for cubes (within OutDir)
-PlotDir:      "plots/"                #   Directory for cubes (within OutDir)
-CanDir:       "cands/"                #   Directory for candidates (within OutDir)
+CubeDir:      "tcubes/"                 #   Directory for cubes (within OutDir)
+PlotDir:      "plots/"                  #   Directory for cubes (within OutDir)
+CanDir:       "cands/"                  #   Directory for candidates (within OutDir)
 
 #   Data cubes
 
-FitsNames:                            #   List of FITSfiles (without FITS)
+FitsNames:                              #   List of FITSfiles (without FITS)
     - "26nov24_b3_J1832_uvsub_f_avg_tcube"            
 
 
 #   Computational parameters
 
-Threads:      4                       #   Threads to use 
+Threads:      4                         #   Threads to use 
 
 
 #   Inspect a specific sky position
 
-SrcRA:        278.2019121             #   In degrees    
-SrcDec:       -9.1875825              #   In degrees
+SrcRA:        278.2019121               #   In degrees    
+SrcDec:       -9.1875825                #   In degrees
 
 
 #   Search related parameters
 
-SigThresh:    8.0                     #   Threshold in units of SD
+SigThresh:    8.0                       #   Threshold (Temporal) in units of SD
+ImgThresh:    6.0                       #   The same in the image plane
+RestBeam:     5.0                       #   Restoring beam size in pixels
+MaxSrc:       10                        #   Maximum sources per time to clean  
+LocNoise:     100                       #   Box size to calculate local noise in the image
