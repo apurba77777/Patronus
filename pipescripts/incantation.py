@@ -106,11 +106,14 @@ if (argus.acleansweep):
         cubepsf     = np.nanmean(psfdata, axis=1)
         hdulist.close()
         hdulisp.close()
-        nsmap       = np.load(fitsname+'_noisemap.npy') / np.sqrt(4)
 
-        avgcube, avgpsf, avgmjdsec  = timeavg (cubedata, psfdata, mjdtime, dtsec, tavgfac=4, tshift=0, pars=None)
-        cleancube (avgcube, avgpsf, argus.pipedir+"/spew/", nsmap, pars=pars)
-        searchcube (avgcube, argus.pipedir+"/spew/", nsmap, pars=pars)
+        for tavg in pars['TavgFacs']:
+            print(f"Time averaging by a factor of {tavg}")
+            for tmov in [0, int(tavg/2)]:
+                nsmap       = np.load(fitsname+'_noisemap.npy') / np.sqrt(float(tavg))
+                avgcube, avgpsf, avgmjdsec  = timeavg (cubedata, psfdata, mjdtime, dtsec, tavgfac=tavg, tshift=tmov, pars=None)
+                cleancube (avgcube, avgpsf, argus.pipedir+"/spew/", nsmap, pars=pars)
+                searchcube (avgcube, argus.pipedir+"/spew/", nsmap, pars=pars)
         
 
 

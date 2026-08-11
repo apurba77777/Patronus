@@ -34,3 +34,4 @@ ImgThresh:    6.0                       #   The same in the image plane
 RestBeam:     5.0                       #   Restoring beam size in pixels
 MaxSrc:       10                        #   Maximum sources per time to clean  
 LocNoise:     100                       #   Box size to calculate local noise in the image
+TavgFacs:     [2,4]                     #   List of time averaging factors 
