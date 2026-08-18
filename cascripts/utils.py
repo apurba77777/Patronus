@@ -225,6 +225,10 @@ def patronus_charm (args):
             patlist = glob.glob(f"{args.pipedir}/patlib/p_7_*.txt")
             patid   = patlist[np.random.randint(0,high=len(patlist))]
     
+    elif ("paradox" in ".".join(spls)):
+            patlist = glob.glob(f"{args.pipedir}/patlib/p_1_*.txt")
+            patid   = patlist[np.random.randint(0,high=len(patlist))]
+    
     else:
         patlist = glob.glob(f"{args.pipedir}/patlib/p_{ptype}_*.txt")
         patid   = patlist[np.random.randint(0,high=len(patlist))]
