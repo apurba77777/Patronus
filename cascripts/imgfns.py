@@ -815,3 +815,19 @@ def splitsubands (visfile, pars):
 
     return (0)
 #   -----------------------------------------------------------------------------------------------------
+
+
+
+def applyselfcal (targetvis, calfile, pars = None):
+    
+    #   Apply self cal solutions to target visibilities
+    
+    print("Applying self cal solutions...\n")
+    
+    print("\nApplying calibration...\n")
+    ct.applycal(vis=targetvis+".ms", gaintable=[calfile])
+    
+    print("\n Done!\n")
+
+    return (0)
+#   -----------------------------------------------------------------------------------------------------

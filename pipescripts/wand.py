@@ -49,6 +49,7 @@ from cascripts.utils import *
 #                       imgtarget   //  Image the calibrated target
 #                       selfcal     //  Self calibrate
 #                       flagselfcal //  Flag calibrated visibilities
+#                       appcalflag  //  Apply self calibration and flag visibilities
 #                       getuvsub    //  Subtract the final continuum model
 #                       flaguvsub   //  Flag continuum subtracted visibilities
 #                                       
@@ -301,13 +302,18 @@ if (argus.imperio or argus.reducto):
     findsrcs (imgfile, pars)
 
     atmpt   = 1
+    pcalit  = 0
+    apcalit = 0
     cstatus = False
     scalmode= "p"
-    if (pars['scapp']=="ap"):
-        scalmode    = "ap"
+    scalint = pars["ScalInt0"]
 
-    while ((atmpt <= pars['MaxIter']) and (not cstatus)):
-        print(f"\n\n Self calibration: iteration {atmpt} Mode {scalmode}")
+    while ((atmpt <= (pars['MaxIter'][0]+pars['MaxIter'][1])) and (not cstatus)):
+
+        if (atmpt > pars['MaxIter'][0]):
+            scalmode= "ap"
+
+        print(f"\n\n Self calibration: iteration {atmpt} Mode {scalmode} [{pcalit}/{apcalit}]")
 
         #   Make image for this iteration
         listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg_b0.ms" for vis in vislist ]
@@ -326,27 +332,39 @@ if (argus.imperio or argus.reducto):
 
         #   Check if selfcal has converged
         if (atmpt > 1):
+            scalint = pars["PcalIntMin"]
             oldim   = pars['WorkDir']+pars['ImgDir']+'/'+pars['TargetName']+"_fscal_"+str(atmpt-1)
             newim   = pars['WorkDir']+pars['ImgDir']+'/'+pars['TargetName']+"_fscal_"+str(atmpt)   
             cstatus = checkselfcal (oldim, newim, pars)
             if (cstatus):
                 print(f"  Selfcal has converged in {scalmode} mode \n")
-                if (scalmode=="p" and pars['scapp']!="p"):
+                if (scalmode=="p"):
                     cstatus     = False
                     scalmode    = "ap"
             else:
                 print("  Nope! Need to continue... \n")
 
+        if (scalmode == "ap"):
+            scalint = pars["APcalInt"]
+
         #   Find gain solutions from self-calibration
         listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg_b0" for vis in vislist ]
         for ivis in listofvis:
-            selfcal (ivis, ivis+".scal", scalmode, pars)
+            selfcal (ivis, ivis+".scal", scalint, scalmode, pars)
 
         #   Flag calibrated visibilities
         for ivis in listofvis:
             flagcaltarget (ivis, pars, argus.pypath, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=True)
 
         atmpt += 1
+
+
+#   apply self calibration and flag calibrated visibilities
+if (argus.appcalflag or argus.imperio or argus.reducto):      
+    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]
+    for ivis in listofvis:
+        flagcaltarget (ivis, pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
+        applyselfcal (ivis, ivis+".scal", pars=pars)
 
 
 #   Attempt to produce the *final* continuum image
