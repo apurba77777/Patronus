@@ -777,3 +777,42 @@ def subandimg (targetvislist, pars=None):
 
     return (0)
 #   -----------------------------------------------------------------------------------------------------
+
+
+
+def splitsubands (visfile, pars):
+    
+    #   Split individual sub-bands 
+
+    if ((pars['ScalFreq']==None) or (len(pars['ScalFreq']) < 2)):
+        print("Simply copying the visibilities...")
+        os.system(f"rm -rf {visfile}_b0.ms")
+        os.system(f"cp -r {visfile}.ms {visfile}_b0.ms")
+        return (0)
+
+    wmsmd   = casatools.msmetadata()
+    wmsmd.open(visfile+".ms")
+    chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
+    wmsmd.done()
+
+    os.system(f"rm -rf {visfile}_b{0}.ms")    
+
+    cl      = max(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][0])), 0) 
+    cr      = min(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][1])), len(chan_freqs)) 
+    chanstr = "0:"+str(min(cl,cr))+"~"+str(max(cl,cr) )
+
+    print(f"  Self-cal frequency range {pars['ScalFreq']}, channels {chanstr}")
+
+    ct.mstransform(
+        vis=visfile+".ms", \
+        outputvis=visfile+"_b0.ms", \
+        datacolumn="DATA", \
+        keepflags=False, \
+        spw=chanstr, \
+        correlation=pars['CorrProds']
+    )        
+    
+    print(" Done!\n")
+
+    return (0)
+#   -----------------------------------------------------------------------------------------------------
