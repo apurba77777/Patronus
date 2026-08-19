@@ -127,7 +127,7 @@ def imgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, pa
 
 
 
-def selfcal (targetvis, calfile, gcmode=None, pars = None):
+def selfcal (targetvis, calfile, scalint="100s", gcmode=None, pars = None):
     
     #   Self-calibrate target visibilities
 
@@ -146,7 +146,7 @@ def selfcal (targetvis, calfile, gcmode=None, pars = None):
         vis=targetvis+".ms", \
         caltable=calfile, \
         uvrange=pars['CalUvLim'], \
-        solint=pars['GainInt'], \
+        solint=scalint, \
         refant=pars['RefAntenna'], \
         minsnr=pars['MinSNR'], \
         calmode=scmode, \
@@ -190,7 +190,6 @@ def selfcal (targetvis, calfile, gcmode=None, pars = None):
     )
 
     print("\n Done!\n")
-
 
     return (0)
 #   -----------------------------------------------------------------------------------------------------

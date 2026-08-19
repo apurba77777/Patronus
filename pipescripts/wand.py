@@ -257,7 +257,7 @@ if (argus.imgtarget):
 if (argus.selfcal):      
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg_b0" for vis in vislist ]
     for ivis in listofvis:
-        selfcal (ivis, ivis+".scal", argus.calmode, pars)
+        selfcal (ivis, ivis+".scal", pars["ScalInt0"], argus.calmode, pars)
     
 
 #   Find sources and make a catalogue
