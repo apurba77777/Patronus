@@ -45,11 +45,9 @@ from cascripts.utils import *
 #                       flagtarget  //  Flag calibrated target file
 #
 #                       avgtarget   //  Channel average target visibilities
-#                       splitsub    //  Split sub-bands
 #                       imgtarget   //  Image the calibrated target
 #                       selfcal     //  Self calibrate
 #                       flagselfcal //  Flag calibrated visibilities
-#                       appcalflag  //  Apply self calibration and flag visibilities
 #                       getuvsub    //  Subtract the final continuum model
 #                       flaguvsub   //  Flag continuum subtracted visibilities
 #                                       
@@ -240,23 +238,18 @@ if (argus.avgtarget or argus.imperio or argus.reducto):
         avgtarget (ivis, pars)
 
 
-#   split sub-bands for self-cal
-if (argus.splitsub or argus.imperio or argus.reducto):      
-
-    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]
-    for ivis in listofvis:
-        splitsubands (ivis, pars)
-
-
 #   Image the target field
 if (argus.imgtarget):      
-    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg_b0.ms" for vis in vislist ]
-    imgtarget(listofvis, argus.imgname, argus.savemodel, argus.intmask, pars, clnmask=pars['MaskFile'])
+    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg.ms" for vis in vislist ]
+    if (pars['ClnWS']):
+        wsimgtarget(listofvis, argus.imgname, argus.savemodel, argus.intmask, pars, clnmask=pars['MaskFile'])
+    else:
+        imgtarget(listofvis, argus.imgname, argus.savemodel, argus.intmask, pars, clnmask=pars['MaskFile'])
 
 
 #   Self-calibrate
 if (argus.selfcal):      
-    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg_b0" for vis in vislist ]
+    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]
     for ivis in listofvis:
         selfcal (ivis, ivis+".scal", pars["ScalInt0"], argus.calmode, pars)
     
@@ -281,7 +274,7 @@ if (argus.scourgify):
 #   Flag calibrated visibilities
 if (argus.flagselfcal):      
 
-    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg_b0" for vis in vislist ]
+    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]
     for ivis in listofvis:
         flagcaltarget (ivis, pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
@@ -289,12 +282,12 @@ if (argus.flagselfcal):
 #   Difficult magic ********* Self-calibrate until it converges
 if (argus.imperio or argus.reducto):
     
-    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg_b0" for vis in vislist ]
+    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]
     for ivis in listofvis:
         flagcaltarget (ivis, pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
     #   Make the zeroth image
-    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg_b0.ms" for vis in vislist ]
+    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg.ms" for vis in vislist ]
     imgtarget(listofvis, "fscal_0", dosavemodel=False, dointeractive=argus.intmask, pars=pars, clnmask=None)
 
     #   Find sources and make a clean mask
@@ -316,7 +309,7 @@ if (argus.imperio or argus.reducto):
         print(f"\n\n Self calibration: iteration {atmpt} Mode {scalmode} [{pcalit}/{apcalit}]")
 
         #   Make image for this iteration
-        listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg_b0.ms" for vis in vislist ]
+        listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg.ms" for vis in vislist ]
         oldmask     = pars['WorkDir']+pars['ImgDir']+'/'+pars['TargetName']+"_fscal_"+str(atmpt-1)+"_src_mask.mask"
         
         if ( (pars['MaskFile'] != None) and (pars['MaskFile'] != "") ):
@@ -348,7 +341,7 @@ if (argus.imperio or argus.reducto):
             scalint = pars["APcalInt"]
 
         #   Find gain solutions from self-calibration
-        listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg_b0" for vis in vislist ]
+        listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]
         for ivis in listofvis:
             selfcal (ivis, ivis+".scal", scalint, scalmode, pars)
 
@@ -357,14 +350,6 @@ if (argus.imperio or argus.reducto):
             flagcaltarget (ivis, pars, argus.pypath, ankdir=argus.pipedir+"ankflag_3/", ankin=argus.flgin, ovrt=True)
 
         atmpt += 1
-
-
-#   apply self calibration and flag calibrated visibilities
-if (argus.appcalflag or argus.imperio or argus.reducto):      
-    listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]
-    for ivis in listofvis:
-        flagcaltarget (ivis, pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
-        applyselfcal (ivis, ivis+".scal", pars=pars)
 
 
 #   Attempt to produce the *final* continuum image

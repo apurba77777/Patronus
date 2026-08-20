@@ -91,6 +91,19 @@ def timager (visfile, tmjds, pars=None, ntime=-1):
 
     print(f"\n Imaging {mjdlims.shape[0]} time intervals...\n")
 
+    chanstr = ""
+        
+    if ((pars['TimgFreq']!=None) and (len(pars['TimgFreq']) == 2)):
+        wmsmd   = casatools.msmetadata()
+        wmsmd.open(visfile)
+        chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
+        wmsmd.done()  
+        cl      = max(np.argmin(np.abs(chan_freqs - pars['TimgFreq'][0])), 0) 
+        cr      = min(np.argmin(np.abs(chan_freqs - pars['TimgFreq'][1])), len(chan_freqs)) 
+        chanstr = "0:"+str(min(cl,cr))+"~"+str(max(cl,cr) )
+
+    print(f" Snapshot imaging frequency range {pars['TimgFreq']}, channels {chanstr}")
+
     for ki in range(0,len(mjdlims)):
 
         os.system("rm -rf tcube_"+str(ki)+"*")
@@ -116,6 +129,7 @@ def timager (visfile, tmjds, pars=None, ntime=-1):
             uvrange=pars['FinUvLim'], \
             timerange=tstring, \
             specmode='mfs', \
+            spw=chanstr, \
             gridder='widefield', \
             wprojplanes=pars['TwprojPln'], \
             pblimit=0.2, \
@@ -151,6 +165,19 @@ def tfimager (visfile, tmjds, pars=None, ntime=-1):
 
     print(f"\n Imaging {mjdlims.shape[0]} time intervals...\n")
 
+    chanstr = ""
+            
+    if ((pars['TimgFreq']!=None) and (len(pars['TimgFreq']) == 2)):
+        wmsmd   = casatools.msmetadata()
+        wmsmd.open(visfile)
+        chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
+        wmsmd.done()  
+        cl      = max(np.argmin(np.abs(chan_freqs - pars['TimgFreq'][0])), 0) 
+        cr      = min(np.argmin(np.abs(chan_freqs - pars['TimgFreq'][1])), len(chan_freqs)) 
+        chanstr = "0:"+str(min(cl,cr))+"~"+str(max(cl,cr) )
+
+    print(f" Snapshot imaging frequency range {pars['TimgFreq']}, channels {chanstr}")
+
     for ki in range(0,len(mjdlims)):
 
         os.system("rm -rf tfcube_"+str(ki)+"*")
@@ -176,6 +203,7 @@ def tfimager (visfile, tmjds, pars=None, ntime=-1):
             uvrange=pars['FinUvLim'], \
             timerange=tstring, \
             specmode='cubedata', \
+            spw=chanstr, \
             width=pars['TavgChan'], \
             gridder='widefield', \
             wprojplanes=pars['TwprojPln'], \

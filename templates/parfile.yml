@@ -5,8 +5,8 @@
 #   Directories 
 
 RawDir:       "../gmrtfits/"
-WorkDir:      "../processing/26nov24_b3/"
-OutDir:       "../processing/reduced/"
+WorkDir:      "../processing/11july26/"
+OutDir:       "../processing/11july26out/"
 
 UvMsDir:      "uvms/"                 #   Directory for intermediate UV files (Within WorkDir)
 LogDir:       "logs/"                 #   Directory for logs and diagnostics (Within WorkDir)
@@ -16,15 +16,15 @@ ImgDir:       "imgs/"                 #   Directory for images (Within WorkDir)
 
 # Data files and field identifiers
 
-RawUvFile:    "47_087C_26NOV2024_SUBAR3_B3_GWB.LTA_RRLL.RRLLFITS"           #   Without .fits
+RawUvFile:    "50_047_11JUL2026_B3_GWB.GWB.LTA_RRLL.RRLLFITS"           #   Without .fits
 RawFlagFiles: ""                      #   Full paths
-ReducedName:  "26nov24_b3"            #   Easier to identify if same string as in WorkDir
-TargetName:   "J1832"                 #   Name of the target field
+ReducedName:  "11july26"               #   Easier to identify if same string as in WorkDir
+TargetName:   "GPP20"                 #   Name of the target field
 
 # Visibility selection 
 
 CorrProds:    "RR,LL"                 #   Correpation products to use
-FreqRange:    [380.0, 450.0]          #   Frequency range in MHz
+FreqRange:    [320.0, 480.0]          #   Frequency range in MHz
 IniChanAvg:   4                       #   Native channel averaging factor
 CalTimeAvg:   ""                      #   Time averaging factor for calibration and imaging
                                       #   Blank string --> no averaging
@@ -32,8 +32,8 @@ CalTimeAvg:   ""                      #   Time averaging factor for calibration 
 #  Calibration 
 
 SingleChan:   410.0                   #   Single channel frequency in MHz 
-FluxCal:      "3C286"                 #   Flux calibrator
-PhaseCal:     "1822-096"              #   Phase calibrator
+FluxCal:      "3C48"                 #   Flux calibrator
+PhaseCal:     "0432+416"              #   Phase calibrator
 CalUvLim:     "2~35klambda"           #   UV range for calibration
 GainInt:      "120s"                  #   Gain solution interval
 RefAntenna:   "10"                    #   Reference antenna
@@ -42,7 +42,7 @@ OutThresh:    [7.0, 5.0, 3.0]         #   Outlier thresholds in units of RMS
 CalScanEnd:   30.0                    #   Seconds to flag at either end of the calibrator scans
 
 CalIter:      4                       #   Flag-cal iterations 
-BpIter:       4                       #   Flag-bandpass iterations 
+BpIter:       3                       #   Flag-bandpass iterations 
 
 PhaseBpCal:   True                    #   Use phase cal for bandpass
 SpecPoly:     1                       #   Polynomial order for phase cal spectrum
@@ -50,9 +50,9 @@ SpecOutMad:   5.0                     #   Outlier threshold in units of MAD for 
 
 #   Computing and transformation
 
-FlgThreads:   8                       #   Number of threads for flagging
-TarChanAvg:   10                      #   Channel averaging factor for selfcal
-FinChanAvg:   10                      #   Channel averaging factor for uvsub
+FlgThreads:   12                      #   Number of threads for flagging
+TarChanAvg:   2                       #   Channel averaging factor for selfcal
+FinChanAvg:   8                       #   Channel averaging factor for uvsub
 TarUvLim:     "2~200klambda"          #   UV range for the target field
 
 
@@ -65,10 +65,12 @@ PreModel:     ""                      #   Existing model to use
 
 # Continuum imaging for selfcal 
 
-ImgUvLim:     "2~200klambda"          #   UV range to use for imaging
-ImUvTaper:    ["20klambda"]           #   UV taper 
+ClnWS:        False                   #   Use WSclean for imaging (Only for self-cal now)
 
-ImgSize:      [4000]                  #   In pixel units [rectangle not yet supported]
+ImgUvLim:     "2~200klambda"          #   UV range to use for imaging
+ImUvTaper:    ["30klambda"]           #   UV taper (Only for CASA)
+
+ImgSize:      [5000]                  #   In pixel units [rectangle not yet supported]
 CellSize:     ["1.5arcsec"]           #   Pixel size
 WprojPln:     100                     #   Number of w-projection planes, -1 for automatic
 WtRobust:     -0.5                    #   Robust for Briggs weighting 
@@ -80,47 +82,54 @@ SclBias:      0.5                     #   Bias towards smaller scales
 
 MaskFile:     Null
                                       #   Pre-existing clean mask
-scapp:        "p"                     #   Self-cal approach (p, ap, otherwise normal)
+
+ScalFreq:     [320.0, 480.0]          #   Frequency range in MHz for self-calibration 
+MaxIter:      [6,2]                   #   Maximum iterations for p and ap selfcal
+ScalInt0:     "300s"                  #   Initial solution interval for p self cal
+PcalIntMin:   "50s"                   #   Minimum solution interval for p selfcal
+APcalInt:     "500s"                  #   Solution interval for ap selfcal
+
 
 #   Self-cal convergence
 
-PeakThresh:   6.0                     #   Peak threshold for source detecion
+PeakThresh:   10.0                    #   Peak threshold for source detecion
 IslThresh:    4.0                     #   Island threshold       
 CenFrac:      0.05                    #   Fractional box size for source detection    
-MaxIter:      8                       #   Maximum iterations for full selfcal
 MaxSrcs:      10                      #   Maximum number of sources to compare
 
-TolPos:       0.5                     #   Position tolerance in pixels
+TolPos:       1.0                     #   Position tolerance in pixels
 TolPeak:      0.05                    #   Fractional tolerance in peak value
 TolRms:       1.0                     #   Fractional tolerance in residual RMS
 TolFrac:      0.05                    #   Fractional tolerance in RMS
 
 
-
 # Final continuum image
 
-FinImage:     "J1832_26nov24_b3"      #   Name of the final image
+FinImage:     "GPP20"                 #   Name of the final image
 FinUvLim:     "1~200klambda"          #   UV range to use for imaging
 ImRobust:     -0.5                    #   Robust for Briggs weighting 
 FiNiter:      5000                    #   Number of iterations
 FinSigma:     4.0                     #   N-sigma threshold for cleaning
+FinalFreq:    [440.0, 480.0]          #   Frequency range in MHz for the final image 
 
-SubRanges:    [380.0, 400.0, 425.0, 450.0]   #   Frequency range in MHz for sub-band imaging
+
+SubRanges:    [320.0, 400.0, 440.0, 480.0]   #   Frequency range in MHz for sub-band imaging
 
 # Snapshot imaging
 
 CubeDir:      "tcubes/"               #   Directory for cubes (within OutDir)
 
 VisUvSub:     null
-#    - "30june2024_b4_J1832"          #   List of visibilities (without .ms) for uvsub imaging
+#    - ""                             #   List of visibilities (without .ms) for uvsub imaging
 
-TimgSize:     [500]                   #   In pixel units 
+TimgFreq:     [440.0, 480.0]          #   Frequency range in MHz for the final image 
+TimgSize:     [3000]                  #   In pixel units 
 TcellSize:    ["1.5arcsec"]           #   Pixel size
-TwprojPln:    1                       #   Number of w-projection planes, -1 for automatic
-TwtRobust:    0.5                     #   Robust for Briggs weighting 
-TimNiter:     10                      #   Cleaning iterations (0 will produce dirty image)
+TwprojPln:    50                      #   Number of w-projection planes, -1 for automatic
+TwtRobust:    -0.5                    #   Robust for Briggs weighting 
+TimNiter:     0                       #   Cleaning iterations (0 will produce dirty image)
 TinSigma:     5.0                     #   Cleaning threshold
-TclnGain:     0.8                     #   Clean gain
+TclnGain:     1.0                     #   Clean gain
 TavgChan:     -1                      #   Channel averaging (<=0 --> average over all frequencies)
 TimeBins:     1                       #   Number of timestamps to bin
 TNImg:        -1                      #   Number of images (Mostly for debugging/testing)

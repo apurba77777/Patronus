@@ -1,4 +1,5 @@
 import os,sys
+import re
 import numpy as np
 from astropy.io import fits
 import casatasks as ct
@@ -90,6 +91,19 @@ def imgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, pa
     else:
         print(f"No cleanmask provided...")
 
+    chanstr = ""
+
+    if ((pars['ScalFreq']!=None) and (len(pars['ScalFreq']) == 2)):
+        wmsmd   = casatools.msmetadata()
+        wmsmd.open(targetvislist[0])
+        chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
+        wmsmd.done()  
+        cl      = max(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][0])), 0) 
+        cr      = min(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][1])), len(chan_freqs)) 
+        chanstr = "0:"+str(min(cl,cr))+"~"+str(max(cl,cr) )
+
+    print(f"  Self-cal frequency range {pars['ScalFreq']}, channels {chanstr}")
+
     print("\nMaking image...\n")
     ct.tclean(
         vis=targetvislist, \
@@ -102,6 +116,7 @@ def imgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, pa
         uvrange=pars['ImgUvLim'], \
         startmodel=pars['PreModel'], \
         specmode='mfs', \
+        spw=chanstr, \
         gridder='widefield', \
         wprojplanes=pars['WprojPln'], \
         pblimit=-0.1, \
@@ -119,6 +134,97 @@ def imgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, pa
         pbmask=0.2, \
         savemodel=savemod        
     )
+    
+    print(" Done!\n")
+
+    return (0)
+#   -----------------------------------------------------------------------------------------------------
+
+
+
+def wsimgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, pars=None, clnmask=None):
+    
+    #   Image calibrated target using wsclean 
+    
+    imgpre  = pars['WorkDir']+pars['ImgDir']+'/'+pars['TargetName']+'_'+imgname
+
+    print("\nVisibilities -- ",targetvislist)
+    print("Imagename -- ",imgpre)    
+
+    print("Clearing existing image components...\n")
+    os.system("rm -rf "+imgpre+".*")
+
+    maskopt = ""
+    if (clnmask != None):
+        print(f"Clean mask = {clnmask}")
+        if (clnmask.endswith(".fits")):
+            maskopt = " -fits-mask " + clnmask
+        elif (clnmask.endswith(".mask")):
+            maskopt = " -casa-mask " + clnmask
+        else:
+            print("Mask unusable...")
+    else:
+        print(f"No cleanmask provided...")
+
+    savemod = ""
+    if (dosavemodel):
+        savemod = " -update-model-required "
+
+    #   Preparing wsclean
+    imsize_int  = str(int(pars['ImgSize'][0]))
+    cellsize_is = pars['CellSize'][0]          
+    cellsize_is = cellsize_is.replace("arcsec", "asec")
+    decon_scls  = ",".join(map(str, pars['DeconScls']))
+    msvis       = " ".join(targetvislist)
+    uvlims      = re.findall(r"\d+\.?\d*", pars['ImgUvLim'])
+    uvklam      = [float(num) for num in uvlims]
+
+    chanstr     = ""
+    
+    if ((pars['ScalFreq']!=None) and (len(pars['ScalFreq']) == 2)):
+        wmsmd   = casatools.msmetadata()
+        wmsmd.open(targetvislist[0])
+        chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
+        #chan_freqs  = np.sort(wmsmd.chanfreqs(0)/1.0e6)
+        wmsmd.done()  
+        cl      = max(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][0])), 0) 
+        cr      = min(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][1])), len(chan_freqs)) 
+        chanstr = " -channel-range "+str(min(cl,cr))+" "+str(max(cl,cr) )
+
+    print(f"  Self-cal frequency range {pars['ScalFreq']}, channels {chanstr}")    
+
+    wscmd = "wsclean " + " -name " + imgpre + \
+            chanstr + \
+            " -size " + imsize_int + " " + imsize_int + \
+            " -scale " + cellsize_is + \
+            " -j " + str(pars["FlgThreads"]) + \
+            " -mem 80 " + \
+            " -temp-dir $PWD " + \
+            savemod + \
+            " -weight briggs " + str(pars['WtRobust']) + \
+            " -minuv-l " + str(1000*uvklam[0]) + \
+            " -maxuv-l " + str(1000*uvklam[1]) + \
+            " -niter " + str(pars['ImNiter']) + \
+            " -nmiter 30 " + \
+            " -auto-threshold 1.0 " + \
+            " -local-rms " + \
+            " -mgain 0.7 " + \
+            " -multiscale " + \
+            " -multiscale-shape 'gaussian' " + \
+            " -multiscale-scale-bias " + str(pars["SclBias"]) + \
+            " -multiscale-scales " + decon_scls + \
+            " -multiscale-gain 0.1 " + \
+            " -clean-border 0.05 " + \
+            " -join-channels " + \
+            " -channels-out 4 " + \
+            maskopt + \
+            " -auto-mask " + str(pars["ClnSigma"]) + \
+            " -fit-spectral-log-pol 2 " + \
+            " -stop-negative " + \
+            msvis + " >> wsclean.log"
+    
+    print("\n--- RUNNING WSCLEAN IMAGING ---\n" + wscmd)
+    os.system(wscmd)
     
     print(" Done!\n")
 
@@ -298,6 +404,19 @@ def finalimg (targetvislist, dosavemodel=True, pars=None):
     hrad    = float(pars['ImgSize'][0])/2
     finmask = 'Circle[['+str(hrad)+'pix, '+str(hrad)+'pix],'+str(hrad)+'pix]'
 
+    chanstr = ""
+    
+    if ((pars['FinalFreq']!=None) and (len(pars['FinalFreq']) == 2)):
+        wmsmd   = casatools.msmetadata()
+        wmsmd.open(targetvislist[0])
+        chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
+        wmsmd.done()  
+        cl      = max(np.argmin(np.abs(chan_freqs - pars['FinalFreq'][0])), 0) 
+        cr      = min(np.argmin(np.abs(chan_freqs - pars['FinalFreq'][1])), len(chan_freqs)) 
+        chanstr = "0:"+str(min(cl,cr))+"~"+str(max(cl,cr) )
+
+    print(f" Continuum imaging frequency range {pars['FinalFreq']}, channels {chanstr}")
+
     print("\nMaking final continuum image...\n")
     ct.tclean(
         vis=targetvislist, \
@@ -309,6 +428,7 @@ def finalimg (targetvislist, dosavemodel=True, pars=None):
         field=pars['TargetName'],\
         uvrange=pars['FinUvLim'], \
         specmode='mfs', \
+        spw=chanstr, \
         gridder='widefield', \
         wprojplanes=pars['WprojPln'], \
         pblimit=0.1, \
@@ -779,55 +899,4 @@ def subandimg (targetvislist, pars=None):
 
 
 
-def splitsubands (visfile, pars):
-    
-    #   Split individual sub-bands 
 
-    if ((pars['ScalFreq']==None) or (len(pars['ScalFreq']) < 2)):
-        print("Simply copying the visibilities...")
-        os.system(f"rm -rf {visfile}_b0.ms")
-        os.system(f"cp -r {visfile}.ms {visfile}_b0.ms")
-        return (0)
-
-    wmsmd   = casatools.msmetadata()
-    wmsmd.open(visfile+".ms")
-    chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
-    wmsmd.done()
-
-    os.system(f"rm -rf {visfile}_b{0}.ms")    
-
-    cl      = max(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][0])), 0) 
-    cr      = min(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][1])), len(chan_freqs)) 
-    chanstr = "0:"+str(min(cl,cr))+"~"+str(max(cl,cr) )
-
-    print(f"  Self-cal frequency range {pars['ScalFreq']}, channels {chanstr}")
-
-    ct.mstransform(
-        vis=visfile+".ms", \
-        outputvis=visfile+"_b0.ms", \
-        datacolumn="DATA", \
-        keepflags=False, \
-        spw=chanstr, \
-        correlation=pars['CorrProds']
-    )        
-    
-    print(" Done!\n")
-
-    return (0)
-#   -----------------------------------------------------------------------------------------------------
-
-
-
-def applyselfcal (targetvis, calfile, pars = None):
-    
-    #   Apply self cal solutions to target visibilities
-    
-    print("Applying self cal solutions...\n")
-    
-    print("\nApplying calibration...\n")
-    ct.applycal(vis=targetvis+".ms", gaintable=[calfile])
-    
-    print("\n Done!\n")
-
-    return (0)
-#   -----------------------------------------------------------------------------------------------------

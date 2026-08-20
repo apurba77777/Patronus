@@ -51,11 +51,9 @@ def get_args():
     parser.add_argument("--flagtarget", help = "Flag calibrated target file", action='store_true')
     #   Imaging tasks
     parser.add_argument("--avgtarget", help = "Channel average target visibilities", action='store_true')
-    parser.add_argument("--splitsub", help = "Split sub-bands", action='store_true')
     parser.add_argument("--imgtarget", help = "Image the calibrated target", action='store_true')
     parser.add_argument("--selfcal", help = "Self calibrate", action='store_true')    
     parser.add_argument("--flagselfcal", help = "Flag self-calibrated visibilities", action='store_true')
-    parser.add_argument("--appcalflag", help = "Apply self calibration and visibilities", action='store_true')
     parser.add_argument("--getuvsub", help = "Subtract the final continuum model", action='store_true')
     parser.add_argument("--flaguvsub", help = "Flag continuum subtracted visibilities", action='store_true')
     #   Snapshot imaging tasks
@@ -109,11 +107,9 @@ def print_spells():
     print("      --flagtarget  - Flag calibrated target file\n")
     
     print("      --avgtarget   - Channel average target visibilities")
-    print("      --splitsub    - split sub-bands")
     print("      --imgtarget   - Image the calibrated target")
     print("      --selfcal     - Self calibrate")
     print("      --flagselfcal - Flag self-calibrated visibilities")
-    print("      --appcalflag  - Apply self calibration and flag visibilities")
     print("      --getuvsub    - Subtract the final continuum model")
     print("      --flaguvsub   - Flag continuum subtracted visibilities\n")    
 
