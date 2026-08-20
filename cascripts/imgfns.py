@@ -651,7 +651,7 @@ def findsrcs (imgname, pars=None):
 
     sfimg   = sf.process_image(
                 imgname+".fits", \
-                rms_box=(int(min(pars['ImgSize'])/10), int(min(pars['ImgSize'])/40)), \
+                rms_box=None, \
                 rms_map=True, \
                 thresh='hard', \
                 group_by_isl = False, \
