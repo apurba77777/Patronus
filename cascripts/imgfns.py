@@ -184,8 +184,8 @@ def wsimgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, 
     if ((pars['ScalFreq']!=None) and (len(pars['ScalFreq']) == 2)):
         wmsmd   = casatools.msmetadata()
         wmsmd.open(targetvislist[0])
-        chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
-        #chan_freqs  = np.sort(wmsmd.chanfreqs(0)/1.0e6)
+        #chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
+        chan_freqs  = np.sort(wmsmd.chanfreqs(0)/1.0e6)
         wmsmd.done()  
         cl      = max(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][0])), 0) 
         cr      = min(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][1])), len(chan_freqs)) 
@@ -220,7 +220,6 @@ def wsimgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, 
             maskopt + \
             " -auto-mask " + str(pars["ClnSigma"]) + \
             " -fit-spectral-log-pol 2 " + \
-            " -stop-negative " + \
             msvis + " >> wsclean.log"
     
     print("\n--- RUNNING WSCLEAN IMAGING ---\n" + wscmd)
