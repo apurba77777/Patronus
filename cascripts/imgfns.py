@@ -653,7 +653,7 @@ def findsrcs (imgname, pars=None):
                 imgname+".fits", \
                 rms_box=(int(min(pars['ImgSize'])/10), int(min(pars['ImgSize'])/40)), \
                 rms_map=True, \
-                thresh='fdr', \
+                thresh='hard', \
                 group_by_isl = False, \
                 interactive = False, \
                 thresh_isl = pars['IslThresh'], \
