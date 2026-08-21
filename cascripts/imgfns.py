@@ -25,10 +25,14 @@ def avgtarget (targetvis, pars=None):
 
     print("Channel averaging...\n")
 
+    cavgdo = False
     tavgdo = False 
     if (pars['CalTimeAvg'] != ""):
         print(f"Time-averaging to {pars['CalTimeAvg']}")
         tavgdo = True
+
+    if (pars['TarChanAvg'] > 1):
+        cavgdo = True
 
     ct.mstransform(
         vis=pars['WorkDir']+pars['UvMsDir']+'/'+targetvis+".ms", \
@@ -36,7 +40,7 @@ def avgtarget (targetvis, pars=None):
         datacolumn="data", \
         keepflags=False, \
         hanning=True, \
-        chanaverage=True, \
+        chanaverage=cavgdo, \
         chanbin=pars['TarChanAvg'], \
         timeaverage=tavgdo, \
         timebin=pars['CalTimeAvg']
@@ -614,6 +618,9 @@ def flagavguvsub (tarfile, pars=None, pyx="python", ankdir=None, ankin=None, ovr
     if (os.path.exists(filetoavg+"_avg.ms")):
         os.system("rm -rf "+filetoavg+"_avg.ms")
 
+    cavgdo = False
+    if (pars['TarChanAvg'] > 1):
+        cavgdo = True
 
     print("Channel averaging...\n")
     ct.mstransform(
@@ -622,7 +629,7 @@ def flagavguvsub (tarfile, pars=None, pyx="python", ankdir=None, ankin=None, ovr
         datacolumn="data", \
         keepflags=False, \
         hanning=True, \
-        chanaverage=True, \
+        chanaverage=cavgdo, \
         chanbin=pars['FinChanAvg']
     )
 
