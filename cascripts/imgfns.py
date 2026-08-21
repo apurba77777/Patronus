@@ -123,7 +123,7 @@ def imgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, pa
         spw=chanstr, \
         gridder='widefield', \
         wprojplanes=pars['WprojPln'], \
-        pblimit=-0.1, \
+        pblimit=-1.0, \
         deconvolver='mtmfs', \
         scales=pars['DeconScls'], \
         smallscalebias=pars['SclBias'], \
@@ -135,7 +135,7 @@ def imgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, pa
         interactive=dointeractive, \
         usemask='user', \
         mask=rgnmask, \
-        pbmask=0.2, \
+        pbmask=-1.0, \
         savemodel=savemod        
     )
     
@@ -449,7 +449,7 @@ def finalimg (targetvislist, dosavemodel=True, pars=None):
         spw=chanstr, \
         gridder='widefield', \
         wprojplanes=pars['WprojPln'], \
-        pblimit=0.1, \
+        pblimit=-1.0, \
         deconvolver='mtmfs', \
         scales=pars['DeconScls'], \
         smallscalebias=pars['SclBias'], \
@@ -461,7 +461,7 @@ def finalimg (targetvislist, dosavemodel=True, pars=None):
         interactive=False, \
         usemask='user', \
         mask=finmask, \
-        pbmask=0.2, \
+        pbmask=-1.0, \
         savemodel=savemod        
     )
 
@@ -890,7 +890,7 @@ def subandimg (targetvislist, pars=None):
             specmode='mfs', \
             gridder='widefield', \
             wprojplanes=pars['WprojPln'], \
-            pblimit=0.1, \
+            pblimit=-1.0, \
             deconvolver='mtmfs', \
             scales=pars['DeconScls'], \
             smallscalebias=pars['SclBias'], \
@@ -902,7 +902,7 @@ def subandimg (targetvislist, pars=None):
             interactive=False, \
             usemask='user', \
             mask=finmask, \
-            pbmask=0.2       
+            pbmask=-1.0       
         )
 
         print("Exporting final image to Output Directory...")
