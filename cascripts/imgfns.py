@@ -135,7 +135,6 @@ def imgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, pa
         interactive=dointeractive, \
         usemask='user', \
         mask=rgnmask, \
-        pbmask=-1.0, \
         savemodel=savemod        
     )
     
@@ -461,7 +460,6 @@ def finalimg (targetvislist, dosavemodel=True, pars=None):
         interactive=False, \
         usemask='user', \
         mask=finmask, \
-        pbmask=-1.0, \
         savemodel=savemod        
     )
 
@@ -901,8 +899,7 @@ def subandimg (targetvislist, pars=None):
             nsigma=pars['FinSigma'], \
             interactive=False, \
             usemask='user', \
-            mask=finmask, \
-            pbmask=-1.0       
+            mask=finmask      
         )
 
         print("Exporting final image to Output Directory...")
