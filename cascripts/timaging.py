@@ -132,7 +132,7 @@ def timager (visfile, tmjds, pars=None, ntime=-1):
             spw=chanstr, \
             gridder='widefield', \
             wprojplanes=pars['TwprojPln'], \
-            pblimit=-1.0, \
+            pblimit=-0.1, \
             deconvolver='hogbom', \
             weighting='briggs',\
             robust=pars['TwtRobust'], \
@@ -207,7 +207,7 @@ def tfimager (visfile, tmjds, pars=None, ntime=-1):
             width=pars['TavgChan'], \
             gridder='widefield', \
             wprojplanes=pars['TwprojPln'], \
-            pblimit=-1.0, \
+            pblimit=-0.1, \
             deconvolver='hogbom', \
             weighting='briggs',\
             robust=pars['TwtRobust'], \

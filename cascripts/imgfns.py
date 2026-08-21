@@ -123,7 +123,7 @@ def imgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, pa
         spw=chanstr, \
         gridder='widefield', \
         wprojplanes=pars['WprojPln'], \
-        pblimit=-1.0, \
+        pblimit=-0.1, \
         deconvolver='mtmfs', \
         scales=pars['DeconScls'], \
         smallscalebias=pars['SclBias'], \
@@ -448,7 +448,7 @@ def finalimg (targetvislist, dosavemodel=True, pars=None):
         spw=chanstr, \
         gridder='widefield', \
         wprojplanes=pars['WprojPln'], \
-        pblimit=-1.0, \
+        pblimit=-0.1, \
         deconvolver='mtmfs', \
         scales=pars['DeconScls'], \
         smallscalebias=pars['SclBias'], \
@@ -888,7 +888,7 @@ def subandimg (targetvislist, pars=None):
             specmode='mfs', \
             gridder='widefield', \
             wprojplanes=pars['WprojPln'], \
-            pblimit=-1.0, \
+            pblimit=-0.1, \
             deconvolver='mtmfs', \
             scales=pars['DeconScls'], \
             smallscalebias=pars['SclBias'], \
