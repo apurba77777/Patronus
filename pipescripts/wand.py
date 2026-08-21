@@ -339,6 +339,9 @@ if (argus.imperio or argus.reducto):
 
         if (scalmode == "ap"):
             scalint = pars["APcalInt"]
+            apcalit = apcalit + 1
+        else:
+            pcalit  = pcalit + 1
 
         #   Find gain solutions from self-calibration
         listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_avg" for vis in vislist ]

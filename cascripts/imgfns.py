@@ -202,6 +202,7 @@ def wsimgtarget (targetvislist, imgname, dosavemodel=True, dointeractive=False, 
             " -temp-dir $PWD " + \
             savemod + \
             " -weight briggs " + str(pars['WtRobust']) + \
+            " -use-weights-as-taper " + \
             " -minuv-l " + str(1000*uvklam[0]) + \
             " -maxuv-l " + str(1000*uvklam[1]) + \
             " -niter " + str(pars['ImNiter']) + \
@@ -246,11 +247,25 @@ def selfcal (targetvis, calfile, scalint="100s", gcmode=None, pars = None):
         apmode='calonly'
 
     print("Self-calibrating in "+scmode+" mode...\n")
+
+    chanstr = ""
+    
+    if ((pars['ScalFreq']!=None) and (len(pars['ScalFreq']) == 2)):
+        wmsmd   = casatools.msmetadata()
+        wmsmd.open(targetvis)
+        chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
+        wmsmd.done()  
+        cl      = max(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][0])), 0) 
+        cr      = min(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][1])), len(chan_freqs)) 
+        chanstr = "0:"+str(min(cl,cr))+"~"+str(max(cl,cr) )
+
+    print(f"  Self-cal frequency range {pars['ScalFreq']}, channels {chanstr}")
     
     ct.gaincal(
         vis=targetvis+".ms", \
         caltable=calfile, \
         uvrange=pars['CalUvLim'], \
+        spw=chanstr, \
         solint=scalint, \
         refant=pars['RefAntenna'], \
         minsnr=pars['MinSNR'], \
