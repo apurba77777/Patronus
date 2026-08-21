@@ -255,7 +255,7 @@ def selfcal (targetvis, calfile, scalint="100s", gcmode=None, pars = None):
     
     if ((pars['ScalFreq']!=None) and (len(pars['ScalFreq']) == 2)):
         wmsmd   = casatools.msmetadata()
-        wmsmd.open(targetvis)
+        wmsmd.open(targetvis+".ms")
         chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
         wmsmd.done()  
         cl      = max(np.argmin(np.abs(chan_freqs - pars['ScalFreq'][0])), 0) 
