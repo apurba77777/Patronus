@@ -95,7 +95,7 @@ def timager (visfile, tmjds, pars=None, ntime=-1):
         
     if ((pars['TimgFreq']!=None) and (len(pars['TimgFreq']) == 2)):
         wmsmd   = casatools.msmetadata()
-        wmsmd.open(visfile)
+        wmsmd.open(visfile+".ms")
         chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
         wmsmd.done()  
         cl      = max(np.argmin(np.abs(chan_freqs - pars['TimgFreq'][0])), 0) 
@@ -169,7 +169,7 @@ def tfimager (visfile, tmjds, pars=None, ntime=-1):
             
     if ((pars['TimgFreq']!=None) and (len(pars['TimgFreq']) == 2)):
         wmsmd   = casatools.msmetadata()
-        wmsmd.open(visfile)
+        wmsmd.open(visfile+".ms")
         chan_freqs  = wmsmd.chanfreqs(0)/1.0e6
         wmsmd.done()  
         cl      = max(np.argmin(np.abs(chan_freqs - pars['TimgFreq'][0])), 0) 
