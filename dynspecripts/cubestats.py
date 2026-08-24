@@ -44,14 +44,6 @@ def noisemap (cubedata, spewdir, pars=None):
     retval      = spew.calcubenoise(tdataptr, np.intc(tdata.ndim), dimptr, noiseptr, np.intc(pars['Threads']))
 
     spatnoise   = np.reshape(spatnoise, (tdata.shape[0], tdata.shape[1]))
-    
-    fig     = plt.figure(figsize=(5,4))     
-    ax5     = fig.add_subplot(111)
-
-    plt.imshow(spatnoise, origin='lower', interpolation='none', aspect='auto', cmap='plasma')
-    plt.colorbar()
-    plt.tight_layout()
-    plt.show()   
 
     return(spatnoise)
 #   -----------------------------------------------------------------------------------------------------

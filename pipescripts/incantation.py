@@ -81,10 +81,35 @@ if (argus.mapnoise):
         # np.save(fitsname+'_noisemap.npy', nsmap)
         with fits.open(fitsname+".fits") as tfdhu:
             tfdata      = tfdhu[0].data
-            tfcrop      = tfdata[0:200, 0:200]
-            cubedata    = np.transpose(np.nanmean(tfcrop, axis=1), axes=(2,1,0))
-            nsmap       = noisemap (cubedata, argus.pipedir+"/spew/", pars=pars)
-            #np.save(fitsname+'_noisemap.npy', nsmap)
+            spatpix     = (tfdata.shape[2], tfdata.shape[3])
+            spatnoise   = np.zeros((tfdata.shape[3], tfdata.shape[2]), dtype='float32')
+            subpix      = 1 + (np.array(spatpix) // pars['SubIms'])
+            print(f"Spatial size {spatpix}")
+            print(f"Dividing in {pars['SubIms']} sub-images of {subpix}")
+
+            for sx in range (0, pars['SubIms']):
+                xstart = sx * subpix[0]
+                xstop  = min(xstart + subpix[0], spatpix[0])
+                for sy in range (0, pars['SubIms']):
+                    ystart = sy * subpix[1]
+                    ystop  = min(ystart + subpix[1], spatpix[1])
+                    print(xstart,xstop,ystart,ystop)
+                    tfcrop      = tfdata[:, :, xstart:xstop, ystart:ystop]
+                    cubedata    = np.transpose(np.nanmean(tfcrop, axis=1), axes=(2,1,0))
+                    nsmap       = noisemap (cubedata, argus.pipedir+"/spew/", pars=pars)
+                    spatnoise[ystart:ystop, xstart:xstop]   = nsmap
+                    del nsmap
+                    del cubedata
+
+            np.save(fitsname+'_noisemap.npy', spatnoise)
+
+            fig     = plt.figure(figsize=(5,4))     
+            ax5     = fig.add_subplot(111)
+        
+            plt.imshow(spatnoise, origin='lower', interpolation='none', aspect='auto', cmap='plasma')
+            plt.colorbar()
+            plt.tight_layout()
+            plt.show()
 
 
 
