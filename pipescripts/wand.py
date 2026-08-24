@@ -423,7 +423,7 @@ if (argus.makefits or argus.petrificus):
         else:
             cubename    = pars['OutDir']+pars['CubeDir']+"/"+ivis+"_tfcube"
         
-        makefits (times, cubename, ntime=pars['TNImg'], nchan=pars['TavgChan']) 
+        makefits (times, cubename, ntime=pars['TNImg'], nchan=pars['TavgChan'], pars=pars) 
     
 
 #   Show patronus
