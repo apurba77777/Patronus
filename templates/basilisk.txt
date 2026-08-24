@@ -55,6 +55,7 @@ regions==0.11
 RM-Tools==1.4.9
 scipy==1.16.1
 setuptools==80.9.0
+shadems
 six==1.17.0
 stack-data==0.6.3
 tdqm==0.0.1
