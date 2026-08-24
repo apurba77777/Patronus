@@ -124,7 +124,7 @@ VisUvSub:     null
 
 TimgFreq:     [440.0, 480.0]          #   Frequency range in MHz for the final image 
 TimgSize:     [3000]                  #   In pixel units 
-TpsfSize:     [300]                   #   In pixel units 
+TpsfSize:     300                     #   In pixel units 
 TcellSize:    ["1.5arcsec"]           #   Pixel size
 TwprojPln:    50                      #   Number of w-projection planes, -1 for automatic
 TwtRobust:    -0.5                    #   Robust for Briggs weighting 
