@@ -56,7 +56,7 @@ def getdynspec (fitsfile, pars=None):
     plt.imshow(np.nanmean(hdulist[0].data[575:577], axis=(0,1)), origin='lower', vmax=0.06, interpolation='none', aspect='auto', cmap='plasma')
     plt.show()
     
-
+    np.save("tf.npy",tfdata)
 
     hdulist.close()
 

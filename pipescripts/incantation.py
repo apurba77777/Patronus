@@ -126,21 +126,12 @@ if (argus.acleansweep):
                 cleancube (avgcube, avgpsf, argus.pipedir+"/spew/", nsmap, pars=pars)
                 searchcube (avgcube, argus.pipedir+"/spew/", nsmap, pars=pars)
         
-
-
-
-
-        
-
-
+    
 #   Search at a specific sky position
 if (argus.getdspec):      
     fitslist   = [ pars['OutDir']+pars['CubeDir']+fname for fname in pars['FitsNames'] ]
     for fitsname in fitslist:
         getdynspec (fitsname, pars=pars)
-
-
-
 
 
 #   Show patronus
