@@ -90,8 +90,8 @@ if (argus.cleansweep):
             cubedata    = np.nanmean(tfdata, axis=1)
             cubepsf     = np.nanmean(psfdata, axis=1)
         else:
-            cubedata    = tfdata
-            cubepsf     = psfdata
+            cubedata    = tfdata[:,0]
+            cubepsf     = psfdata[:,0]
         nsmap       = np.load(fitsname+'_noisemap.npy')
         print("Attempting to clean cube...")
         cleancube (cubedata, cubepsf, argus.pipedir+"/spew/", nsmap, pars=pars)
