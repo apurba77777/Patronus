@@ -75,10 +75,16 @@ fitslist   = [ pars['OutDir']+pars['CubeDir']+fname for fname in pars['FitsNames
 #   Generate a spatial map of noise
 if (argus.mapnoise):      
     for fitsname in fitslist:
-        tfdata      = fits.getdata(fitsname+".fits", ext=0)
-        cubedata    = np.transpose(np.nanmean(tfdata, axis=1), axes=(2,1,0))
-        nsmap       = noisemap (cubedata, argus.pipedir+"/spew/", pars=pars)
-        np.save(fitsname+'_noisemap.npy', nsmap)
+        # tfdata      = fits.getdata(fitsname+".fits", ext=0)
+        # cubedata    = np.transpose(np.nanmean(tfdata, axis=1), axes=(2,1,0))
+        # nsmap       = noisemap (cubedata, argus.pipedir+"/spew/", pars=pars)
+        # np.save(fitsname+'_noisemap.npy', nsmap)
+        with fits.open(fitsname+".fits") as tfdhu:
+            tfdata      = tfdhu[0].data[0:200, 0:200]
+            cubedata    = np.transpose(np.nanmean(tfdata, axis=1), axes=(2,1,0))
+            nsmap       = noisemap (cubedata, argus.pipedir+"/spew/", pars=pars)
+            #np.save(fitsname+'_noisemap.npy', nsmap)
+
 
 
 #   Clean and search for transients at the original time resolution
