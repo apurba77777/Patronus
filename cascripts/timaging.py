@@ -1,5 +1,6 @@
 import os,sys
 import numpy as np
+from numpy.lib.format import open_memmap
 import casatasks as ct
 import casatools
 from casaplotms import plotms
@@ -224,11 +225,9 @@ def tfimager (visfile, tmjds, pars=None, ntime=-1):
 
 
 
-def makefits (tmjds, cubename, ntime=-1, nchan=-1):
+def makefits (tmjds, cubename, ntime=-1, nchan=-1, pars=None):
 
     #   Combine image time series into a single FITS
-
-
 
     iman    = casatools.image()
 
@@ -247,8 +246,13 @@ def makefits (tmjds, cubename, ntime=-1, nchan=-1):
     imhdr   = refcube[0].header
     refcube.close() 
 
-    tfcube  = np.zeros((len(mjdarr), imhdr['NAXIS3'], imhdr['NAXIS2'], imhdr['NAXIS1']), dtype='float32')
-    pfcube  = np.zeros((len(mjdarr), imhdr['NAXIS3'], imhdr['NAXIS2'], imhdr['NAXIS1']), dtype='float32')
+    #tfcube  = np.zeros((len(mjdarr), imhdr['NAXIS3'], imhdr['NAXIS2'], imhdr['NAXIS1']), dtype='float32')
+    #pfcube  = np.zeros((len(mjdarr), imhdr['NAXIS3'], imhdr['NAXIS2'], imhdr['NAXIS1']), dtype='float32')
+
+    tfcube   = open_memmap("temptfcube.npy", mode="w+", dtype='float32', \
+                            shape=(len(mjdarr), imhdr['NAXIS3'], imhdr['NAXIS2'], imhdr['NAXIS1']))
+    pfcube   = open_memmap("temppfcube.npy", mode="w+", dtype='float32', \
+                            shape=(len(mjdarr), imhdr['NAXIS3'], pars['TpsfSize'], pars['TpsfSize']))
 
     print(f"Reading {len(mjdarr)} images into cube {cubename}.fits...\n")
 
@@ -259,12 +263,16 @@ def makefits (tmjds, cubename, ntime=-1, nchan=-1):
             timecube    = np.array([iman.getchunk(dropdeg=True)])
             #print(timecube.shape)
             tfcube[ki] = np.transpose(timecube, (0,2,1))
+            tfcube.flush()
             iman.done()
 
             iman.open("tcube_"+str(ki)+".psf")
-            psfcube    = np.array([iman.getchunk(dropdeg=True)])
+            psfcube     = np.array([iman.getchunk(dropdeg=True)])
+            bleft       = int((imhdr['NAXIS2'] - pars['TpsfSize']) / 2)
+            psfcrop     = psfcube[:, bleft : bleft + pars['TpsfSize'], bleft : bleft + pars['TpsfSize']]
             #print(psfcube.shape)
-            pfcube[ki] = np.transpose(psfcube, (0,2,1))
+            pfcube[ki] = np.transpose(psfcrop, (0,2,1))
+            pfcube.flush()
             iman.done()
 
         else:
@@ -272,12 +280,16 @@ def makefits (tmjds, cubename, ntime=-1, nchan=-1):
             timecube    = iman.getchunk(dropdeg=True)
             #print(timecube.shape)
             tfcube[ki] = np.transpose(timecube, (2,1,0))
+            tfcube.flush()
             iman.done()     
 
             iman.open("tfcube_"+str(ki)+".psf")
             psfcube    = iman.getchunk(dropdeg=True)
+            bleft      = int((imhdr['NAXIS2'] - pars['TpsfSize']) / 2)
+            psfcrop    = psfcube[bleft : bleft + pars['TpsfSize'], bleft : bleft + pars['TpsfSize']]
             #print(psfcube.shape)
-            pfcube[ki] = np.transpose(psfcube, (2,1,0))
+            pfcube[ki] = np.transpose(psfcrop, (2,1,0))
+            pfcube.flush()
             iman.done()   
 
     iman.close()
@@ -308,6 +320,12 @@ def makefits (tmjds, cubename, ntime=-1, nchan=-1):
     phdulist    = fits.HDUList([pfhdu])
     phdulist.append(tabhdu)    
     phdulist.writeto(cubename+"_psf.fits", overwrite=True)
+
+    del pfcube
+    del tfcube
+
+    os.system("rm -rf temptfcube.npy")
+    os.system("rm -rf temppfcube.npy")
 
     print("\n    Clearing images...\n")
     for ki in range(0,len(mjdarr)):

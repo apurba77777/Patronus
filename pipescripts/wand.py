@@ -53,6 +53,7 @@ from cascripts.utils import *
 #                                       
 #                       metronome   //  Make list of timestamps in MJD
 #                       snapshot    //  Make snapshot images/cubes
+#                       makefits    //  Combine snapshots into a fits cube
 #
 #   Simple & convenient charms          
 #                       obliviate   //  Clear existing files 
@@ -404,12 +405,25 @@ if (argus.snapshot or argus.petrificus):
         if (pars['TavgChan'] < 1):
             print('\n Averaging over all frequencies... \n')
             timager (pars['WorkDir']+pars['ImgUvDir']+ivis, times, pars, ntime=pars['TNImg'])
-            cubename    = pars['OutDir']+pars['CubeDir']+"/"+ivis+"_tcube"
         else:
             tfimager (pars['WorkDir']+pars['ImgUvDir']+ivis, times, pars, ntime=pars['TNImg'])
+
+
+#   Combine snapshots into a fits cube
+if (argus.makefits or argus.petrificus):
+
+    listofvis   = [ vis+"_uvsub_f_avg" for vis in visuvsublist ]
+
+    for ivis in listofvis:
+        times = np.loadtxt(pars['WorkDir']+pars['ImgUvDir']+ivis+"_mjds.txt")
+        
+        if (pars['TavgChan'] < 1):
+            print('\n Averaging over all frequencies... \n')
+            cubename    = pars['OutDir']+pars['CubeDir']+"/"+ivis+"_tcube"
+        else:
             cubename    = pars['OutDir']+pars['CubeDir']+"/"+ivis+"_tfcube"
         
-        makefits (times, cubename, ntime=pars['TNImg'], nchan=pars['TavgChan'])
+        makefits (times, cubename, ntime=pars['TNImg'], nchan=pars['TavgChan']) 
     
 
 #   Show patronus

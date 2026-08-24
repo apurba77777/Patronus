@@ -58,7 +58,8 @@ def get_args():
     parser.add_argument("--flaguvsub", help = "Flag continuum subtracted visibilities", action='store_true')
     #   Snapshot imaging tasks
     parser.add_argument("--metronome", help = "Make list of timestamps in MJD", action='store_true')
-    parser.add_argument("--snapshot", help = "Make snapshot images/cubes", action='store_true')    
+    parser.add_argument("--snapshot", help = "Make snapshot images/cubes", action='store_true') 
+    parser.add_argument("--makefits", help = "Combined snapshots into a fits cube", action='store_true')    
 
     #   Options/utilities
     parser.add_argument("--obliviate", help = "Clear existing files ?", action='store_true')
@@ -115,6 +116,7 @@ def print_spells():
 
     print("      --metronome   - Make list of timestamps in MJD")
     print("      --snapshot    - Make snapshot images/cubes")
+    print("      --makefits    - Combine snapshots into a fits cube")
 
     print("\n Simple & convenient charms \n")
 
