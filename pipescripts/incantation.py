@@ -80,8 +80,9 @@ if (argus.mapnoise):
         # nsmap       = noisemap (cubedata, argus.pipedir+"/spew/", pars=pars)
         # np.save(fitsname+'_noisemap.npy', nsmap)
         with fits.open(fitsname+".fits") as tfdhu:
-            tfdata      = tfdhu[0].data[0:200, 0:200]
-            cubedata    = np.transpose(np.nanmean(tfdata, axis=1), axes=(2,1,0))
+            tfdata      = tfdhu[0].data
+            tfcrop      = tfdata[0:200, 0:200]
+            cubedata    = np.transpose(np.nanmean(tfcrop, axis=1), axes=(2,1,0))
             nsmap       = noisemap (cubedata, argus.pipedir+"/spew/", pars=pars)
             #np.save(fitsname+'_noisemap.npy', nsmap)
 
