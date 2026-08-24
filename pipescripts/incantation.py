@@ -107,8 +107,14 @@ if (argus.acleansweep):
         dtsec       = hdulist[0].header['CDELT4']
         hdulisp     = fits.open(fitsname+"_psf.fits")
         psfdata     = hdulisp[0].data
-        cubedata    = np.nanmean(tfdata, axis=1)
-        cubepsf     = np.nanmean(psfdata, axis=1)
+        if (tfdata.shape[1] > 1):
+            cubedata    = np.nanmean(tfdata, axis=1)
+            cubepsf     = np.nanmean(psfdata, axis=1)
+        else:
+            cubedata    = tfdata[:,0]
+            cubepsf     = psfdata[:,0]
+        nsmap       = np.load(fitsname+'_noisemap.npy')
+        print("Attempting to clean cube...")
         hdulist.close()
         hdulisp.close()
 
