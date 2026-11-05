@@ -17,7 +17,7 @@
 
 confile=""
 pyex="python3"
-Pipe_Dir="../../patronus/"
+Pipe_Dir="${PATRONUSPATH}/Patronus/"
 parfile="../inputfiles/calibration_b4_exam"
 flgpar="../inputfiles/ankpar_b4"
 rfifile="../inputfiles/rfifreqb4.txt"

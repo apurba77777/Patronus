@@ -82,6 +82,7 @@ phials(pars)
 if (argus.lumos):  
     potion_ingredients()
 
+
 #   --------------------------- Potion brewing tasks   ----------------------------------
 
 #   Extract COSMOS catalogue
@@ -101,6 +102,7 @@ if (argus.excat):
 #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV-r r-J  Type  U-V  V-J   SFR10  SFR100  lgm
 #	0	1	2	3	4	5	6	7	8	9	    10	11	12    13   14    15   16    17     18      19
 
+
 #   Extract subcubes
 if (argus.exubcubes):  
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CatFile'])
@@ -113,12 +115,14 @@ if (argus.exubcubes):
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
 
 
+
 #   Spatially smooth subcubes
 if (argus.smoothcubes):  
     if (pars['SmKpc'] > 0):
         print("\n Smoothing has not yet been implemented...\n")
     else:
         print("\n No smoothing required...\n")
+
 
 
 #   Spectrally interpolate subcubes
@@ -129,12 +133,14 @@ if (argus.intercubes):
     intercubes(detid, detz, posra, posdec, obschan, istart=argus.istart, pars=pars, ovrt=argus.obliviate, nobj=-1)
 
 
+
 #   Regrid subcubes to spatial pixels
 if (argus.regcubes):  
     if (pars['ReGrid']):        
         print("\n Regridding has not yet been implemented...\n")
     else:        
         print("\n No regridding required...\n")
+
 
 
 #   Reduce subcubes and extract spectra
@@ -155,6 +161,7 @@ if (argus.redcubes):
     reducecubes(getcubedir, getnoisedir, redscubedir, outspecdir, detid, istart=argus.istart, pars=pars, cskip=coskip, nobj=-1)
     
 
+
 #   Construct master catalogue
 if (argus.getmastercat):  
     dets    = np.loadtxt(f"{pars['CatDir']}/{pars['CubeCatFile']}")
@@ -163,6 +170,7 @@ if (argus.getmastercat):
     np.savetxt(f"{pars['WorkDir']}/{pars['StacatDir']}/mastercat_{pars['StackName']}_{pars['ColType']}.cat", gdets, \
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
     
+
 
 #   Construct catalogue with well-behaved spectra
 if (argus.getfinecat):  
@@ -180,11 +188,13 @@ if (argus.getfinecat):
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
 
 
+
 #   Construct sample for stacking
 if (argus.stackcats or argus.amortentia):  
     refcat  = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/mastercat_{pars['StackName']}_{pars['NbrType']}.cat")
     detcat  = np.loadtxt(f"{pars['WorkDir']}/{pars['StacatDir']}/finecat_{pars['StackName']}_{pars['ColType']}.cat")
     constackcat(detcat, refcat, pars=pars)
+
 
 
 #   Plot sample statistica
@@ -205,6 +215,7 @@ if (argus.samplot):
                 gsamp	= pkl.load(sampfile)
             detcats.append(gsamp.sampcat)
         zdist(detcats, f"{pars['StackName']}_{pars['ColType']}_{pars['BinParam']}", pars=pars)             
+
 
 
 #   Stack spectral cubes and/or calculate errors
@@ -247,7 +258,8 @@ if (argus.stackcubes or argus.stackerrs):
                 with open(samfilename, 'wb') as sampfile:
                     pkl.dump(mgsamp, sampfile)
             
-    
+
+
 #   Calculate average mass
 if (argus.stackmass):   
     if ((pars['BinEdges']==None) or (pars['BinParam']==None) or (pars['BinParam']=="")):
@@ -276,6 +288,7 @@ if (argus.stackmass):
         results = pd.concat(reslist)
         results.to_csv(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['StackName']+"_"+pars['ColType']+"_"+pars["BinParam"]+".txt")
     
+
     
 #   Stack spectral cubes, calculate errors and average mass
 if (argus.amortentia): 
