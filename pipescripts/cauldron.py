@@ -87,14 +87,23 @@ if (argus.lumos):
 
 #   Extract COSMOS catalogue
 if (argus.excat):  
-    
-    srcs    = exkhastocat(pars)
-    if (pars['SrcType']=="galaxy"):
-        srcs    = srcs[srcs[:,14]==0]
-        print("Selecting galaxies only")
-    elif (pars['SrcType']=="agn"):
-        srcs    = srcs[srcs[:,14]==2]
-        print("Selecting AGNs only")
+    if ( (pars["RefCat"] is not None) and (pars["RefCat"].strip()) ):
+        print(f"Using reference catalogue {pars["RefCat"]}")
+        refcatfile  = pars["CatDir"]+"/"+pars["RefCat"]
+        if os.path.isfile(refcatfile):
+            srcs    = exrefcat(pars, refcatfile)
+        else:
+            print("Where is the reference catalogue?")
+            sys.exit()
+    else:
+        srcs    = exkhastocat(pars)
+        if (pars['SrcType']=="galaxy"):
+            srcs    = srcs[srcs[:,14]==0]
+            print("Selecting galaxies only")
+        elif (pars['SrcType']=="agn"):
+            srcs    = srcs[srcs[:,14]==2]
+            print("Selecting AGNs only")
+
     print('Extracted sources		= %d'%len(srcs))
     np.savetxt(pars['CatDir']+'/'+pars['CatFile'], srcs, \
                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
