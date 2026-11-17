@@ -88,7 +88,7 @@ if (argus.lumos):
 #   Extract COSMOS catalogue
 if (argus.excat):  
     if ( (pars["RefCat"] is not None) and (pars["RefCat"].strip()) ):
-        print(f"Using reference catalogue {pars["RefCat"]}")
+        print("Using reference catalogue", pars["RefCat"])
         refcatfile  = pars["CatDir"]+"/"+pars["RefCat"]
         if os.path.isfile(refcatfile):
             srcs    = exrefcat(pars, refcatfile)
@@ -104,7 +104,7 @@ if (argus.excat):
             srcs    = srcs[srcs[:,14]==2]
             print("Selecting AGNs only")
 
-    print('Extracted sources		= %d'%len(srcs))
+    print('Extracted sources        = %d'%len(srcs))
     np.savetxt(pars['CatDir']+'/'+pars['CatFile'], srcs, \
                fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
 
@@ -119,7 +119,7 @@ if (argus.exubcubes):
     detid   = detid.astype(int)
     exsrcs  = exubcubes(detid, detz, posra, posdec, obschan, istart=0, pars=pars, ovrt=argus.obliviate, nobj=-1)
     dets    = dets[exsrcs]
-    print('Extracted sources		= %d'%len(dets))
+    print('Extracted sources    = %d'%len(dets))
     np.savetxt(pars['CatDir']+'/'+pars['CubeCatFile'], dets, \
                 fmt = '%d  %d  %f  %f  %f  %d  %f  %d  %d  %d  %f  %f  %f  %f  %d  %f  %f  %f  %f  %f')
 

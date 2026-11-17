@@ -119,7 +119,7 @@ def exrefcat(pars, refcatfile):
     
     #   Function to extract sources from COSMOS compilation catalogue by Khastobhan et al. from a reference catalogue
 
-    refids  = np.genfromtxt(refcatfile, dtype=int, usecols=(0))
+    refids  = np.genfromtxt(refcatfile, dtype=int, usecols=(pars["IdenCol"]))
     
     reffile = fits.open(pars['CubeDir']+'/'+pars['ImgCube']+".fits")    
     testhd	= reffile[0].header							#	image header
@@ -157,7 +157,7 @@ def exrefcat(pars, refcatfile):
     spzid	= spdata['Id_COS20_Classic']
     srcra	= spdata['ra_corrected']					#	source RAs
     srcdec	= spdata['dec_corrected']					#	source DECs
-    srcz	= spdata['specz']							#	source redshifts
+    srcz	= spdata['specz']   						#	source redshifts
     srczq	= spdata['flag']							#	source redshift quality, Good = 3,4,13,14
     srctype	= spdata['photoz_type']						#	source type, 0 = galaxy, 1 = star, 2 = AGN
     srcsur  = spdata['survey']                          #   Survey IDs
@@ -176,15 +176,25 @@ def exrefcat(pars, refcatfile):
     srclgm      = np.log10(sedata['best.stellar.m_gas'])    #   log(gas mass)
 
     srcn	= len(srcra)	
-    print(f"Starting with {srcn} objects")							    #	number of sources 
+    print(f"Starting with           {srcn} objects")        #	number of sources 
 
     if (len(srcz) != len(sedz)):
         print("Catalogue mismatch !!!")
         print(f"{len(srcz)} vs {len(sedz)}")
         sys.exit()
 
-    for i in range (0,srcn):
-        if (np.isin(srczq[i], np.array(pars['ZQuality'])) and np.isin(srcsur[i], np.array(pars['SurveyIds']))):
+    nref    = len(refids)
+    print(f"Length of ref catalogue = {nref}")
+
+    for k in range(0, nref):
+        i = np.where(spdata['Id_specz']==refids[k])
+        if (len(i) != 1):
+            print(f"Something wrong at {i}")
+            sys.exit()
+        else:
+            i = i[0][0]
+
+        if (np.isin(srczq[i], np.array(pars['ZQuality']))):
             if (np.abs(srcz[i] - sedz[i]) > pars['ZTol']):
                 print("Redshift mismatch !!!", i, srcz[i], sedz[i], srczq[i])
                 sys.exit()
@@ -208,6 +218,14 @@ def exrefcat(pars, refcatfile):
                             srcs.append([i, spzid[i], srcra[i], srcdec[i], srcz[i], srczq[i], dtheta, px, py, \
                                          obschan, srcsfr[i], srclsm[i], srcnuvr[i], srcrj[i], srctype[i], \
                                             srcuv[i], srcvj[i], srcsfr10[i], srcsfr100[i], srclgm[i]])
+                        else:
+                            print(f"Rejected {i}: outside frequency range")                   
+                    else:
+                        print(f"Rejected {i}: outside allowed region")
+                else:
+                    print(f"Rejected {i}: No stellar mass")
+            else:
+                print(f"Rejected {i}: outside z-limits")
 
         #	i	id	ra	dec	z	zq  d   px	py	ochan   SFR	lsm	NUV-r r-J  Type  U-V  V-J   SFR10  SFR100  lgm
         #	0	1	2	3	4	5	6	7	8	9	    10	11	12    13   14    15   16    17     18      19
