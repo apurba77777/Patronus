@@ -113,7 +113,7 @@ if (argus.excat):
 
 
 #   Extract subcubes
-if (argus.exubcubes):  
+if (argus.exubcubes or argus.polyjuice):  
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CatFile'])
     (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
     detid   = detid.astype(int)
@@ -135,7 +135,7 @@ if (argus.smoothcubes):
 
 
 #   Spectrally interpolate subcubes
-if (argus.intercubes):  
+if (argus.intercubes or argus.polyjuice):  
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
     (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
     detid   = detid.astype(int)
@@ -153,7 +153,7 @@ if (argus.regcubes):
 
 
 #   Reduce subcubes and extract spectra
-if (argus.redcubes):  
+if (argus.redcubes or argus.polyjuice):  
     dets    = np.loadtxt(pars['WorkDir']+'/'+pars['StacatDir']+'/'+pars['CubeCatFile'])
     (detid, detz, posra, posdec, obschan) = (dets[:,1], dets[:,4], dets[:,2], dets[:,3], dets[:,9]) 
     detid   = detid.astype(int)
