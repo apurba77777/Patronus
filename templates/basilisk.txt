@@ -29,8 +29,6 @@ jedi==0.19.2
 kiwisolver==1.4.9
 matplotlib==3.10.6
 matplotlib-inline==0.2.1
-mpi4py==4.1.2
-mplcyberpunk==0.7.6
 numpy==1.26.4
 packaging==25.0
 pandas==3.0.3
@@ -52,7 +50,6 @@ python-casacore==3.7.1
 python-dateutil==2.9.0.post0
 PyYAML==6.0.2
 regions==0.11
-RM-Tools==1.4.9
 scipy==1.16.1
 setuptools==80.9.0
 shadems

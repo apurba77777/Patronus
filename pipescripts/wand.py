@@ -386,7 +386,7 @@ if (argus.flaguvsub or argus.rictusempra):
         flagavguvsub (ivis, pars, argus.pypath, ankdir=argus.pipedir+"/ankflag_3/", ankin=argus.flgin, ovrt=argus.obliviate)
 
 
-#   Make list of timestamps in MJD
+#   Make a list of timestamps in MJD
 if (argus.metronome or argus.petrificus):      
     listofvis   = [ pars['WorkDir']+pars['ImgUvDir']+vis+"_uvsub_f_avg" for vis in visuvsublist ]
 
