@@ -1,4 +1,5 @@
 import os,sys
+import glob
 import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
@@ -301,19 +302,33 @@ def flagsinglechan (pars=None, pyx="python", ankdir=None, ankin=None, ovrt=False
 
         print("Generating diagnostic plots...")
 
-        plotms(vis=fcalfile+"_f.ms", xaxis="uvwave", yaxis="amp", gridrows=2, \
-               height=1000, width=1000, gridcols=1, showgui=False)
+        #   Using shadems instead of plotms
 
-        plotms(vis=fcalfile+"_f.ms", xaxis="uvwave", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-                plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/fcal_"+pars['ReducedName']+"_uv.png", \
-                    height=1000, width=1000, overwrite=True, showgui=False)
+        pltcmd  = f"shadems --xaxis uv --yaxis amp --xaxis uv --yaxis phase -C DATA \
+            --noconj --noflags -X 400 -Y 300 --dir {pars['WorkDir']}{pars['LogDir']} \
+                --title {pars['FluxCal']} {fcalfile}_f.ms"
 
-        plotms(vis=pcalfile+"_f.ms", xaxis="uvwave", yaxis="amp", gridrows=2, \
-               height=1000, width=1000, gridcols=1, showgui=False)
+        os.system(pltcmd)
 
-        plotms(vis=pcalfile+"_f.ms", xaxis="uvwave", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-                plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/pcal_"+pars['ReducedName']+"_uv.png", \
-                    height=1000, width=1000, overwrite=True, showgui=False)
+        pltcmd  = f"shadems --xaxis uv --yaxis amp --xaxis uv --yaxis phase -C DATA \
+            --noconj --noflags -X 400 -Y 300 --dir {pars['WorkDir']}{pars['LogDir']} \
+                --title {pars['PhaseCal']} {pcalfile}_f.ms"
+
+        os.system(pltcmd)
+
+        # plotms(vis=fcalfile+"_f.ms", xaxis="uvwave", yaxis="amp", gridrows=2, \
+        #        height=1000, width=1000, gridcols=1, showgui=False)
+
+        # plotms(vis=fcalfile+"_f.ms", xaxis="uvwave", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
+        #         plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/fcal_"+pars['ReducedName']+"_uv.png", \
+        #             height=1000, width=1000, overwrite=True, showgui=False)
+
+        # plotms(vis=pcalfile+"_f.ms", xaxis="uvwave", yaxis="amp", gridrows=2, \
+        #        height=1000, width=1000, gridcols=1, showgui=False)
+
+        # plotms(vis=pcalfile+"_f.ms", xaxis="uvwave", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
+        #         plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/pcal_"+pars['ReducedName']+"_uv.png", \
+        #             height=1000, width=1000, overwrite=True, showgui=False)
 
 
 
