@@ -1,4 +1,6 @@
 import os,sys
+import glob
+from PIL import Image
 import re
 import numpy as np
 from astropy.io import fits
@@ -49,20 +51,29 @@ def avgtarget (targetvis, pars=None):
 
     print("Generating diagnostic plots...")
 
-    plotms(vis=pars['WorkDir']+pars['ImgUvDir']+'/'+avgvis+".ms", xaxis="frequency", yaxis="amp", gridrows=2, \
-           height=1000, width=1000, gridcols=1, showgui=False)
+    #   Using shadems instead of plotms
+        
+    pltcmd  = f"shadems --xaxis uv --yaxis amp --xaxis CHAN --yaxis amp --xaxis ROW --yaxis amp --xaxis TIME --yaxis amp -C DATA \
+        --noconj -X 400 -Y 300 --title {pars['TargetName']} {pars['WorkDir']}/{pars['ImgUvDir']}/{avgvis}.ms"
 
-    plotms(vis=pars['WorkDir']+pars['ImgUvDir']+'/'+avgvis+".ms", xaxis="frequency", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-            plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/target_"+avgvis+"_freq.png", \
-                height=1000, width=1000, overwrite=True, showgui=False)
+    os.system(pltcmd)
 
-    plotms(vis=pars['WorkDir']+pars['ImgUvDir']+'/'+avgvis+".ms", xaxis="uvwave", yaxis="amp", gridrows=2, \
-           height=1000, width=1000, gridcols=1, showgui=False)
+    pngfiles    = sorted(glob.glob("plot*.png"))
+    pngimages   = [Image.open(f) for f in pngfiles]
 
-    plotms(vis=pars['WorkDir']+pars['ImgUvDir']+'/'+avgvis+".ms", xaxis="uvwave", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-            plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/target_"+avgvis+"_uv.png", \
-                height=1000, width=1000, overwrite=True, showgui=False)
-    
+    cols, rows  = 2, 2
+    w, h        = pngimages[0].size
+    grid        = Image.new("RGB", size=(cols * w, rows * h), color="white")
+
+    for idx, img in enumerate(pngimages):
+        r, c = divmod(idx, cols)
+        grid.paste(img, box=(c * w, r * h))
+
+    grid.save(f"{pars['WorkDir']}{pars['LogDir']}/avgvis.png")
+
+    os.system("rm -rf *.png")
+    os.system("rm -rf *.json")
+
     print("\n Done!\n")
 
     return (0)
@@ -359,21 +370,28 @@ def flagcaltarget (tarfile, pars=None, pyx="python", ankdir=None, ankin=None, ov
         
         print("Generating diagnostic plots...")
 
-        plotms(vis=tarfile+"_f.ms", xaxis="frequency", yaxis="amp", gridrows=2, \
-               height=1000, width=1000, gridcols=1, showgui=False)
-
-        plotms(vis=tarfile+"_f.ms", xaxis="frequency", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-                plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/sc_target_"+pars['TargetName']+"_freq.png", \
-                    height=1000, width=1000, overwrite=True, showgui=False)
-
-        plotms(vis=tarfile+"_f.ms", xaxis="row", yaxis="amp", gridrows=2, \
-               height=1000, width=1000, gridcols=1, showgui=False)
-
-        plotms(vis=tarfile+"_f.ms", xaxis="row", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-                plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/sc_target_"+pars['TargetName']+"_row.png", \
-                    height=1000, width=1000, overwrite=True, showgui=False)
-        
-
+        #   Using shadems instead of plotms
+                
+        pltcmd  = f"shadems --xaxis uv --yaxis amp --xaxis CHAN --yaxis amp --xaxis ROW --yaxis amp --xaxis TIME --yaxis amp -C DATA \
+            --noconj -X 400 -Y 300 --title {pars['TargetName']} {tarfile}_f.ms"
+    
+        os.system(pltcmd)
+    
+        pngfiles    = sorted(glob.glob("plot*.png"))
+        pngimages   = [Image.open(f) for f in pngfiles]
+    
+        cols, rows  = 2, 2
+        w, h        = pngimages[0].size
+        grid        = Image.new("RGB", size=(cols * w, rows * h), color="white")
+    
+        for idx, img in enumerate(pngimages):
+            r, c = divmod(idx, cols)
+            grid.paste(img, box=(c * w, r * h))
+    
+        grid.save(f"{pars['WorkDir']}{pars['LogDir']}/caltarget.png")
+    
+        os.system("rm -rf *.png")
+        os.system("rm -rf *.json")
 
         #   Open and edit the flags in the MS files
         print("Copying flags to the original file...\n")
@@ -631,26 +649,31 @@ def flagavguvsub (tarfile, pars=None, pyx="python", ankdir=None, ankin=None, ovr
         chanbin=pars['FinChanAvg']
     )
 
-
-
     print("Generating diagnostic plots...")
 
-    plotms(vis=filetoavg+"_avg.ms", xaxis="frequency", yaxis="amp", gridrows=2, \
-           height=1000, width=1000, gridcols=1, showgui=False)
+    #   Using shadems instead of plotms
+                    
+    pltcmd  = f"shadems --xaxis uv --yaxis amp --xaxis CHAN --yaxis amp --xaxis ROW --yaxis amp --xaxis TIME --yaxis amp -C DATA \
+        --noconj -X 400 -Y 300 --title {pars['TargetName']} {filetoavg}_avg.ms"
 
-    plotms(vis=filetoavg+"_avg.ms", xaxis="frequency", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-            plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/uvsub_"+pars['TargetName']+"_freq.png", \
-                height=1000, width=1000, overwrite=True, showgui=False)
+    os.system(pltcmd)
 
-    plotms(vis=filetoavg+"_avg.ms", xaxis="row", yaxis="amp", gridrows=2, \
-           height=1000, width=1000, gridcols=1, showgui=False)
+    pngfiles    = sorted(glob.glob("plot*.png"))
+    pngimages   = [Image.open(f) for f in pngfiles]
 
-    plotms(vis=filetoavg+"_avg.ms", xaxis="row", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-            plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/uvsub_"+pars['TargetName']+"_row.png", \
-                height=1000, width=1000, overwrite=True, showgui=False)
+    cols, rows  = 2, 2
+    w, h        = pngimages[0].size
+    grid        = Image.new("RGB", size=(cols * w, rows * h), color="white")
 
+    for idx, img in enumerate(pngimages):
+        r, c = divmod(idx, cols)
+        grid.paste(img, box=(c * w, r * h))
 
-    
+    grid.save(f"{pars['WorkDir']}{pars['LogDir']}/caltar_uvsub.png")
+
+    os.system("rm -rf *.png")
+    os.system("rm -rf *.json")
+
     print(" Done!\n")
 
 

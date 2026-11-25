@@ -1,5 +1,6 @@
 import os,sys
 import glob
+from PIL import Image
 import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
@@ -305,32 +306,30 @@ def flagsinglechan (pars=None, pyx="python", ankdir=None, ankin=None, ovrt=False
         #   Using shadems instead of plotms
 
         pltcmd  = f"shadems --xaxis uv --yaxis amp --xaxis uv --yaxis phase -C DATA \
-            --noconj --noflags -X 400 -Y 300 --dir {pars['WorkDir']}{pars['LogDir']} \
-                --title {pars['FluxCal']} {fcalfile}_f.ms"
+            --noconj -X 400 -Y 300 --title {pars['FluxCal']} {fcalfile}_f.ms"
 
         os.system(pltcmd)
 
         pltcmd  = f"shadems --xaxis uv --yaxis amp --xaxis uv --yaxis phase -C DATA \
-            --noconj --noflags -X 400 -Y 300 --dir {pars['WorkDir']}{pars['LogDir']} \
-                --title {pars['PhaseCal']} {pcalfile}_f.ms"
+            --noconj -X 400 -Y 300 --title {pars['PhaseCal']} {pcalfile}_f.ms"
 
         os.system(pltcmd)
 
-        # plotms(vis=fcalfile+"_f.ms", xaxis="uvwave", yaxis="amp", gridrows=2, \
-        #        height=1000, width=1000, gridcols=1, showgui=False)
+        pngfiles    = sorted(glob.glob("plot*.png"))
+        pngimages   = [Image.open(f) for f in pngfiles]
 
-        # plotms(vis=fcalfile+"_f.ms", xaxis="uvwave", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-        #         plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/fcal_"+pars['ReducedName']+"_uv.png", \
-        #             height=1000, width=1000, overwrite=True, showgui=False)
+        cols, rows  = 2, 2
+        w, h        = pngimages[0].size
+        grid        = Image.new("RGB", size=(cols * w, rows * h), color="white")
 
-        # plotms(vis=pcalfile+"_f.ms", xaxis="uvwave", yaxis="amp", gridrows=2, \
-        #        height=1000, width=1000, gridcols=1, showgui=False)
+        for idx, img in enumerate(pngimages):
+            r, c = divmod(idx, cols)
+            grid.paste(img, box=(c * w, r * h))
 
-        # plotms(vis=pcalfile+"_f.ms", xaxis="uvwave", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-        #         plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/pcal_"+pars['ReducedName']+"_uv.png", \
-        #             height=1000, width=1000, overwrite=True, showgui=False)
+        grid.save(f"{pars['WorkDir']}{pars['LogDir']}/cal_ch0.png")
 
-
+        os.system("rm -rf *.png")
+        os.system("rm -rf *.json")
 
         #   Open and edit the flags in the MS files
         print("Copying flags to the single channel file...\n")
@@ -576,19 +575,33 @@ def flagbpcal (bpcal, pars=None, pyx="python", ankdir=None, ankin=None, ovrt=Fal
         
         print("Generating diagnostic plots...")
 
-        plotms(vis=bpcalfile+"_f.ms", xaxis="frequency", yaxis="amp", gridrows=2, \
-               height=1000, width=1000, gridcols=1, showgui=False)
+        #   Using shadems instead of plotms
+        
+        pltcmd  = f"shadems --xaxis uv --yaxis amp --xaxis uv --yaxis phase -C DATA \
+            --noconj -X 400 -Y 300 --title {pars['FluxCal']} {bpcalfile}_f.ms"
 
-        plotms(vis=bpcalfile+"_f.ms", xaxis="frequency", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-                plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/bpcal_"+pars['ReducedName']+"_"+bpcal+"_freq.png", \
-                    height=1000, width=1000, overwrite=True, showgui=False)
+        os.system(pltcmd)
 
-        plotms(vis=bpcalfile+"_f.ms", xaxis="uvwave", yaxis="amp", gridrows=2, \
-               height=1000, width=1000, gridcols=1, showgui=False)
+        pltcmd  = f"shadems --xaxis FREQ --yaxis amp --xaxis FREQ --yaxis phase -C DATA \
+            --noconj -X 400 -Y 300 --title {pars['FluxCal']} {bpcalfile}_f.ms"
 
-        plotms(vis=bpcalfile+"_f.ms", xaxis="uvwave", yaxis="phase", gridrows=2, gridcols=1, rowindex=1, \
-                plotindex=1, clearplots=False, plotfile=pars['WorkDir']+pars['LogDir']+"/bpcal_"+pars['ReducedName']+"_"+bpcal+"_uv.png", \
-                    height=1000, width=1000, overwrite=True, showgui=False)
+        os.system(pltcmd)
+
+        pngfiles    = sorted(glob.glob("plot*.png"))
+        pngimages   = [Image.open(f) for f in pngfiles]
+
+        cols, rows  = 2, 2
+        w, h        = pngimages[0].size
+        grid        = Image.new("RGB", size=(cols * w, rows * h), color="white")
+
+        for idx, img in enumerate(pngimages):
+            r, c = divmod(idx, cols)
+            grid.paste(img, box=(c * w, r * h))
+
+        grid.save(f"{pars['WorkDir']}{pars['LogDir']}/bpcal.png")
+
+        os.system("rm -rf *.png")
+        os.system("rm -rf *.json")
 
         #   Open and edit the flags in the MS files
         print("Copying flags to the BP cal file...\n")
