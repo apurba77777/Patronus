@@ -687,13 +687,13 @@ def findsrcs (imgname, pars=None):
     #   Find sources in an image and make a catalogue
 
     ct.exportfits(
-        imagename=imgname+".image.tt0", \
-        fitsimage=imgname+".fits", \
+        imagename=os.path.abspath(imgname+".image.tt0"), \
+        fitsimage=os.path.abspath(imgname+".fits"), \
         overwrite=True
     )
 
     sfimg   = sf.process_image(
-                imgname+".fits", \
+                os.path.abspath(imgname+".fits"), \
                 rms_box=None, \
                 rms_map=True, \
                 thresh='hard', \
@@ -704,7 +704,7 @@ def findsrcs (imgname, pars=None):
             )
     
     sfimg.export_image(
-        outfile = imgname+"_src_mask.fits", \
+        outfile = os.path.abspath(imgname+"_src_mask.fits"), \
         clobber = True, \
         img_format = 'fits', \
         img_type = 'island_mask', \
@@ -728,7 +728,7 @@ def findsrcs (imgname, pars=None):
     tarfits.close()
 
     sfimg.write_catalog(
-        outfile=imgname+"_srcat.fits", \
+        outfile=os.path.abspath(imgname+"_srcat.fits"), \
         catalog_type='gaul', \
         format='fits', \
         clobber=True
