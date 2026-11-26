@@ -578,12 +578,12 @@ def flagbpcal (bpcal, pars=None, pyx="python", ankdir=None, ankin=None, ovrt=Fal
         #   Using shadems instead of plotms
         
         pltcmd  = f"shadems --xaxis uv --yaxis amp --xaxis uv --yaxis phase -C DATA \
-            --noconj -X 400 -Y 300 --title {pars['FluxCal']} {bpcalfile}_f.ms"
+            --noconj -X 400 -Y 300 --title {bpcal} {bpcalfile}_f.ms"
 
         os.system(pltcmd)
 
         pltcmd  = f"shadems --xaxis FREQ --yaxis amp --xaxis FREQ --yaxis phase -C DATA \
-            --noconj -X 400 -Y 300 --title {pars['FluxCal']} {bpcalfile}_f.ms"
+            --noconj -X 400 -Y 300 --title {bpcal} {bpcalfile}_f.ms"
 
         os.system(pltcmd)
 
@@ -598,7 +598,7 @@ def flagbpcal (bpcal, pars=None, pyx="python", ankdir=None, ankin=None, ovrt=Fal
             r, c = divmod(idx, cols)
             grid.paste(img, box=(c * w, r * h))
 
-        grid.save(f"{pars['WorkDir']}{pars['LogDir']}/bpcal.png")
+        grid.save(f"{pars['WorkDir']}{pars['LogDir']}/bpcal_{bpcal}_calibrated.png")
 
         os.system("rm -rf *.png")
         os.system("rm -rf *.json")
